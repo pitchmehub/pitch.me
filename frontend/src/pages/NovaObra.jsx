@@ -43,7 +43,7 @@ export default function NovaObra() {
     }
     setEditoraLookup({ status: 'checking' })
     try {
-      const { data } = await api.get('/publishers/lookup-by-email', { params: { email } })
+      const data = await api.get(`/publishers/lookup-by-email?email=${encodeURIComponent(email)}`)
       if (data?.found) {
         setEditoraLookup({ status: 'found', data })
         const oficial = data.razao_social || data.nome_fantasia
