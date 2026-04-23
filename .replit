@@ -26,13 +26,13 @@ args = "Frontend"
 name = "Backend"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd backend && python run.py"
-waitForPort = 8000
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend && gunicorn --bind=0.0.0.0:8000 --workers 2 'app:create_app()'"
+waitForPort = 8000
 
 [[workflows.workflow]]
 name = "Frontend"
@@ -52,6 +52,7 @@ externalPort = 80
 
 [[ports]]
 localPort = 8000
+externalPort = 8000
 
 [deployment]
 deploymentTarget = "autoscale"
