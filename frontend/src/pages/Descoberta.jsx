@@ -28,7 +28,12 @@ function ObraCard({ obra, onPlay, onShowFicha, onExpand, isPlaying, isActive, on
   function handleClick(e) {
     if (e.target.closest('.dc-card-play')) return
     if (e.target.closest('.dc-card-info-btn')) return
-    // Clique simples: SEMPRE abre o player minimizado e começa a tocar (se tiver áudio).
+    // 1º clique: começa a tocar e abre o player minimizado.
+    // 2º clique (mesma obra): abre a ficha técnica em vez de pausar.
+    if (isActive) {
+      onShowFicha(obra)
+      return
+    }
     onAddHistorico(obra.id)
     onPlay(obra)
   }
@@ -414,7 +419,8 @@ export default function Descoberta() {
     navigate(`/perfil/${comp.id}`)
   }
 
-  // Monta fila com todas as obras visíveis que têm áudio
+  // Monta fila com todas as obras visíveis que têm áudio,
+  // embaralhada aleatoriamente — a obra clicada toca primeiro.
   function buildQueue(clickedObra) {
     let lista
     if (busca && resultados.obras.length > 0) {
@@ -425,8 +431,16 @@ export default function Descoberta() {
       lista = catalogo.filter(o => o.audio_path)
     }
     if (lista.length === 0) lista = [clickedObra]
-    const idx = lista.findIndex(o => o.id === clickedObra.id)
-    return { lista, idx: idx >= 0 ? idx : 0 }
+
+    // Fisher-Yates nas demais obras; clicada vai para o índice 0.
+    const restantes = lista.filter(o => o.id !== clickedObra.id)
+    for (let i = restantes.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[restantes[i], restantes[j]] = [restantes[j], restantes[i]]
+    }
+    const clicada = lista.find(o => o.id === clickedObra.id) || clickedObra
+    const filaFinal = [clicada, ...restantes]
+    return { lista: filaFinal, idx: 0 }
   }
 
   function handlePlay(obra) {

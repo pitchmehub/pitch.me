@@ -643,9 +643,9 @@
   .gp-time    { display: none; }
   .gp-queue-info { display: none; }
 
-  /* Minimizado: full width na parte de baixo */
+  /* Minimizado: full width na parte de baixo, acima do botão Descoberta */
   .gp-mini {
-    bottom: 72px;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
     left: 12px; right: 12px;
     max-width: none; min-width: 0;
   }
