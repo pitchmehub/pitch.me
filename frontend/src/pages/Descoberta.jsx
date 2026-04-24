@@ -25,27 +25,12 @@ const GRADIENTS = [
 const ObrgGrad = id => GRADIENTS[(id?.charCodeAt(0) ?? 0) % GRADIENTS.length]
 
 function ObraCard({ obra, onPlay, onShowFicha, onExpand, isPlaying, isActive, onAddHistorico }) {
-  const lastClick = useRef(0)
-
   function handleClick(e) {
     if (e.target.closest('.dc-card-play')) return
-    const now = Date.now()
-    if (now - lastClick.current < 400) {
-      lastClick.current = 0
-      // Duplo clique: abre a ficha técnica.
-      // Se a obra tem áudio e ainda não está tocando, garante que o player continue tocando.
-      if (obra.audio_path && !isActive) {
-        onAddHistorico(obra.id)
-        onPlay(obra)
-      }
-      onShowFicha(obra)
-    } else {
-      lastClick.current = now
-      // Clique simples: SEMPRE abre o player (minimizado no mobile).
-      // Se a obra tem áudio, começa a tocar; se não, apenas mostra o player.
-      onAddHistorico(obra.id)
-      onPlay(obra)
-    }
+    if (e.target.closest('.dc-card-info-btn')) return
+    // Clique simples: SEMPRE abre o player minimizado e começa a tocar (se tiver áudio).
+    onAddHistorico(obra.id)
+    onPlay(obra)
   }
 
   return (
@@ -445,12 +430,10 @@ export default function Descoberta() {
   }
 
   function handlePlay(obra) {
-    if (!obra.audio_path) {
-      setFichaObra(obra)
-      return
-    }
     if (obraAtual?.id === obra.id) { togglePlay(); setMinimized(true); return }
-    api.post(`/analytics/play/${obra.id}`, {}).catch(() => {})
+    if (obra.audio_path) {
+      api.post(`/analytics/play/${obra.id}`, {}).catch(() => {})
+    }
     const { lista, idx } = buildQueue(obra)
     playObra(lista, idx)
     setMinimized(true)
