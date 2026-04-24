@@ -10,6 +10,8 @@ const ICONES = {
   licenciamento:     '💰',
   oferta:            '✉️',
   dossie_download:   '📥',
+  saque_confirmado:  '◎',
+  saque_cancelado:   '⛔',
 }
 
 function tempoRelativo(iso) {

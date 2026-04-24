@@ -571,6 +571,23 @@ def aceitar_contrato(contract_id: str, user_id: str, ip_hash: str | None = None)
     except Exception:
         pass
 
+    # Notifica o próprio signatário que sua assinatura foi registrada
+    try:
+        from services.notificacoes import notify
+        ctr_info = sb.table("contracts").select("obra_id, buyer_id, seller_id").eq("id", contract_id).single().execute().data or {}
+        obra_row = sb.table("obras").select("nome").eq("id", ctr_info.get("obra_id")).single().execute().data or {}
+        obra_nome = obra_row.get("nome") or "obra"
+        notify(
+            user_id,
+            tipo="contrato_assinado",
+            titulo="Assinatura registrada",
+            mensagem=f'Sua assinatura no contrato da obra "{obra_nome}" foi registrada com sucesso.',
+            link=f"/contratos/{contract_id}",
+            payload={"contract_id": contract_id},
+        )
+    except Exception:
+        pass
+
     # Todos assinaram?
     signers = sb.table("contract_signers").select("signed").eq("contract_id", contract_id).execute().data or []
     todos = signers and all(s.get("signed") for s in signers)
@@ -584,6 +601,25 @@ def aceitar_contrato(contract_id: str, user_id: str, ip_hash: str | None = None)
                 "contract_id": contract_id,
                 "event_type":  "completed",
             }).execute()
+        except Exception:
+            pass
+
+        # Notifica todas as partes que o contrato foi concluído (licenciamento efetivado)
+        try:
+            from services.notificacoes import notify as _notify
+            ctr = sb.table("contracts").select("obra_id, buyer_id, seller_id, valor_cents").eq("id", contract_id).single().execute().data or {}
+            obra2 = sb.table("obras").select("nome").eq("id", ctr.get("obra_id")).single().execute().data or {}
+            obra_nome2 = obra2.get("nome") or "obra"
+            partes = list(filter(None, {ctr.get("buyer_id"), ctr.get("seller_id")}))
+            for pid in partes:
+                _notify(
+                    pid,
+                    tipo="licenciamento",
+                    titulo="Contrato concluído",
+                    mensagem=f'O licenciamento da obra "{obra_nome2}" foi finalizado: todas as partes assinaram.',
+                    link=f"/contratos/{contract_id}",
+                    payload={"contract_id": contract_id, "obra_id": ctr.get("obra_id")},
+                )
         except Exception:
             pass
 

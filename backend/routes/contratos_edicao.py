@@ -94,5 +94,30 @@ def assinar(cid):
               metadata={"parte": "autor" if g.user.id == c["autor_id"] else "publisher",
                         "status_final": update["status"]})
 
+    try:
+        from services.notificacoes import notify
+        outra_parte = c["publisher_id"] if g.user.id == c["autor_id"] else c["autor_id"]
+        if update["status"] == "assinado":
+            for pid in filter(None, {c["autor_id"], c["publisher_id"]}):
+                notify(
+                    pid,
+                    tipo="contrato_assinado",
+                    titulo="Contrato de edição assinado",
+                    mensagem="Todas as partes assinaram o contrato de edição.",
+                    link=f"/contratos/{cid}",
+                    payload={"contract_id": cid, "tipo": "edicao"},
+                )
+        elif outra_parte:
+            notify(
+                outra_parte,
+                tipo="contrato_assinado",
+                titulo="Contrato aguardando sua assinatura",
+                mensagem="A outra parte assinou o contrato de edição. Falta apenas a sua assinatura.",
+                link=f"/contratos/{cid}",
+                payload={"contract_id": cid, "tipo": "edicao"},
+            )
+    except Exception:
+        pass
+
     atualizado = sb.table("contracts_edicao").select("*").eq("id", cid).single().execute()
     return jsonify(atualizado.data)

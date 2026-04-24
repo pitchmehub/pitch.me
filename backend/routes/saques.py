@@ -100,6 +100,25 @@ def confirmar(saque_id):
 
     log_event("saque.confirmado", entity_type="saque", entity_id=saque_id,
               metadata={"liberar_em": r["liberar_em"]})
+
+    try:
+        from services.notificacoes import notify
+        from db.supabase_client import get_supabase
+        sb = get_supabase()
+        s = sb.table("saques").select("valor_cents").eq("id", saque_id).maybe_single().execute()
+        valor = (s.data or {}).get("valor_cents", 0) if s else 0
+        valor_brl = f"R$ {valor/100:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        notify(
+            g.user.id,
+            tipo="saque_confirmado",
+            titulo="Saque confirmado",
+            mensagem=f"Seu saque de {valor_brl} foi confirmado e será processado.",
+            link="/saques",
+            payload={"saque_id": saque_id, "liberar_em": r.get("liberar_em")},
+        )
+    except Exception:
+        pass
+
     return jsonify(r), 200
 
 
@@ -154,6 +173,20 @@ def cancelar_app(saque_id):
         abort(422, description=str(e))
     log_event("saque.cancelado", entity_type="saque", entity_id=saque_id,
               metadata={"motivo": motivo, "via": "app"})
+
+    try:
+        from services.notificacoes import notify
+        notify(
+            g.user.id,
+            tipo="saque_cancelado",
+            titulo="Saque cancelado",
+            mensagem="Seu saque foi cancelado conforme solicitado.",
+            link="/saques",
+            payload={"saque_id": saque_id, "motivo": motivo},
+        )
+    except Exception:
+        pass
+
     return jsonify(r), 200
 
 
