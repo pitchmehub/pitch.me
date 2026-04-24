@@ -26,3 +26,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Replit anexos do chat (podem conter segredos)
+attached_assets/
