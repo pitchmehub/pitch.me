@@ -41,13 +41,10 @@ function ObraCard({ obra, onPlay, onShowFicha, onExpand, isPlaying, isActive, on
       onShowFicha(obra)
     } else {
       lastClick.current = now
-      // Clique simples: começa a tocar (player aparece minimizado no mobile).
-      if (obra.audio_path) {
-        onAddHistorico(obra.id)
-        onPlay(obra)
-      } else {
-        onShowFicha(obra)
-      }
+      // Clique simples: SEMPRE abre o player (minimizado no mobile).
+      // Se a obra tem áudio, começa a tocar; se não, apenas mostra o player.
+      onAddHistorico(obra.id)
+      onPlay(obra)
     }
   }
 
