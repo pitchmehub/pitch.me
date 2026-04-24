@@ -32,3 +32,48 @@ services:
         sync: false
       - key: ALLOWED_ORIGINS
         sync: false
+      - key: SAQUE_CRON_SECRET
+        sync: false
+      - key: PII_ENCRYPTION_KEY
+        sync: false
+
+  # ─────────────────────────────────────────────────────────────
+  # CRON 1 — Processar saques pendentes (libera após janela de 24h)
+  # Roda a cada 10 minutos
+  # ─────────────────────────────────────────────────────────────
+  - type: cron
+    name: pitchme-cron-processar-pendentes
+    env: python
+    plan: free
+    schedule: "*/10 * * * *"
+    buildCommand: "echo 'no build needed'"
+    startCommand: >-
+      curl -fsS -X POST
+      -H "X-Cron-Secret: $SAQUE_CRON_SECRET"
+      "$API_BASE_URL/api/saques/processar-pendentes?limit=50"
+    envVars:
+      - key: API_BASE_URL
+        sync: false
+      - key: SAQUE_CRON_SECRET
+        sync: false
+
+  # ─────────────────────────────────────────────────────────────
+  # CRON 2 — Auto-criar saques mensais
+  # Roda diariamente às 03:01 UTC (00:01 horário de Brasília)
+  # A própria função verifica se hoje é o último dia útil do mês
+  # ─────────────────────────────────────────────────────────────
+  - type: cron
+    name: pitchme-cron-auto-criar-mensal
+    env: python
+    plan: free
+    schedule: "1 3 * * *"
+    buildCommand: "echo 'no build needed'"
+    startCommand: >-
+      curl -fsS -X POST
+      -H "X-Cron-Secret: $SAQUE_CRON_SECRET"
+      "$API_BASE_URL/api/saques/auto-criar-mensal?limit=200"
+    envVars:
+      - key: API_BASE_URL
+        sync: false
+      - key: SAQUE_CRON_SECRET
+        sync: false
