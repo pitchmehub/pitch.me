@@ -11,7 +11,7 @@
     "link3": "Preços"
   },
   "hero": {
-    "ctaPrimary": "▶ Começar Agora",
+    "ctaPrimary": "Começar Agora",
     "ctaSecondary": "Saiba mais →",
     "imageLabel": "EM GRAVAÇÃO · 04:37",
     "imageUrl": "https://images.pexels.com/photos/32725048/pexels-photo-32725048.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=900&w=900",
@@ -128,14 +128,14 @@
       "cta": "Assinar PRO",
       "features": [
         "Tudo do Starter +",
-        "💰 Mais lucro em cada negócio",
+        "Mais lucro em cada negócio",
         "Fee reduzido de 20% → 15%",
         "Ganhe mais em cada negociação",
         "Negocie oportunidades mais valiosas",
-        "📊 Analytics completo",
+        "Analytics completo",
         "Veja quem ouviu suas músicas",
         "Tome decisões com base em dados",
-        "❤️ Controle de repertório",
+        "Controle de repertório",
         "Salve músicas",
         "Crie listas e organize ideias"
       ],
@@ -151,7 +151,7 @@
     "colLegalTitle": "Legal",
     "colPlatformTitle": "Plataforma",
     "copyright": "© 2025 Gravan — Todos os direitos reservados.",
-    "ctaButton": "▶ Criar conta grátis",
+    "ctaButton": "Criar conta grátis",
     "ctaTitle": "Comece agora.",
     "email": "contato@gravan.com",
     "tagline": "Feito com precisão para compositores.",

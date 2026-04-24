@@ -78,7 +78,7 @@ export default function FichaTecnica({ obra, onClose, onPlay, isPlaying, isActiv
         <button className="dc-modal-close" onClick={onClose}>×</button>
 
         <div className="dc-modal-header" style={{ background: grad(obra.id) }}>
-          <div className="dc-modal-cover">♪</div>
+          <div className="dc-modal-cover">{(obra.nome || '?').charAt(0).toUpperCase()}</div>
           <div>
             <div className="dc-modal-genre">{obra.genero || 'Composição'}</div>
             <div className="dc-modal-nome">{obra.nome}</div>
@@ -88,8 +88,11 @@ export default function FichaTecnica({ obra, onClose, onPlay, isPlaying, isActiv
 
         {obra.audio_path && onPlay && (
           <div className="dc-modal-actions">
-            <button className="dc-modal-play-btn" onClick={() => onPlay(obra)}>
-              {isPlaying ? '⏸' : '▶'}
+            <button className="dc-modal-play-btn" onClick={() => onPlay(obra)} aria-label={isPlaying ? 'Pausar' : 'Tocar'}>
+              {isPlaying
+                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+                : <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21" /></svg>
+              }
             </button>
             <span className="dc-modal-action-label">
               {isActive && isPlaying ? 'Reproduzindo…' : 'Ouvir preview'}
@@ -102,14 +105,14 @@ export default function FichaTecnica({ obra, onClose, onPlay, isPlaying, isActiv
             type="button"
             onClick={abrirLetra}
             style={{
-              width: '100%', padding: '12px 16px',
+              width: '100%', padding: '10px 14px',
               background: '#09090B', color: '#fff',
-              border: 'none', borderRadius: 8,
-              fontSize: 13, fontWeight: 700, letterSpacing: 0.4,
+              border: 'none', borderRadius: 6,
+              fontSize: 12, fontWeight: 700, letterSpacing: 0.4,
               cursor: 'pointer', display: 'flex',
               alignItems: 'center', justifyContent: 'center', gap: 8,
             }}>
-            <span style={{ fontSize: 15 }}>📖</span> Ler letra
+            Ler letra
           </button>
         </div>
 
@@ -121,7 +124,7 @@ export default function FichaTecnica({ obra, onClose, onPlay, isPlaying, isActiv
             <div className="dc-modal" style={{ maxWidth: 640, display: 'flex', flexDirection: 'column', maxHeight: '85vh' }}>
               <button className="dc-modal-close" onClick={() => setLetraOpen(false)}>×</button>
               <div className="dc-modal-header" style={{ background: grad(obra.id) }}>
-                <div className="dc-modal-cover">📖</div>
+                <div className="dc-modal-cover">{(obra.nome || '?').charAt(0).toUpperCase()}</div>
                 <div>
                   <div className="dc-modal-genre">Letra completa</div>
                   <div className="dc-modal-nome">{obra.nome}</div>

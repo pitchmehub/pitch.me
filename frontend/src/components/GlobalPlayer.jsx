@@ -78,7 +78,8 @@ export default function GlobalPlayer() {
   if (!visible || !obra) return null
 
   const pct = duration > 0 ? (currentTime / duration) * 100 : 0
-  const iniciais = obra.titular_nome?.charAt(0).toUpperCase() ?? '♪'
+  const nomeArtistico = obra.nome_artistico || obra.titular_nome || ''
+  const iniciais = (obra.nome || nomeArtistico)?.charAt(0).toUpperCase() ?? ''
 
   // ── Seek ─────────────────────────────────────────────────
   function seekFromEvent(e) {
@@ -184,7 +185,7 @@ export default function GlobalPlayer() {
             <ChevronDownIcon />
           </button>
           <div className="gp-exp-title-center">
-            {obra.titular_nome || 'Tocando agora'}
+            {nomeArtistico || 'Tocando agora'}
           </div>
           <button
             className="gp-exp-btn"
@@ -211,11 +212,11 @@ export default function GlobalPlayer() {
             {/* Linha: mini thumb + nome + autor + check (curtir) */}
             <div className="gp-exp-track-row">
               <div className="gp-exp-track-thumb" style={{ background: miniColor(obra) }}>
-                <span style={{ fontSize: 14, color: 'rgba(255,255,255,.85)' }}>♪</span>
+                <span style={{ fontSize: 14, color: 'rgba(255,255,255,.85)', fontWeight: 700 }}>{iniciais}</span>
               </div>
               <div className="gp-exp-track-meta">
                 <div className="gp-exp-nome">{obra.nome}</div>
-                <div className="gp-exp-autor">{obra.titular_nome}</div>
+                <div className="gp-exp-autor">{nomeArtistico}</div>
               </div>
               <div className="gp-exp-track-check">
                 <BotaoCurtir obraId={obra.id} size={26} />
@@ -248,16 +249,16 @@ export default function GlobalPlayer() {
                 onDragEnd={handleDragEnd}
                 onClick={() => { if (dragIdx === null) goToIndex(i) }}
               >
-                <span className="gp-q-grip" onTouchStart={e => handleGripTouchStart(e, i)}>⠿</span>
+                <span className="gp-q-grip" onTouchStart={e => handleGripTouchStart(e, i)}><GripIcon /></span>
                 <div className="gp-q-mini-cover" style={{ background: miniColor(item) }}>
                   {i === index && playing
-                    ? <span className="gp-q-playing-dot">▶</span>
-                    : <span style={{ fontSize: 11 }}>♪</span>
+                    ? <span className="gp-q-playing-dot"><PlayIcon size={10} /></span>
+                    : <span style={{ fontSize: 11, fontWeight: 700 }}>{(item.nome || '').charAt(0).toUpperCase()}</span>
                   }
                 </div>
                 <div className="gp-q-info">
                   <div className="gp-q-nome">{item.nome}</div>
-                  <div className="gp-q-autor">{item.titular_nome}</div>
+                  <div className="gp-q-autor">{item.nome_artistico || item.titular_nome}</div>
                 </div>
                 {i === index && <span className="gp-q-now-badge">agora</span>}
                 {queue.length > 1 && (
@@ -388,7 +389,7 @@ export default function GlobalPlayer() {
         <div className="gp-mini-cover">{iniciais}</div>
         <div className="gp-mini-info">
           <span className="gp-mini-nome">{obra.nome}</span>
-          <span className="gp-mini-autor">{obra.titular_nome}</span>
+          <span className="gp-mini-autor">{nomeArtistico}</span>
         </div>
         <button className="gp-icon-btn" onClick={e => { e.stopPropagation(); prevTrack() }}><PrevIcon /></button>
         <button className="gp-icon-btn" onClick={e => { e.stopPropagation(); togglePlay() }}>
@@ -414,7 +415,7 @@ export default function GlobalPlayer() {
           <div className="gp-cover"><span>{iniciais}</span></div>
           <div className="gp-meta">
             <div className="gp-nome">{obra.nome}</div>
-            <div className="gp-autor">{obra.titular_nome}</div>
+            <div className="gp-autor">{nomeArtistico}</div>
           </div>
         </div>
         <div className="gp-controls" onClick={e => e.stopPropagation()}>
@@ -487,6 +488,9 @@ function BookIcon() {
 }
 function QueueIcon() {
   return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+}
+function GripIcon() {
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
 }
 function Spinner({ size = 16 }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" strokeOpacity=".25"/><path d="M12 2 a10 10 0 0 1 10 10" strokeLinecap="round" style={{ animation: 'gp-spin .8s linear infinite' }}/></svg>

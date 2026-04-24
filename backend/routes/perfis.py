@@ -134,7 +134,7 @@ def minhas_compras():
     sb = get_supabase()
     resp = (
         sb.table("transacoes")
-        .select("id, created_at, confirmed_at, status, metodo, valor_cents, obras(id, nome, audio_path, genero, perfis!titular_id(nome))")
+        .select("id, created_at, confirmed_at, status, metodo, valor_cents, obras(id, nome, audio_path, genero, perfis!titular_id(nome, nome_artistico))")
         .eq("comprador_id", g.user.id)
         .order("created_at", desc=True)
         .limit(50)
@@ -154,7 +154,7 @@ def minhas_compras():
             "obra_nome":    obra.get("nome"),
             "audio_path":   obra.get("audio_path"),
             "genero":       obra.get("genero"),
-            "titular_nome": (obra.get("perfis") or {}).get("nome"),
+            "titular_nome": (obra.get("perfis") or {}).get("nome_artistico") or (obra.get("perfis") or {}).get("nome"),
         })
     return jsonify(compras), 200
 

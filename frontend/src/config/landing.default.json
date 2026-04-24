@@ -15,7 +15,7 @@
     "titleLine2": "obras musicais",
     "titleLine3": "como nunca antes.",
     "subtitle": "O marketplace que conecta compositores e compradores com transparência, segurança e pagamento instantâneo.",
-    "ctaPrimary": "▶ Começar Agora",
+    "ctaPrimary": "Começar Agora",
     "ctaSecondary": "Saiba mais →",
     "imageUrl": "https://images.pexels.com/photos/32725048/pexels-photo-32725048.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=900&w=900",
     "imageLabel": "EM GRAVAÇÃO · 04:37"
@@ -79,7 +79,7 @@
       "price": "R$ 49",
       "priceUnit": "/mês",
       "features": ["Tudo do Básico", "Taxa reduzida de 7% por venda", "Pagamento em 24h", "Analytics avançado", "Suporte prioritário"],
-      "cta": "Assinar Pro ▶"
+      "cta": "Assinar Pro →"
     }
   },
   "footer": {
@@ -88,7 +88,7 @@
     "colContactTitle": "Contato",
     "email": "contato@gravan.com",
     "ctaTitle": "Comece agora.",
-    "ctaButton": "▶ Criar conta grátis",
+    "ctaButton": "Criar conta grátis",
     "wordmark": "GRAVAN",
     "copyright": "© 2025 Gravan — Todos os direitos reservados.",
     "tagline": "Feito com precisão para compositores."

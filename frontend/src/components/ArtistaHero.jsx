@@ -25,7 +25,7 @@ export default function ArtistaHero({
       {/* Camada da capa */}
       <div style={{
         position: 'relative',
-        height: 340,
+        height: 220,
         background: perfil.capa_url
           ? `url(${perfil.capa_url}) center/cover no-repeat`
           : fallbackGrad,
@@ -49,7 +49,7 @@ export default function ArtistaHero({
         }} />
         {/* Fade para branco na base (suave) */}
         <div style={{
-          position: 'absolute', left: 0, right: 0, bottom: 0, height: 80,
+          position: 'absolute', left: 0, right: 0, bottom: 0, height: 60,
           background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.85) 100%)',
           pointerEvents: 'none',
         }} />
@@ -81,20 +81,20 @@ export default function ArtistaHero({
       {/* Bloco de identidade — avatar SOBRE a capa */}
       <div style={{
         position: 'relative',
-        margin: '-90px 32px 0',
-        display: 'flex', alignItems: 'flex-end', gap: 22,
+        margin: '-56px 24px 0',
+        display: 'flex', alignItems: 'flex-end', gap: 16,
         flexWrap: 'wrap',
         zIndex: 2,
       }}>
         <div style={{
-          width: 160, height: 160, borderRadius: '50%',
+          width: 96, height: 96, borderRadius: '50%',
           background: perfil.avatar_url ? '#fff' : fallbackGrad,
           color: '#fff',
           overflow: 'hidden', flexShrink: 0,
-          border: '6px solid #fff',
-          boxShadow: '0 12px 30px rgba(0,0,0,.25)',
+          border: '4px solid #fff',
+          boxShadow: '0 8px 22px rgba(0,0,0,.22)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 52, fontWeight: 800,
+          fontSize: 32, fontWeight: 800,
         }}>
           {perfil.avatar_url
             ? <img src={perfil.avatar_url} alt={nomeExibicao}
@@ -102,37 +102,32 @@ export default function ArtistaHero({
             : iniciais}
         </div>
 
-        <div style={{ flex: 1, minWidth: 240, paddingBottom: 8 }}>
+        <div style={{ flex: 1, minWidth: 200, paddingBottom: 4 }}>
           <div style={{
-            fontSize: 11, fontWeight: 700, color: '#71717A',
-            textTransform: 'uppercase', letterSpacing: 1.5,
+            fontSize: 10, fontWeight: 700, color: '#71717A',
+            textTransform: 'uppercase', letterSpacing: 1.2,
           }}>
             {tipo}
           </div>
           <h1 style={{
-            fontSize: 'clamp(34px, 6vw, 64px)',
-            fontWeight: 900, margin: '4px 0 0',
-            lineHeight: 1.05, letterSpacing: -1.5,
+            fontSize: 'clamp(22px, 4vw, 34px)',
+            fontWeight: 900, margin: '2px 0 0',
+            lineHeight: 1.1, letterSpacing: -.8,
             color: '#09090B',
           }}>
             {nomeExibicao}
           </h1>
-          {perfil.nome_artistico && perfil.nome_artistico !== perfil.nome && (
-            <div style={{ fontSize: 13, color: '#71717A', marginTop: 6 }}>
-              {perfil.nome}
-            </div>
-          )}
           <div style={{
-            fontSize: 13, color: '#3F3F46', marginTop: 10,
-            display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+            fontSize: 12, color: '#3F3F46', marginTop: 6,
+            display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
           }}>
             {perfil.nivel && <><span style={{ fontWeight: 600 }}>{perfil.nivel}</span><span>·</span></>}
             <span>{totalObras} obra{totalObras !== 1 ? 's' : ''}</span>
           </div>
           {perfil.bio && (
             <p style={{
-              fontSize: 13.5, color: '#3F3F46', marginTop: 14,
-              maxWidth: 640, lineHeight: 1.55,
+              fontSize: 12.5, color: '#3F3F46', marginTop: 8,
+              maxWidth: 640, lineHeight: 1.5,
             }}>
               {perfil.bio}
             </p>
@@ -150,7 +145,7 @@ export default function ArtistaHero({
  *   1) Modo player (preferido): passar onPlay + onShowFicha.
  *      - 1º clique numa linha: começa a tocar (modo minimizado).
  *      - 2º clique na mesma obra: abre a ficha técnica.
- *      - O botão da direita vira ▶/⏸ na obra ativa.
+ *      - O botão da direita vira play/pause na obra ativa.
  *   2) Modo legado: passar onSelect + ctaLabel.
  *      - Clique na linha ou no botão chama onSelect(obra).
  */
@@ -208,18 +203,20 @@ export function ObrasLista({
             }}>
             <div style={{
               color: isActive ? '#E11D48' : '#71717A',
-              fontSize: 14, fontWeight: 600, textAlign: 'center',
+              fontSize: 13, fontWeight: 600, textAlign: 'center',
             }}>
-              {isActive && isPlaying ? '♪' : i + 1}
+              {isActive && isPlaying
+                ? <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'inline-block' }}><polygon points="5,3 19,12 5,21" /></svg>
+                : i + 1}
             </div>
             <div style={{
-              width: 56, height: 56, borderRadius: 6,
+              width: 48, height: 48, borderRadius: 6,
               background: getGrad ? getGrad(o.id) : '#09090B',
               color: '#fff',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 22, flexShrink: 0,
+              fontSize: 18, fontWeight: 700, flexShrink: 0,
             }}>
-              ♪
+              {(o.nome || '?').charAt(0).toUpperCase()}
             </div>
             <div style={{ minWidth: 0 }}>
               <div style={{
@@ -240,11 +237,14 @@ export function ObrasLista({
                 style={{
                   background: isActive ? '#E11D48' : '#09090B', color: '#fff',
                   border: 'none', borderRadius: '50%',
-                  width: 36, height: 36, fontSize: 14,
+                  width: 32, height: 32,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', whiteSpace: 'nowrap',
                 }}>
-                {isActive && isPlaying ? '⏸' : '▶'}
+                {isActive && isPlaying
+                  ? <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+                  : <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21" /></svg>
+                }
               </button>
             ) : (
               <button

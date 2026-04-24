@@ -88,7 +88,7 @@ export default function PerfilPublico() {
 
       const { data: coa } = await supabase
         .from('coautorias')
-        .select('obra_id, is_titular, share_pct, obras(id, nome, genero, preco_cents, audio_path, status, titular_id, perfis!titular_id(nome, nivel))')
+        .select('obra_id, is_titular, share_pct, obras(id, nome, genero, preco_cents, audio_path, status, titular_id, perfis!titular_id(nome, nome_artistico, nivel))')
         .eq('perfil_id', perfilId)
         .limit(60)
 
@@ -96,7 +96,7 @@ export default function PerfilPublico() {
         .filter(c => c.obras?.status === 'publicada')
         .map(c => ({
           ...c.obras,
-          titular_nome: c.obras?.perfis?.nome,
+          titular_nome: c.obras?.perfis?.nome_artistico || c.obras?.perfis?.nome,
           titular_nivel: c.obras?.perfis?.nivel,
         }))
 
@@ -147,7 +147,7 @@ export default function PerfilPublico() {
   }
 
   if (loading) return <div style={{ padding: 32, color: '#71717A' }}>Carregando…</div>
-  if (erro)    return <div style={{ padding: 32, color: '#c0392b' }}>⚠ {erro}</div>
+  if (erro)    return <div style={{ padding: 32, color: '#c0392b' }}>{erro}</div>
   if (!perfil) return null
 
   const adminBtn = isAdmin ? (
@@ -159,7 +159,7 @@ export default function PerfilPublico() {
               border: '1px solid #09090B', borderRadius: 10, cursor: 'pointer',
               backdropFilter: 'blur(4px)',
             }}>
-      👑 Visualizar como administrador
+      Visualizar como administrador
     </button>
   ) : null
 
@@ -175,24 +175,24 @@ export default function PerfilPublico() {
 
       {/* Faixa de ações secundárias */}
       <div style={{
-        padding: '8px 32px 0',
+        padding: '4px 24px 0',
         display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-        gap: 8, fontSize: 11, color: '#71717A',
+        gap: 8, fontSize: 10, color: '#71717A',
       }}>
         {atualizadoEm && <span>Atualizado às {atualizadoEm.toLocaleTimeString('pt-BR')}</span>}
         <button onClick={() => carregarPerfil({ silencioso: true })}
                 title="Atualizar dados"
                 style={{
                   background: 'transparent', border: '1px solid #E5E7EB', borderRadius: 6,
-                  padding: '4px 8px', cursor: 'pointer', fontSize: 11, color: '#71717A',
+                  padding: '3px 8px', cursor: 'pointer', fontSize: 10, color: '#71717A',
                 }}>
-          ↻ Atualizar
+          Atualizar
         </button>
       </div>
 
       {/* Lista vertical de obras estilo Spotify */}
-      <div style={{ padding: '20px 32px 40px' }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 16 }}>
+      <div style={{ padding: '12px 24px 28px' }}>
+        <h2 style={{ fontSize: 16, fontWeight: 800, marginBottom: 10, letterSpacing: -.2 }}>
           Composições
         </h2>
         <ObrasLista
@@ -238,7 +238,7 @@ export default function PerfilPublico() {
               display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
             }}>
               <span>
-                👑 <strong>Modo Admin:</strong> visualizando dashboard de{' '}
+                <strong>Modo Admin:</strong> visualizando dashboard de{' '}
                 <strong>{perfil.nome_artistico || perfil.nome}</strong> ({perfil.role}).
               </span>
               <button onClick={carregarVisaoAdmin} disabled={adminLoad}
@@ -247,7 +247,7 @@ export default function PerfilPublico() {
                         padding: '4px 10px', fontSize: 11, color: '#71717A',
                         cursor: adminLoad ? 'wait' : 'pointer',
                       }}>
-                {adminLoad ? 'Atualizando…' : '↻ Atualizar'}
+                {adminLoad ? 'Atualizando…' : 'Atualizar'}
               </button>
             </div>
             {adminAtualizadoEm && (
@@ -257,7 +257,7 @@ export default function PerfilPublico() {
             )}
 
             {adminLoad && <div style={{ color: '#71717A' }}>Carregando dados…</div>}
-            {adminErro && <div style={{ color: '#c0392b' }}>⚠ {adminErro}</div>}
+            {adminErro && <div style={{ color: '#c0392b' }}>{adminErro}</div>}
 
             {adminData && (
               <>
@@ -310,7 +310,7 @@ export default function PerfilPublico() {
                             borderRadius: 8,
                             cursor: perfil.role === 'administrador' ? 'not-allowed' : 'pointer',
                           }}>
-                    🗑 Excluir usuário definitivamente
+                    Excluir usuário definitivamente
                   </button>
 
                   <div style={{ display: 'flex', gap: 10 }}>
@@ -349,7 +349,7 @@ export default function PerfilPublico() {
             padding: 24, position: 'relative',
           }}>
             <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#B91C1C' }}>
-              ⚠ Excluir usuário definitivamente
+              Excluir usuário definitivamente
             </h3>
             <p style={{ fontSize: 13, color: '#3F3F46', marginTop: 12, lineHeight: 1.5 }}>
               Esta ação <strong>não pode ser desfeita</strong>. Serão apagados de forma permanente:
@@ -377,7 +377,7 @@ export default function PerfilPublico() {
                   }}
                 />
                 {excluirErro && (
-                  <div style={{ color: '#c0392b', fontSize: 12, marginTop: 8 }}>⚠ {excluirErro}</div>
+                  <div style={{ color: '#c0392b', fontSize: 12, marginTop: 8 }}>{excluirErro}</div>
                 )}
                 <div style={{ display: 'flex', gap: 10, marginTop: 18, justifyContent: 'flex-end' }}>
                   <button onClick={() => setExcluirOpen(false)}
@@ -423,7 +423,7 @@ export default function PerfilPublico() {
                   marginTop: 14, padding: 12, borderRadius: 8,
                   background: '#ECFDF5', border: '1px solid #A7F3D0', color: '#065F46', fontSize: 13,
                 }}>
-                  ✔ Usuário excluído.
+                  Usuário excluído.
                   {excluirResult.auth_apagado === false && (
                     <div style={{ color: '#92400E', marginTop: 6 }}>
                       Atenção: o registro de login (auth) não pôde ser removido — verifique manualmente.

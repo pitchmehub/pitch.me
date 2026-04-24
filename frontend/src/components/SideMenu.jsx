@@ -5,342 +5,342 @@ import GravanLogo from './GravanLogo'
 import './SideMenu.css'
 
 const NAV_ITEMS = {
-  compositor: [
-    { to: '/descoberta',  icon: '⊞', label: 'Descoberta'      },
-    { to: '/dashboard',   icon: '◈', label: 'Dashboard'       },
-    { to: '/obras',       icon: '♫', label: 'Minhas obras'    },
-    { to: '/obras/nova',  icon: '♪', label: 'Nova obra'       },
-    { to: '/analytics',   icon: '◐', label: 'Analytics', pro: true },
-    { to: '/contratos',   icon: '§', label: 'Meus contratos'  },
-    { to: '/saques',      icon: '◎', label: 'Saques' },
-    { to: '/ofertas',     icon: '✉', label: 'Ofertas'         },
-    { to: '/planos',      icon: '★', label: 'Planos'          },
-  ],
-  interprete: [
-    { to: '/descoberta',  icon: '⊞', label: 'Descoberta'      },
-    { to: '/compras',     icon: '◉', label: 'Compras'         },
-    { to: '/ofertas',     icon: '✉', label: 'Ofertas'         },
-    { to: '/planos',      icon: '★', label: 'Planos'          },
-  ],
-  // ADMINISTRADOR: "Biblioteca" substituída por "Dossiês" conforme spec.
-  administrador: [
-    { to: '/admin',             icon: '▦', label: 'Painel admin',  highlight: true },
-    { to: '/admin/landing',     icon: '✎', label: 'Editar Landing' },
-    { to: '/descoberta',        icon: '⊞', label: 'Descoberta'    },
-    { to: '/dashboard',         icon: '◈', label: 'Dashboard'     },
-    { to: '/obras',             icon: '♫', label: 'Obras'         },
-    { to: '/obras/nova',        icon: '♪', label: 'Nova obra'     },
-    { to: '/contratos',         icon: '§', label: 'Contratos'     },
-    { to: '/dossies',           icon: '📂', label: 'Dossiês'      },
-    { to: '/analytics',         icon: '◐', label: 'Analytics'     },
-    { to: '/saques',            icon: '◎', label: 'Saques'        },
-    { to: '/admin/editoras',    icon: '🏢', label: 'Editoras'     },
-    { to: '/ofertas',           icon: '✉', label: 'Ofertas'       },
-    { to: '/planos',            icon: '★', label: 'Planos'        },
-  ],
-  publisher: [
-    { to: '/editora/dashboard', icon: '◈', label: 'Dashboard'    },
-    { to: '/agregados',         icon: '👥', label: 'Agregados'   },
-    { to: '/obras/nova',        icon: '♪', label: 'Nova obra'    },
-    { to: '/obras',             icon: '♫', label: 'Obras'        },
-    { to: '/contratos',         icon: '§', label: 'Contratos'    },
-    { to: '/descoberta',        icon: '⊞', label: 'Descoberta'   },
-  ],
-  artist: [
-    { to: '/dashboard',   icon: '◈', label: 'Dashboard'       },
-    { to: '/contratos',   icon: '§', label: 'Meus contratos'  },
-    { to: '/descoberta',  icon: '⊞', label: 'Descoberta'      },
-  ],
+ compositor: [
+ { to: '/descoberta', icon: '⊞', label: 'Descoberta' },
+ { to: '/dashboard', icon: '◈', label: 'Dashboard' },
+ { to: '/obras', icon: '', label: 'Minhas obras' },
+ { to: '/obras/nova', icon: '', label: 'Nova obra' },
+ { to: '/analytics', icon: '◐', label: 'Analytics', pro: true },
+ { to: '/contratos', icon: '§', label: 'Meus contratos' },
+ { to: '/saques', icon: '◎', label: 'Saques' },
+ { to: '/ofertas', icon: '', label: 'Ofertas' },
+ { to: '/planos', icon: '', label: 'Planos' },
+ ],
+ interprete: [
+ { to: '/descoberta', icon: '⊞', label: 'Descoberta' },
+ { to: '/compras', icon: '◉', label: 'Compras' },
+ { to: '/ofertas', icon: '', label: 'Ofertas' },
+ { to: '/planos', icon: '', label: 'Planos' },
+ ],
+ // ADMINISTRADOR: "Biblioteca" substituída por "Dossiês" conforme spec.
+ administrador: [
+ { to: '/admin', icon: '▦', label: 'Painel admin', highlight: true },
+ { to: '/admin/landing', icon: '', label: 'Editar Landing' },
+ { to: '/descoberta', icon: '⊞', label: 'Descoberta' },
+ { to: '/dashboard', icon: '◈', label: 'Dashboard' },
+ { to: '/obras', icon: '', label: 'Obras' },
+ { to: '/obras/nova', icon: '', label: 'Nova obra' },
+ { to: '/contratos', icon: '§', label: 'Contratos' },
+ { to: '/dossies', icon: '', label: 'Dossiês' },
+ { to: '/analytics', icon: '◐', label: 'Analytics' },
+ { to: '/saques', icon: '◎', label: 'Saques' },
+ { to: '/admin/editoras', icon: '', label: 'Editoras' },
+ { to: '/ofertas', icon: '', label: 'Ofertas' },
+ { to: '/planos', icon: '', label: 'Planos' },
+ ],
+ publisher: [
+ { to: '/editora/dashboard', icon: '◈', label: 'Dashboard' },
+ { to: '/agregados', icon: '', label: 'Agregados' },
+ { to: '/obras/nova', icon: '', label: 'Nova obra' },
+ { to: '/obras', icon: '', label: 'Obras' },
+ { to: '/contratos', icon: '§', label: 'Contratos' },
+ { to: '/descoberta', icon: '⊞', label: 'Descoberta' },
+ ],
+ artist: [
+ { to: '/dashboard', icon: '◈', label: 'Dashboard' },
+ { to: '/contratos', icon: '§', label: 'Meus contratos' },
+ { to: '/descoberta', icon: '⊞', label: 'Descoberta' },
+ ],
 }
 
 function useIsMobile() {
-  const [m, setM] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768)
-  useEffect(() => {
-    function h() { setM(window.innerWidth < 768) }
-    window.addEventListener('resize', h)
-    return () => window.removeEventListener('resize', h)
-  }, [])
-  return m
+ const [m, setM] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768)
+ useEffect(() => {
+ function h() { setM(window.innerWidth < 768) }
+ window.addEventListener('resize', h)
+ return () => window.removeEventListener('resize', h)
+ }, [])
+ return m
 }
 
 function UserMenu({ perfil, collapsed }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef(null)
-  const navigate = useNavigate()
-  const { signOut } = useAuth()
+ const [open, setOpen] = useState(false)
+ const ref = useRef(null)
+ const navigate = useNavigate()
+ const { signOut } = useAuth()
 
-  useEffect(() => {
-    function handle(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
-    document.addEventListener('mousedown', handle)
-    return () => document.removeEventListener('mousedown', handle)
-  }, [])
+ useEffect(() => {
+ function handle(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+ document.addEventListener('mousedown', handle)
+ return () => document.removeEventListener('mousedown', handle)
+ }, [])
 
-  if (!perfil) return null
-  const iniciais = perfil.nome?.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase() ?? '?'
-  const isPro = perfil.plano === 'PRO' && perfil.status_assinatura && perfil.status_assinatura !== 'inativa'
+ if (!perfil) return null
+ const iniciais = perfil.nome?.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase() ?? '?'
+ const isPro = perfil.plano === 'PRO' && perfil.status_assinatura && perfil.status_assinatura !== 'inativa'
 
-  return (
-    <div ref={ref} style={{ position: 'relative' }}>
-      <div className="sidebar-user-btn" onClick={() => setOpen(o => !o)}>
-        <div className="sidebar-avatar">
-          {perfil.avatar_url ? <img src={perfil.avatar_url} alt={perfil.nome} /> : iniciais}
-        </div>
-        {!collapsed && (
-          <>
-            <div className="sidebar-user-info">
-              <span className="sidebar-user-nome" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                {perfil.nome_artistico || perfil.nome}
-                {isPro && (
-                  <span data-testid="badge-pro" style={{
-                    background: 'var(--brand)', color: '#fff',
-                    fontSize: 9, fontWeight: 700, letterSpacing: 0.8,
-                    padding: '1px 5px', borderRadius: 3,
-                  }}>PRO</span>
-                )}
-              </span>
-              <span className="sidebar-user-role">{perfil.role}</span>
-            </div>
-            <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 'auto' }}>{open ? '▴' : '▾'}</span>
-          </>
-        )}
-      </div>
-      {open && (
-        <div className="sidebar-user-dropdown">
-          <button className="sidebar-user-item" onClick={() => { setOpen(false); navigate('/perfil/editar') }}>
-            <span>✎</span> Editar informações
-          </button>
-          <button className="sidebar-user-item" onClick={() => { setOpen(false); navigate('/planos') }}>
-            <span>★</span> {isPro ? 'Gerenciar assinatura' : 'Assinar PRO'}
-          </button>
-          <div className="sidebar-user-divider" />
-          <button className="sidebar-user-item sidebar-user-item-danger" onClick={() => { setOpen(false); signOut() }}>
-            <span>⏻</span> Sair da conta
-          </button>
-        </div>
-      )}
-    </div>
-  )
+ return (
+ <div ref={ref} style={{ position: 'relative' }}>
+ <div className="sidebar-user-btn" onClick={() => setOpen(o => !o)}>
+ <div className="sidebar-avatar">
+ {perfil.avatar_url ? <img src={perfil.avatar_url} alt={perfil.nome} /> : iniciais}
+ </div>
+ {!collapsed && (
+ <>
+ <div className="sidebar-user-info">
+ <span className="sidebar-user-nome" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+ {perfil.nome_artistico || perfil.nome}
+ {isPro && (
+ <span data-testid="badge-pro" style={{
+ background: 'var(--brand)', color: '#fff',
+ fontSize: 9, fontWeight: 700, letterSpacing: 0.8,
+ padding: '1px 5px', borderRadius: 3,
+ }}>PRO</span>
+ )}
+ </span>
+ <span className="sidebar-user-role">{perfil.role}</span>
+ </div>
+ <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 'auto' }}>{open ? '▴' : '▾'}</span>
+ </>
+ )}
+ </div>
+ {open && (
+ <div className="sidebar-user-dropdown">
+ <button className="sidebar-user-item" onClick={() => { setOpen(false); navigate('/perfil/editar') }}>
+ <span></span> Editar informações
+ </button>
+ <button className="sidebar-user-item" onClick={() => { setOpen(false); navigate('/planos') }}>
+ <span></span> {isPro ? 'Gerenciar assinatura' : 'Assinar PRO'}
+ </button>
+ <div className="sidebar-user-divider" />
+ <button className="sidebar-user-item sidebar-user-item-danger" onClick={() => { setOpen(false); signOut() }}>
+ <span>⏻</span> Sair da conta
+ </button>
+ </div>
+ )}
+ </div>
+ )
 }
 
 function AdminBadge({ collapsed }) {
-  const navigate = useNavigate()
-  if (collapsed) {
-    return (
-      <button
-        onClick={() => navigate('/admin')}
-        title="MODO ADMINISTRADOR"
-        data-testid="modo-admin-btn"
-        style={{
-          width: '100%', padding: '8px 0', margin: '8px 0',
-          background: 'linear-gradient(135deg,#7C3AED,#0C447C)',
-          color: '#fff', fontSize: 11, fontWeight: 800, letterSpacing: 0.4,
-          border: 'none', borderRadius: 6, cursor: 'pointer',
-        }}>
-        ADM
-      </button>
-    )
-  }
-  return (
-    <button
-      onClick={() => navigate('/admin')}
-      data-testid="modo-admin-btn"
-      style={{
-        width: '100%', padding: '10px 12px', margin: '8px 0 12px',
-        background: 'linear-gradient(135deg,#7C3AED,#0C447C)',
-        color: '#fff', fontSize: 11.5, fontWeight: 800, letterSpacing: 0.6,
-        border: 'none', borderRadius: 8, cursor: 'pointer',
-        display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center',
-        boxShadow: '0 4px 14px rgba(124,58,237,.25)',
-      }}>
-      <span style={{ fontSize: 13 }}>⚡</span>
-      MODO ADMINISTRADOR
-    </button>
-  )
+ const navigate = useNavigate()
+ if (collapsed) {
+ return (
+ <button
+ onClick={() => navigate('/admin')}
+ title="MODO ADMINISTRADOR"
+ data-testid="modo-admin-btn"
+ style={{
+ width: '100%', padding: '8px 0', margin: '8px 0',
+ background: 'linear-gradient(135deg,#7C3AED,#0C447C)',
+ color: '#fff', fontSize: 11, fontWeight: 800, letterSpacing: 0.4,
+ border: 'none', borderRadius: 6, cursor: 'pointer',
+ }}>
+ ADM
+ </button>
+ )
+ }
+ return (
+ <button
+ onClick={() => navigate('/admin')}
+ data-testid="modo-admin-btn"
+ style={{
+ width: '100%', padding: '10px 12px', margin: '8px 0 12px',
+ background: 'linear-gradient(135deg,#7C3AED,#0C447C)',
+ color: '#fff', fontSize: 11.5, fontWeight: 800, letterSpacing: 0.6,
+ border: 'none', borderRadius: 8, cursor: 'pointer',
+ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center',
+ boxShadow: '0 4px 14px rgba(124,58,237,.25)',
+ }}>
+ <span style={{ fontSize: 13 }}></span>
+ MODO ADMINISTRADOR
+ </button>
+ )
 }
 
 export default function SideMenu({ onCollapse }) {
-  const isMobile = useIsMobile()
-  const [collapsed, setCollapsed] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const { perfil, signOut } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
+ const isMobile = useIsMobile()
+ const [collapsed, setCollapsed] = useState(false)
+ const [mobileOpen, setMobileOpen] = useState(false)
+ const { perfil, signOut } = useAuth()
+ const navigate = useNavigate()
+ const location = useLocation()
 
-  useEffect(() => { onCollapse?.(isMobile ? true : collapsed) }, [collapsed, isMobile])
-  useEffect(() => { setMobileOpen(false) }, [location.pathname])
+ useEffect(() => { onCollapse?.(isMobile ? true : collapsed) }, [collapsed, isMobile])
+ useEffect(() => { setMobileOpen(false) }, [location.pathname])
 
-  const role = perfil?.role ?? 'compositor'
-  const items = NAV_ITEMS[role] ?? NAV_ITEMS.compositor
-  const isAdmin = role === 'administrador'
+ const role = perfil?.role ?? 'compositor'
+ const items = NAV_ITEMS[role] ?? NAV_ITEMS.compositor
+ const isAdmin = role === 'administrador'
 
-  // ── MOBILE: barra de navegação inferior ──────────────────────
-  if (isMobile) {
-    // Descoberta sempre fica como botão central destacado.
-    const descoberta = items.find(i => i.to === '/descoberta')
-                    ?? { to: '/descoberta', icon: '⊞', label: 'Descoberta' }
-    const semDescoberta = items.filter(i => i.to !== '/descoberta')
-    // 2 itens à esquerda, Descoberta no centro, 2 itens à direita (último é "Mais").
-    const left  = semDescoberta.slice(0, 2)
-    const right = semDescoberta.slice(2, 3) // 1 item, depois vem o "Mais"
-    return (
-      <>
-        {mobileOpen && (
-          <div
-            className="mobile-drawer-backdrop"
-            onClick={() => setMobileOpen(false)}
-          />
-        )}
+ // ── MOBILE: barra de navegação inferior ──────────────────────
+ if (isMobile) {
+ // Descoberta sempre fica como botão central destacado.
+ const descoberta = items.find(i => i.to === '/descoberta')
+ ?? { to: '/descoberta', icon: '⊞', label: 'Descoberta' }
+ const semDescoberta = items.filter(i => i.to !== '/descoberta')
+ // 2 itens à esquerda, Descoberta no centro, 2 itens à direita (último é "Mais").
+ const left = semDescoberta.slice(0, 2)
+ const right = semDescoberta.slice(2, 3) // 1 item, depois vem o "Mais"
+ return (
+ <>
+ {mobileOpen && (
+ <div
+ className="mobile-drawer-backdrop"
+ onClick={() => setMobileOpen(false)}
+ />
+ )}
 
-        {mobileOpen && (
-          <aside className="sidebar mobile-drawer mobile-drawer-open">
-            <div className="sidebar-header">
-              <button className="sidebar-logo-btn" onClick={() => { navigate('/descoberta'); setMobileOpen(false) }}>
-                <GravanLogo height={28} />
-              </button>
-              <button
-                className="sidebar-toggle"
-                onClick={() => setMobileOpen(false)}
-                aria-label="Fechar menu"
-              >×</button>
-            </div>
+ {mobileOpen && (
+ <aside className="sidebar mobile-drawer mobile-drawer-open">
+ <div className="sidebar-header">
+ <button className="sidebar-logo-btn" onClick={() => { navigate('/descoberta'); setMobileOpen(false) }}>
+ <GravanLogo height={28} />
+ </button>
+ <button
+ className="sidebar-toggle"
+ onClick={() => setMobileOpen(false)}
+ aria-label="Fechar menu"
+ >×</button>
+ </div>
 
-            <nav className="sidebar-nav">
-              {isAdmin && <AdminBadge collapsed={false} />}
-              {items.map(({ to, icon, label, pro, highlight }) => (
-                <NavLink key={to} to={to}
-                  className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-                  style={highlight ? { fontWeight: 700 } : undefined}
-                  onClick={() => setMobileOpen(false)}>
-                  <span className="sidebar-icon">{icon}</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    {label}
-                    {pro && <span style={proTag}>PRO</span>}
-                  </span>
-                </NavLink>
-              ))}
-              <div style={{ height: 1, background: 'var(--border)', margin: '8px 4px' }} />
-              <NavLink to="/perfil/editar"
-                className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-                onClick={() => setMobileOpen(false)}>
-                <span className="sidebar-icon">✎</span>
-                <span>Editar informações</span>
-              </NavLink>
-              <button
-                className="sidebar-link"
-                onClick={() => { setMobileOpen(false); signOut() }}
-                style={{ color: 'var(--error)' }}>
-                <span className="sidebar-icon">⏻</span>
-                <span>Sair da conta</span>
-              </button>
-            </nav>
+ <nav className="sidebar-nav">
+ {isAdmin && <AdminBadge collapsed={false} />}
+ {items.map(({ to, icon, label, pro, highlight }) => (
+ <NavLink key={to} to={to}
+ className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+ style={highlight ? { fontWeight: 700 } : undefined}
+ onClick={() => setMobileOpen(false)}>
+ <span className="sidebar-icon">{icon}</span>
+ <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+ {label}
+ {pro && <span style={proTag}>PRO</span>}
+ </span>
+ </NavLink>
+ ))}
+ <div style={{ height: 1, background: 'var(--border)', margin: '8px 4px' }} />
+ <NavLink to="/perfil/editar"
+ className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+ onClick={() => setMobileOpen(false)}>
+ <span className="sidebar-icon"></span>
+ <span>Editar informações</span>
+ </NavLink>
+ <button
+ className="sidebar-link"
+ onClick={() => { setMobileOpen(false); signOut() }}
+ style={{ color: 'var(--error)' }}>
+ <span className="sidebar-icon">⏻</span>
+ <span>Sair da conta</span>
+ </button>
+ </nav>
 
-            <div className="sidebar-footer">
-              <UserMenu perfil={perfil} collapsed={false} />
-            </div>
-          </aside>
-        )}
+ <div className="sidebar-footer">
+ <UserMenu perfil={perfil} collapsed={false} />
+ </div>
+ </aside>
+ )}
 
-        <nav className="mobile-bottom-nav">
-          {left.map(({ to, icon, label }) => (
-            <NavLink key={to} to={to}
-              className={({ isActive }) => `mobile-bottom-item ${isActive ? 'active' : ''}`}>
-              <span className="mobile-bottom-icon">{icon}</span>
-              <span className="mobile-bottom-label">{label}</span>
-            </NavLink>
-          ))}
+ <nav className="mobile-bottom-nav">
+ {left.map(({ to, icon, label }) => (
+ <NavLink key={to} to={to}
+ className={({ isActive }) => `mobile-bottom-item ${isActive ? 'active' : ''}`}>
+ <span className="mobile-bottom-icon">{icon}</span>
+ <span className="mobile-bottom-label">{label}</span>
+ </NavLink>
+ ))}
 
-          {/* Botão central: Descoberta */}
-          <NavLink
-            key={descoberta.to}
-            to={descoberta.to}
-            className={({ isActive }) => `mobile-bottom-center ${isActive ? 'active' : ''}`}
-            aria-label="Descoberta">
-            <span className="mobile-bottom-center-circle">
-              <span className="mobile-bottom-center-icon">{descoberta.icon}</span>
-            </span>
-            <span className="mobile-bottom-center-label">{descoberta.label}</span>
-          </NavLink>
+ {/* Botão central: Descoberta */}
+ <NavLink
+ key={descoberta.to}
+ to={descoberta.to}
+ className={({ isActive }) => `mobile-bottom-center ${isActive ? 'active' : ''}`}
+ aria-label="Descoberta">
+ <span className="mobile-bottom-center-circle">
+ <span className="mobile-bottom-center-icon">{descoberta.icon}</span>
+ </span>
+ <span className="mobile-bottom-center-label">{descoberta.label}</span>
+ </NavLink>
 
-          {right.map(({ to, icon, label }) => (
-            <NavLink key={to} to={to}
-              className={({ isActive }) => `mobile-bottom-item ${isActive ? 'active' : ''}`}>
-              <span className="mobile-bottom-icon">{icon}</span>
-              <span className="mobile-bottom-label">{label}</span>
-            </NavLink>
-          ))}
-          <button
-            className="mobile-bottom-item"
-            onClick={() => setMobileOpen(o => !o)}
-            aria-label="Mais opções">
-            <span className="mobile-bottom-icon">☰</span>
-            <span className="mobile-bottom-label">Mais</span>
-          </button>
-        </nav>
-      </>
-    )
-  }
+ {right.map(({ to, icon, label }) => (
+ <NavLink key={to} to={to}
+ className={({ isActive }) => `mobile-bottom-item ${isActive ? 'active' : ''}`}>
+ <span className="mobile-bottom-icon">{icon}</span>
+ <span className="mobile-bottom-label">{label}</span>
+ </NavLink>
+ ))}
+ <button
+ className="mobile-bottom-item"
+ onClick={() => setMobileOpen(o => !o)}
+ aria-label="Mais opções">
+ <span className="mobile-bottom-icon"></span>
+ <span className="mobile-bottom-label">Mais</span>
+ </button>
+ </nav>
+ </>
+ )
+ }
 
-  // ── DESKTOP: sidebar fixa ─────────────────────────
-  return (
-    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
-      <div className="sidebar-header">
-        {!collapsed && (
-          <button className="sidebar-logo-btn" onClick={() => navigate('/descoberta')}>
-            <GravanLogo height={28} />
-          </button>
-        )}
-        <button className="sidebar-toggle" onClick={() => setCollapsed(c => !c)}>
-          {collapsed ? '›' : '‹'}
-        </button>
-      </div>
+ // ── DESKTOP: sidebar fixa ─────────────────────────
+ return (
+ <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
+ <div className="sidebar-header">
+ {!collapsed && (
+ <button className="sidebar-logo-btn" onClick={() => navigate('/descoberta')}>
+ <GravanLogo height={28} />
+ </button>
+ )}
+ <button className="sidebar-toggle" onClick={() => setCollapsed(c => !c)}>
+ {collapsed ? '›' : '‹'}
+ </button>
+ </div>
 
-      <nav className="sidebar-nav">
-        {isAdmin && <AdminBadge collapsed={collapsed} />}
+ <nav className="sidebar-nav">
+ {isAdmin && <AdminBadge collapsed={collapsed} />}
 
-        {items.map(({ to, icon, label, pro, highlight }) => (
-          <NavLink key={to} to={to}
-            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-            title={collapsed ? label : undefined}
-            style={highlight ? { fontWeight: 700 } : undefined}>
-            <span className="sidebar-icon">{icon}</span>
-            {!collapsed && (
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                {label}
-                {pro && <span style={proTag}>PRO</span>}
-              </span>
-            )}
-          </NavLink>
-        ))}
+ {items.map(({ to, icon, label, pro, highlight }) => (
+ <NavLink key={to} to={to}
+ className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+ title={collapsed ? label : undefined}
+ style={highlight ? { fontWeight: 700 } : undefined}>
+ <span className="sidebar-icon">{icon}</span>
+ {!collapsed && (
+ <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+ {label}
+ {pro && <span style={proTag}>PRO</span>}
+ </span>
+ )}
+ </NavLink>
+ ))}
 
-        <div style={{ height: 1, background: 'var(--border)', margin: '8px 4px' }} />
+ <div style={{ height: 1, background: 'var(--border)', margin: '8px 4px' }} />
 
-        <NavLink to="/perfil/editar"
-          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-          title={collapsed ? 'Editar informações' : undefined}>
-          <span className="sidebar-icon">✎</span>
-          {!collapsed && <span>Editar informações</span>}
-        </NavLink>
+ <NavLink to="/perfil/editar"
+ className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+ title={collapsed ? 'Editar informações' : undefined}>
+ <span className="sidebar-icon"></span>
+ {!collapsed && <span>Editar informações</span>}
+ </NavLink>
 
-        <button
-          className="sidebar-link"
-          onClick={() => signOut()}
-          title={collapsed ? 'Sair da conta' : undefined}
-          style={{ color: 'var(--error)' }}>
-          <span className="sidebar-icon">⏻</span>
-          {!collapsed && <span>Sair da conta</span>}
-        </button>
-      </nav>
+ <button
+ className="sidebar-link"
+ onClick={() => signOut()}
+ title={collapsed ? 'Sair da conta' : undefined}
+ style={{ color: 'var(--error)' }}>
+ <span className="sidebar-icon">⏻</span>
+ {!collapsed && <span>Sair da conta</span>}
+ </button>
+ </nav>
 
-      <div className="sidebar-footer">
-        <UserMenu perfil={perfil} collapsed={collapsed} />
-      </div>
-    </aside>
-  )
+ <div className="sidebar-footer">
+ <UserMenu perfil={perfil} collapsed={collapsed} />
+ </div>
+ </aside>
+ )
 }
 
 
 const proTag = {
-  background: 'var(--brand)', color: '#fff',
-  fontSize: 8.5, fontWeight: 700, letterSpacing: 0.8,
-  padding: '1px 5px', borderRadius: 3,
+ background: 'var(--brand)', color: '#fff',
+ fontSize: 8.5, fontWeight: 700, letterSpacing: 0.8,
+ padding: '1px 5px', borderRadius: 3,
 }
