@@ -320,7 +320,7 @@ export default function Descoberta() {
 
   const { perfil } = useAuth()
   const navigate = useNavigate()
-  const { playObra, expandPlayer, obra: obraAtual, playing, togglePlay, nextTrack, prevTrack } = usePlayer()
+  const { playObra, expandPlayer, setMinimized, obra: obraAtual, playing, togglePlay, nextTrack, prevTrack } = usePlayer()
 
   // Swipe esquerda/direita na tela → próxima/anterior
   const swipeStart = useRef(null)
@@ -449,10 +449,11 @@ export default function Descoberta() {
       setFichaObra(obra)
       return
     }
-    if (obraAtual?.id === obra.id) { togglePlay(); return }
+    if (obraAtual?.id === obra.id) { togglePlay(); setMinimized(true); return }
     api.post(`/analytics/play/${obra.id}`, {}).catch(() => {})
     const { lista, idx } = buildQueue(obra)
     playObra(lista, idx)
+    setMinimized(true)
   }
 
   const cadastroIncompleto = perfil && !perfil.cadastro_completo
