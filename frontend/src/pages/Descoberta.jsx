@@ -407,22 +407,8 @@ export default function Descoberta() {
   }, [busca])
 
   async function selecionarCompositor(comp) {
-    setCompositor(comp)
-    setBusca('')
-    setResultados({ obras: [], compositores: [] })
-    const { data } = await supabase
-      .from('coautorias')
-      .select('obra_id, is_titular, share_pct, obras(id, nome, genero, preco_cents, audio_path, status, titular_id, perfis!titular_id(nome, nivel))')
-      .eq('perfil_id', comp.id)
-      .limit(60)
-    const obras = (data ?? [])
-      .filter(c => c.obras?.status === 'publicada')
-      .map(c => ({
-        ...c.obras,
-        titular_nome:  c.obras?.perfis?.nome,
-        titular_nivel: c.obras?.perfis?.nivel,
-      }))
-    setObrasDoCom(obras)
+    if (!comp?.id) return
+    navigate(`/perfil/${comp.id}`)
   }
 
   function handlePlay(obra) {
