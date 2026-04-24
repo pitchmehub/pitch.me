@@ -22,7 +22,11 @@ from services.saque_security import (
     cancelar_pelo_dono,
     cancelar_por_token,
     liberar_pendentes,
+    auto_criar_mensal,
+    _ja_sacou_este_mes,
 )
+from services.saque_calendar import janela_atual
+from db.supabase_client import get_supabase
 
 log = logging.getLogger("pitchme.saques.routes")
 saques_bp = Blueprint("saques", __name__, url_prefix="/api/saques")
@@ -234,4 +238,46 @@ def processar_pendentes():
 
     r = liberar_pendentes(limite=limite)
     log.info("Cron processar-pendentes: %s", r)
+    return jsonify(r), 200
+
+
+# ──────────────────────────────────────────────────────────
+# 7. Janela mensal de saque (informativo pro dashboard)
+# ──────────────────────────────────────────────────────────
+@saques_bp.route("/janela", methods=["GET"])
+@require_auth
+def janela():
+    """Retorna o status da janela mensal e se o usuário já sacou este mês."""
+    info = janela_atual()
+    sb = get_supabase()
+    info["ja_sacou_este_mes"] = _ja_sacou_este_mes(sb, g.user.id)
+    info["pode_sacar_agora"] = info["aberta"] and not info["ja_sacou_este_mes"]
+    return jsonify(info), 200
+
+
+# ──────────────────────────────────────────────────────────
+# 8. Auto-criação mensal (cron — último dia útil 00:01)
+# ──────────────────────────────────────────────────────────
+@saques_bp.route("/auto-criar-mensal", methods=["POST"])
+def auto_criar_mensal_cron():
+    """
+    Endpoint chamado por cron externo no último dia útil de cada mês.
+    Cria saques automáticos para perfis com saldo que não sacaram manualmente.
+
+    Header obrigatório:
+      X-Cron-Secret: <valor de SAQUE_CRON_SECRET no .env>
+    """
+    secret_esperado = os.environ.get("SAQUE_CRON_SECRET")
+    if not secret_esperado:
+        abort(503, description="Cron não configurado (SAQUE_CRON_SECRET ausente).")
+    if request.headers.get("X-Cron-Secret") != secret_esperado:
+        abort(403, description="Acesso negado.")
+
+    try:
+        limite = int(request.args.get("limit", "100"))
+    except ValueError:
+        limite = 100
+
+    r = auto_criar_mensal(limite=limite)
+    log.info("Cron auto-criar-mensal: %s", r)
     return jsonify(r), 200

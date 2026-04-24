@@ -37,6 +37,12 @@ from services.email_service import (
     render_saque_pago_email,
     render_saque_cancelado_email,
 )
+from services.saque_calendar import (
+    janela_atual,
+    saque_permitido_hoje,
+    primeiro_dia_do_mes_iso,
+    ultimo_dia_util_do_mes,
+)
 
 log = logging.getLogger("pitchme.saque")
 
@@ -134,12 +140,57 @@ def _sacado_ultimas_24h(sb, perfil_id: str) -> int:
     )
 
 
+def _ja_sacou_este_mes(sb, perfil_id: str) -> bool:
+    """True se o usuário já tem um saque ativo (não cancelado) iniciado este mês."""
+    cutoff = primeiro_dia_do_mes_iso()
+    r = (sb.table("saques")
+         .select("id, status")
+         .eq("perfil_id", perfil_id)
+         .gte("created_at", cutoff)
+         .execute())
+    ATIVOS = ("pendente_otp", "aguardando_liberacao", "processando", "pago")
+    return any(s.get("status") in ATIVOS for s in (r.data or []))
+
+
 # ────────── (1) Iniciar saque ──────────
-def iniciar_saque(perfil_id: str, valor_cents: int, ip: str, user_agent: str) -> dict:
+def iniciar_saque(
+    perfil_id: str,
+    valor_cents: int,
+    ip: str,
+    user_agent: str,
+    *,
+    auto: bool = False,
+) -> dict:
+    """
+    Inicia um saque. `auto=True` significa que veio do cron de fim de mês
+    (pula validação de janela e validação manual de once-per-month porque
+    o cron já filtra os elegíveis).
+    """
     sb = get_supabase()
 
     if not isinstance(valor_cents, int) or valor_cents < VALOR_MIN_CENTS:
         raise ValueError(f"Valor mínimo: R$ {VALOR_MIN_CENTS/100:.2f}")
+
+    # ── Janela mensal (só pra saques manuais) ──
+    if not auto:
+        info = janela_atual()
+        if not info["aberta"]:
+            if info["dias_ate_abrir"] > 0:
+                raise ValueError(
+                    f"Saques só ficam disponíveis a partir do dia "
+                    f"{info['dia_inicio_config']} de cada mês. "
+                    f"Próxima janela abre em {info['dias_ate_abrir']} dia(s)."
+                )
+            raise ValueError(
+                f"A janela deste mês já fechou. Próxima janela: "
+                f"{info['proxima_inicio']} a {info['proxima_fim']}."
+            )
+        if _ja_sacou_este_mes(sb, perfil_id):
+            raise ValueError(
+                "Você já realizou um saque este mês. O próximo saque ficará "
+                "disponível a partir do dia "
+                f"{janela_atual()['dia_inicio_config']} do próximo mês."
+            )
 
     perfil = _validar_perfil_pode_sacar(sb, perfil_id)
 
@@ -424,3 +475,101 @@ def _processar_um_saque(sb, saque: dict) -> None:
         valor_brl=_fmt_brl(valor_cents), transfer_id=tr.id,
     )
     send_email(perfil.get("email", ""), "Pitch.me — Saque enviado ✓", html, text)
+
+
+# ────────── (5) Auto-criação no último dia útil ──────────
+def auto_criar_mensal(limite: int = 100, valor_min_cents: int = VALOR_MIN_CENTS) -> dict:
+    """
+    Cron rodado às 00:01 do último dia útil de cada mês.
+    Para cada perfil com:
+      - saldo_disponivel >= valor_min_cents
+      - sem saque ativo neste mês
+      - stripe_charges_enabled = true
+    cria um saque automático com status 'aguardando_liberacao' (pula OTP).
+    O cron normal (`liberar_pendentes`) pega depois e executa o transfer.
+    """
+    info = janela_atual()
+
+    # Só roda no último dia útil (defesa adicional — cheap check antes do DB)
+    if not info.get("eh_ultimo_dia_util"):
+        return {"executado": False, "motivo": f"Hoje ({info['hoje']}) não é o último dia útil. Próximo: {info['fim']}."}
+
+    sb = get_supabase()
+
+    # Busca quem tem saldo
+    wallets = sb.table("wallets").select("perfil_id, saldo_cents") \
+        .gte("saldo_cents", valor_min_cents).limit(limite).execute()
+    candidatos = wallets.data or []
+
+    criados, pulados, falhas = 0, 0, 0
+    detalhes = []
+    libera_em_dt = _now() + timedelta(hours=JANELA_LIBERACAO_HORAS)
+
+    for w in candidatos:
+        perfil_id = w["perfil_id"]
+        saldo = int(w["saldo_cents"] or 0)
+        try:
+            # Pula quem já tem saque ativo este mês
+            if _ja_sacou_este_mes(sb, perfil_id):
+                pulados += 1
+                detalhes.append({"perfil_id": perfil_id, "status": "pulado_ja_sacou"})
+                continue
+
+            # Valida perfil + Stripe Connect
+            try:
+                perfil = _validar_perfil_pode_sacar(sb, perfil_id)
+            except ValueError as e:
+                pulados += 1
+                detalhes.append({"perfil_id": perfil_id, "status": f"pulado_{e}"[:80]})
+                continue
+
+            # Saca o saldo TOTAL disponível (descontado o que já está reservado)
+            reservado = _reservado_em_pendentes(sb, perfil_id)
+            valor_cents = saldo - reservado
+            if valor_cents < valor_min_cents:
+                pulados += 1
+                detalhes.append({"perfil_id": perfil_id, "status": "pulado_saldo_baixo"})
+                continue
+
+            # Cria direto em 'aguardando_liberacao' (sem OTP — é automático)
+            ins = sb.table("saques").insert({
+                "perfil_id":         perfil_id,
+                "valor_cents":       valor_cents,
+                "status":            "aguardando_liberacao",
+                "metodo":            "stripe",
+                "stripe_account_id": perfil.get("stripe_account_id"),
+                "confirmado_em":     _now().isoformat(),
+                "liberar_em":        libera_em_dt.isoformat(),
+            }).execute()
+            saque_id = ins.data[0]["id"] if ins.data else None
+            criados += 1
+            detalhes.append({"perfil_id": perfil_id, "status": "criado", "saque_id": saque_id, "valor_cents": valor_cents})
+
+            # Email avisando
+            try:
+                libera_em_str = libera_em_dt.astimezone(timezone(timedelta(hours=-3))) \
+                                            .strftime("%d/%m/%Y às %H:%M (BRT)")
+                html, text = render_saque_agendado_email(
+                    nome=perfil.get("nome_artistico") or perfil.get("nome") or "",
+                    valor_brl=_fmt_brl(valor_cents),
+                    libera_em=libera_em_str,
+                    cancel_url="",  # auto-saque não tem link "não fui eu"
+                )
+                send_email(perfil["email"], "Pitch.me — Saque automático agendado", html, text)
+            except Exception as e:
+                log.warning("Email de auto-saque falhou para %s: %s", perfil_id, e)
+
+        except Exception as e:
+            falhas += 1
+            log.error("auto_criar_mensal falhou para perfil %s: %s", perfil_id, e)
+            detalhes.append({"perfil_id": perfil_id, "status": f"erro_{str(e)[:60]}"})
+
+    return {
+        "executado": True,
+        "data": info["fim"],
+        "candidatos": len(candidatos),
+        "criados": criados,
+        "pulados": pulados,
+        "falhas": falhas,
+        "detalhes": detalhes,
+    }

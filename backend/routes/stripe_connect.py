@@ -146,6 +146,14 @@ def criar_onboarding():
                 },
                 business_type="individual",
                 metadata={"perfil_id": str(perfil["id"])},
+                # Payout manual: o saldo na conta Stripe Connect só sai
+                # quando NÓS dispararmos um Transfer (controlado pelo
+                # fluxo de saque mensal com janela 24h+OTP).
+                settings={
+                    "payouts": {
+                        "schedule": {"interval": "manual"},
+                    },
+                },
             )
             account_id = acc.id
             if perfil.get("_migration_pendente"):

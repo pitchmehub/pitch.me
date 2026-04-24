@@ -25,6 +25,7 @@ export default function Saques() {
   const [params] = useSearchParams()
   const [wallet,   setWallet]   = useState(null)
   const [connect,  setConnect]  = useState(null)
+  const [janela,   setJanela]   = useState(null)
   const [loading,  setLoading]  = useState(true)
   const [valor,    setValor]    = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -38,11 +39,12 @@ export default function Saques() {
   async function load() {
     setLoading(true); setErro('')
     try {
-      const [w, c] = await Promise.all([
+      const [w, c, j] = await Promise.all([
         api.get('/perfis/me/wallet'),
         api.get('/connect/status'),
+        api.get('/saques/janela').catch(() => null),
       ])
-      setWallet(w); setConnect(c)
+      setWallet(w); setConnect(c); setJanela(j)
     } catch (e) { setErro(e.message) }
     finally { setLoading(false) }
   }
@@ -110,7 +112,9 @@ export default function Saques() {
   const disponivel  = Math.max(0, saldo - reservado)
 
   const connectAtivo = connect?.charges_enabled
-  const podeSacar    = connectAtivo && disponivel >= 1000
+  const janelaAberta = janela?.aberta ?? true
+  const jaSacouMes   = janela?.ja_sacou_este_mes ?? false
+  const podeSacar    = connectAtivo && disponivel >= 1000 && janelaAberta && !jaSacouMes
 
   return (
     <div style={{ padding: 32, maxWidth: 880 }}>
@@ -165,6 +169,30 @@ export default function Saques() {
         </div>
       )}
 
+      {janela && (
+        <div style={{
+          padding: 16, marginBottom: 16, borderRadius: 12, fontSize: 13,
+          background: jaSacouMes ? '#F3F4F6' : (janelaAberta ? 'var(--success-bg)' : '#FEF3C7'),
+          color:      jaSacouMes ? '#6B7280' : (janelaAberta ? 'var(--success)'   : '#92400E'),
+          border:     jaSacouMes ? '1px solid #E5E7EB' : 'none',
+        }}>
+          {jaSacouMes ? (
+            <>
+              <strong>✓ Você já solicitou seu saque deste mês.</strong><br/>
+              A próxima janela abre em {new Date(janela.proxima_inicio).toLocaleDateString('pt-BR')} e fecha em {new Date(janela.proxima_fim).toLocaleDateString('pt-BR')}.
+            </>
+          ) : janelaAberta ? (
+            <>
+              <strong>📅 Janela de saque aberta!</strong> Você pode solicitar seu saque até <strong>{new Date(janela.fim).toLocaleDateString('pt-BR')}</strong> ({janela.dias_ate_fechar} dia(s)). Se você não solicitar, faremos o saque automaticamente no último dia útil.
+            </>
+          ) : (
+            <>
+              <strong>⏳ Janela fechada.</strong> Saques são liberados a partir do dia {janela.dia_inicio_config} de cada mês. Próxima janela: <strong>{new Date(janela.proxima_inicio).toLocaleDateString('pt-BR')}</strong> a {new Date(janela.proxima_fim).toLocaleDateString('pt-BR')}.
+            </>
+          )}
+        </div>
+      )}
+
       <div className="card" style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>Solicitar saque</h2>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
@@ -208,6 +236,8 @@ export default function Saques() {
             {enviando ? 'Enviando código…'
               : !connectAtivo  ? '🔒 Conecte sua conta Stripe primeiro'
               : disponivel < 1000 ? '💸 Saldo disponível insuficiente (mín. R$ 10)'
+              : jaSacouMes ? '✓ Você já sacou este mês'
+              : !janelaAberta ? `⏳ Aguarde a abertura da janela (dia ${janela?.dia_inicio_config ?? 25})`
               : '✉ Enviar código de confirmação'}
           </button>
         </form>
