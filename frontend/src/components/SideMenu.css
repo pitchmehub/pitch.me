@@ -299,15 +299,15 @@
     text-align: center;
   }
 
-  /* Botão central destacado: Descoberta */
+  /* Botão central destacado: Descoberta (mantém destaque sem ultrapassar os outros) */
   .mobile-bottom-center {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
-    gap: 2px;
-    padding: 0 4px 6px;
+    justify-content: center;
+    gap: 3px;
+    padding: 8px 4px;
     text-decoration: none;
     color: var(--text-muted);
     font-family: inherit;
@@ -315,30 +315,25 @@
     position: relative;
   }
   .mobile-bottom-center-circle {
-    width: 56px;
-    height: 56px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: var(--brand);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: -22px;
-    box-shadow:
-      0 6px 18px rgba(225,29,72,.35),
-      0 0 0 4px var(--surface);
+    box-shadow: 0 3px 10px rgba(225,29,72,.30);
     transition: transform .15s, box-shadow .15s;
   }
   .mobile-bottom-center:active .mobile-bottom-center-circle {
     transform: scale(.94);
   }
   .mobile-bottom-center.active .mobile-bottom-center-circle {
-    box-shadow:
-      0 8px 22px rgba(225,29,72,.5),
-      0 0 0 4px var(--surface);
+    box-shadow: 0 4px 14px rgba(225,29,72,.45);
   }
   .mobile-bottom-center-icon {
-    font-size: 24px;
+    font-size: 16px;
     line-height: 1;
     color: #fff;
   }
@@ -347,7 +342,11 @@
     font-weight: 700;
     letter-spacing: 0.02em;
     color: var(--text-muted);
-    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 56px;
+    text-align: center;
   }
   .mobile-bottom-center.active .mobile-bottom-center-label {
     color: var(--brand);
