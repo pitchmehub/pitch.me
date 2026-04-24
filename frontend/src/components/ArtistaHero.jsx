@@ -36,21 +36,21 @@ export default function ArtistaHero({
           background: 'linear-gradient(180deg, rgba(0,0,0,.10) 0%, rgba(0,0,0,.35) 100%)',
         }} />
 
-        {/* Fade para branco nas laterais */}
+        {/* Fade para branco nas laterais (suave) */}
         <div style={{
-          position: 'absolute', top: 0, bottom: 0, left: 0, width: 80,
-          background: 'linear-gradient(90deg, #fff 0%, rgba(255,255,255,0) 100%)',
+          position: 'absolute', top: 0, bottom: 0, left: 0, width: 50,
+          background: 'linear-gradient(90deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 100%)',
           pointerEvents: 'none',
         }} />
         <div style={{
-          position: 'absolute', top: 0, bottom: 0, right: 0, width: 80,
-          background: 'linear-gradient(270deg, #fff 0%, rgba(255,255,255,0) 100%)',
+          position: 'absolute', top: 0, bottom: 0, right: 0, width: 50,
+          background: 'linear-gradient(270deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 100%)',
           pointerEvents: 'none',
         }} />
-        {/* Fade para branco na base */}
+        {/* Fade para branco na base (suave) */}
         <div style={{
-          position: 'absolute', left: 0, right: 0, bottom: 0, height: 120,
-          background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 100%)',
+          position: 'absolute', left: 0, right: 0, bottom: 0, height: 80,
+          background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.85) 100%)',
           pointerEvents: 'none',
         }} />
 
