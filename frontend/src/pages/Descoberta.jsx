@@ -67,7 +67,6 @@ function ObraCard({ obra, onPlay, onShowFicha, isPlaying, isActive, onAddHistori
             <BotaoCurtir obraId={obra.id} size={16} />
           </div>
         </div>
-        <div className="dc-card-preco">{fmt(obra.preco_cents)}</div>
       </div>
     </div>
   )
@@ -294,13 +293,10 @@ function FichaTecnica({ obra, onClose, onPlay, isPlaying, isActive }) {
           </div>
         </div>
 
-        <div className="dc-modal-buy-bar">
-          <div>
-            <div className="dc-modal-buy-label">Valor da licença</div>
-            <div className="dc-modal-buy-valor">{fmt(obra.preco_cents)}</div>
-          </div>
+        <div className="dc-modal-buy-bar" style={{ justifyContent: 'center' }}>
           <button
             className="dc-modal-buy-btn"
+            style={{ width: '100%' }}
             onClick={() => { onClose(); navigate(`/comprar/${obra.id}`) }}
           >
             Licenciar composição
