@@ -19,8 +19,7 @@ export default function GravanLogo({
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 520 160"
         height={height}
-        width="auto"
-        style={{ display: 'block' }}
+        style={{ display: 'block', width: 'auto' }}
       >
         <g fill="none" stroke={color} strokeWidth="10" strokeLinecap="round">
           <path d="M 105 45 A 55 55 0 1 0 105 135" />
