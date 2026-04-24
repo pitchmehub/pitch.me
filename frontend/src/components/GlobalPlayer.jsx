@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react'
 import { usePlayer } from '../contexts/PlayerContext'
 import { supabase } from '../lib/supabase'
+import BotaoCurtir from './BotaoCurtir'
 import './GlobalPlayer.css'
 
 function fmt(s) {
@@ -31,7 +32,9 @@ export default function GlobalPlayer() {
   const {
     obra, queue, index, playing, minimized, expanded, visible,
     currentTime, duration, loading, volume,
+    shuffle, repeat,
     togglePlay, seek, nextTrack, prevTrack, goToIndex, reorderQueue, removeFromQueue,
+    toggleShuffle, cycleRepeat,
     close, setMinimized, setExpanded, expandPlayer, setVolume,
   } = usePlayer()
 
@@ -200,7 +203,7 @@ export default function GlobalPlayer() {
                 <div className="gp-exp-autor">{obra.titular_nome}</div>
               </div>
               <div className="gp-exp-track-check">
-                <CheckIcon />
+                <BotaoCurtir obraId={obra.id} size={26} />
               </div>
             </div>
           </>
@@ -275,13 +278,28 @@ export default function GlobalPlayer() {
 
         {/* ── Controles principais ── */}
         <div className="gp-exp-controls">
-          <button className="gp-exp-ctrl-btn gp-exp-ctrl-side" aria-label="Embaralhar"><ShuffleIcon /></button>
+          <button
+            className={`gp-exp-ctrl-btn gp-exp-ctrl-side ${shuffle ? 'gp-exp-ctrl-on' : ''}`}
+            onClick={toggleShuffle}
+            aria-label={shuffle ? 'Desativar aleatório' : 'Aleatório'}
+            title={shuffle ? 'Aleatório ligado' : 'Aleatório desligado'}
+          >
+            <ShuffleIcon />
+          </button>
           <button className="gp-exp-ctrl-btn" onClick={prevTrack} aria-label="Anterior"><PrevIcon size={30} /></button>
           <button className="gp-exp-play-btn" onClick={togglePlay} aria-label={playing ? 'Pausar' : 'Tocar'}>
             {loading ? <Spinner size={32} /> : playing ? <PauseIcon size={34} /> : <PlayIcon size={34} />}
           </button>
           <button className="gp-exp-ctrl-btn" onClick={nextTrack} aria-label="Próxima"><NextIcon size={30} /></button>
-          <button className="gp-exp-ctrl-btn gp-exp-ctrl-side" aria-label="Repetir"><RepeatIcon /></button>
+          <button
+            className={`gp-exp-ctrl-btn gp-exp-ctrl-side ${repeat !== 'off' ? 'gp-exp-ctrl-on' : ''}`}
+            onClick={cycleRepeat}
+            aria-label={`Repetir: ${repeat}`}
+            title={repeat === 'off' ? 'Repetir desligado' : repeat === 'all' ? 'Repetir fila' : 'Repetir esta obra'}
+          >
+            <RepeatIcon />
+            {repeat === 'one' && <span className="gp-exp-ctrl-badge">1</span>}
+          </button>
         </div>
 
         {/* ── Barra de ações inferior ── */}

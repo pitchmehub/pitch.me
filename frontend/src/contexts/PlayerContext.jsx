@@ -14,8 +14,18 @@ export function PlayerProvider({ children }) {
   const [duration,    setDuration]   = useState(0)
   const [loading,     setLoading]    = useState(false)
   const [volume,      setVolume]     = useState(1)
+  // Aleatório ligado por padrão (a fila já é montada embaralhada na Descoberta).
+  const [shuffle,     setShuffle]    = useState(true)
+  // 'off' | 'all' (repete a fila) | 'one' (repete a obra atual)
+  const [repeat,      setRepeat]     = useState('off')
 
   const audioRef = useRef(new Audio())
+  // Refs p/ que listeners do <audio> sempre leiam o valor mais recente
+  // sem precisar reanexar a cada toggle.
+  const shuffleRef = useRef(shuffle)
+  const repeatRef  = useRef(repeat)
+  useEffect(() => { shuffleRef.current = shuffle }, [shuffle])
+  useEffect(() => { repeatRef.current  = repeat  }, [repeat])
 
   const obra = queue[index] ?? null
 
@@ -23,7 +33,30 @@ export function PlayerProvider({ children }) {
     const el = audioRef.current
     const onTime     = () => setCurrentTime(el.currentTime)
     const onDuration = () => setDuration(el.duration || 0)
-    const onEnded    = () => setIndex(i => (i + 1 < queue.length ? i + 1 : 0))
+    const onEnded    = () => {
+      // Repeat-one: reinicia a mesma faixa
+      if (repeatRef.current === 'one') {
+        el.currentTime = 0
+        el.play().catch(() => {})
+        return
+      }
+      setIndex(i => {
+        if (queue.length <= 1) {
+          if (repeatRef.current === 'all') {
+            el.currentTime = 0
+            el.play().catch(() => {})
+          }
+          return i
+        }
+        if (shuffleRef.current) {
+          let next = i
+          while (next === i) next = Math.floor(Math.random() * queue.length)
+          return next
+        }
+        if (i + 1 < queue.length) return i + 1
+        return repeatRef.current === 'all' ? 0 : i
+      })
+    }
     const onWaiting  = () => setLoading(true)
     const onCanPlay  = () => setLoading(false)
     const onPlay     = () => setPlaying(true)
@@ -104,8 +137,24 @@ export function PlayerProvider({ children }) {
   }, [])
 
   const nextTrack = useCallback(() => {
-    setIndex(i => (i + 1 < queue.length ? i + 1 : 0))
-  }, [queue.length])
+    setIndex(i => {
+      if (queue.length <= 1) return i
+      if (shuffle) {
+        let next = i
+        while (next === i) next = Math.floor(Math.random() * queue.length)
+        return next
+      }
+      return i + 1 < queue.length ? i + 1 : 0
+    })
+  }, [queue.length, shuffle])
+
+  const toggleShuffle = useCallback(() => {
+    setShuffle(s => !s)
+  }, [])
+
+  const cycleRepeat = useCallback(() => {
+    setRepeat(r => (r === 'off' ? 'all' : r === 'all' ? 'one' : 'off'))
+  }, [])
 
   const prevTrack = useCallback(() => {
     const el = audioRef.current
@@ -159,8 +208,10 @@ export function PlayerProvider({ children }) {
     <PlayerContext.Provider value={{
       obra, queue, index, playing, minimized, expanded, visible,
       currentTime, duration, loading, volume,
+      shuffle, repeat,
       playObra, expandPlayer, togglePlay, seek,
       goToIndex, nextTrack, prevTrack, reorderQueue, removeFromQueue,
+      toggleShuffle, cycleRepeat,
       close, setMinimized, setExpanded, setVolume,
     }}>
       {children}

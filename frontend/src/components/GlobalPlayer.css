@@ -331,7 +331,31 @@
 .gp-exp-ctrl-btn:hover  { background: rgba(255,255,255,.12); }
 .gp-exp-ctrl-btn:active { transform: scale(.92); }
 .gp-exp-ctrl-btn:disabled { opacity: .3; cursor: default; }
-.gp-exp-ctrl-side { color: rgba(255,255,255,.7); }
+.gp-exp-ctrl-side { color: rgba(255,255,255,.7); position: relative; }
+.gp-exp-ctrl-on   { color: #fff; }
+.gp-exp-ctrl-on::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 50%;
+  transform: translateX(-50%);
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #fff;
+}
+.gp-exp-ctrl-badge {
+  position: absolute;
+  top: 2px; right: 2px;
+  background: #fff;
+  color: #09090B;
+  font-size: 9px;
+  font-weight: 800;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 99px;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
 .gp-exp-play-btn {
   width: 76px; height: 76px; border-radius: 50%;
   background: #fff; color: #09090B;
