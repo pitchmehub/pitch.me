@@ -9,6 +9,11 @@ import ContratoEdicaoModal from '../components/ContratoEdicaoModal'
 const MAX_BYTES   = 10 * 1024 * 1024
 const MAX_AUTORES = 10
 
+const GENEROS_PERMITIDOS = [
+  'Sertanejo', 'MPB', 'Funk', 'Samba', 'Rock', 'Pop',
+  'Gospel', 'Forró', 'Pagode', 'RNB', 'RAP', 'OUTROS',
+]
+
 export default function NovaObra() {
   const { perfil } = useAuth()
   const navigate   = useNavigate()
@@ -116,6 +121,9 @@ export default function NovaObra() {
     if (!audioFile)    { setError('Selecione um arquivo de áudio.'); return }
     if (!nome.trim())  { setError('Nome da obra é obrigatório.'); return }
     if (!letra.trim()) { setError('Letra da obra é obrigatória.'); return }
+    if (!genero || !GENEROS_PERMITIDOS.includes(genero)) {
+      setError('Selecione o gênero da composição.'); return
+    }
     const precoNum = Number(preco)
     const precoMax = perfil?.nivel === 'diamante' ? 10000 : 3000
     if (!preco || precoNum < 500) { setError('Preço mínimo: R$ 500,00.'); return }
@@ -206,9 +214,18 @@ export default function NovaObra() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div className="form-group">
-              <label className="form-label">Gênero</label>
-              <input className="input" placeholder="Ex: Sertanejo, MPB…"
-                value={genero} onChange={e => setGenero(e.target.value)} maxLength={80} />
+              <label className="form-label">Gênero *</label>
+              <select
+                className="input"
+                value={genero}
+                onChange={e => setGenero(e.target.value)}
+                required
+              >
+                <option value="">Selecione o gênero…</option>
+                {GENEROS_PERMITIDOS.map(g => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label className="form-label">Valor da licença (R$) *</label>

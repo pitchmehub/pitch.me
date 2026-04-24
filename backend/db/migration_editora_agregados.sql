@@ -215,11 +215,11 @@ CONSIDERANDO QUE:
 CLÁUSULA PRIMEIRA — OBJETO
 1.1 O AUTOR contrata com a EDITORA a edição musical de sua parte sobre a OBRA, em regime de exclusividade, sem limitação territorial, nos termos da Lei 9.610/1998.
 
-1.2 Para todos os efeitos legais, integra o presente Contrato a LETRA COMPLETA da OBRA, conforme cadastrada pelo AUTOR na plataforma PITCH.ME, transcrita a seguir:
+1.2 Para todos os efeitos legais, integra o presente Contrato o CORPO DA OBRA, conforme cadastrado pelo AUTOR na plataforma PITCH.ME, transcrito a seguir:
 
-— INÍCIO DA LETRA DA OBRA "{{obra_nome}}" —
+— CORPO DA OBRA "{{obra_nome}}" —
 {{obra_letra}}
-— FIM DA LETRA DA OBRA —
+— FIM DO CORPO DA OBRA —
 
 CLÁUSULA SEGUNDA — DIREITOS
 2.1 Ficam sob a égide da EDITORA todos os direitos patrimoniais sobre a OBRA durante o prazo de proteção legal, em todos os países.

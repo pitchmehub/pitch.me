@@ -46,7 +46,18 @@ def criar_obra():
     if not nome or not letra:
         abort(422, description="Campos 'nome' e 'letra' são obrigatórios.")
 
-    genero = request.form.get("genero")
+    GENEROS_PERMITIDOS = {
+        "Sertanejo", "MPB", "Funk", "Samba", "Rock", "Pop",
+        "Gospel", "Forró", "Pagode", "RNB", "RAP", "OUTROS",
+    }
+    genero = (request.form.get("genero") or "").strip()
+    if not genero:
+        abort(422, description="Campo 'genero' é obrigatório.")
+    if genero not in GENEROS_PERMITIDOS:
+        abort(422, description=(
+            "Gênero inválido. Valores permitidos: "
+            + ", ".join(sorted(GENEROS_PERMITIDOS))
+        ))
 
     try:
         preco_cents = int(request.form.get("preco_cents", 0))

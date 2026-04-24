@@ -34,9 +34,9 @@ CLÁUSULA PRIMEIRA — OBJETO
 
 1.3 Para todos os efeitos legais, integra o presente Contrato a LETRA COMPLETA da OBRA, conforme cadastrada pelo AUTOR na plataforma Pitch.me, transcrita a seguir:
 
-— INÍCIO DA LETRA DA OBRA "{{obra_nome}}" —
+— CORPO DA OBRA "{{obra_nome}}" —
 {{obra_letra}}
-— FIM DA LETRA DA OBRA —
+— FIM DO CORPO DA OBRA —
 
 CLÁUSULA SEGUNDA — DIREITOS
 

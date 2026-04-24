@@ -36,11 +36,11 @@ O presente contrato tem por objeto a autorização para fixação da obra musica
 
 Título da Obra: {{obra_nome}}
 
-LETRA COMPLETA DA OBRA, conforme cadastrada pelo(s) AUTOR(ES) na plataforma PITCH.ME, parte integrante e indissociável deste Contrato:
+CORPO DA OBRA, conforme cadastrada pelo(s) AUTOR(ES) na plataforma PITCH.ME, parte integrante e indissociável deste Contrato:
 
-— INÍCIO DA LETRA —
+— CORPO DA OBRA —
 {{obra_letra}}
-— FIM DA LETRA —
+— FIM DO CORPO DA OBRA —
 
 CLÁUSULA 2 — CESSÃO DE DIREITOS
 
@@ -350,12 +350,12 @@ fonograma e sua exploração comercial pelo LICENCIADO, com a participação
 da EDITORA TERCEIRA na qualidade de detentora dos direitos editoriais e
 da PITCH.ME como plataforma intermediária.
 
-LETRA COMPLETA DA OBRA, conforme cadastrada pelo(s) AUTOR(ES) na plataforma
+CORPO DA OBRA, conforme cadastrada pelo(s) AUTOR(ES) na plataforma
 PITCH.ME, parte integrante e indissociável deste Contrato:
 
-— INÍCIO DA LETRA —
+— CORPO DA OBRA —
 {{obra_letra}}
-— FIM DA LETRA —
+— FIM DO CORPO DA OBRA —
 
 CLÁUSULA 3 — VALOR E ESCROW
 
