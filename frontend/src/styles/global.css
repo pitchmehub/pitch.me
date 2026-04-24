@@ -311,29 +311,39 @@ select.input {
     box-shadow: 0 2px 8px rgba(9,9,11,.08);
   }
 
-  .card { padding: 14px !important; }
-  h1    { font-size: 20px !important; }
-  h2    { font-size: 16px !important; }
-  h3    { font-size: 14px !important; }
+  .card { padding: 10px !important; }
+  h1    { font-size: 18px !important; }
+  h2    { font-size: 15px !important; }
+  h3    { font-size: 13px !important; }
+
+  body  { font-size: 13px; }
 
   .input, input, textarea, select {
-    font-size: 16px !important;
-    padding: 11px 14px !important;
+    font-size: 14px !important;
+    padding: 9px 12px !important;
   }
-  .btn { padding: 10px 16px; font-size: 13px; }
+  .btn        { padding: 9px 14px; font-size: 12px; }
+  .btn-lg     { padding: 11px 20px; font-size: 13px; }
+  .badge      { font-size: 10px; padding: 2px 7px; }
 
-  /* Espaço para a barra de navegação inferior não cobrir o conteúdo */
+  /* Espaço para a barra de navegação inferior */
   .main-content {
     margin-left: 0 !important;
-    padding: 16px 14px !important;
-    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 12px 12px !important;
+    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   /* Compactar espaçamentos gerais */
-  .form-group { margin-bottom: 14px; }
-  .divider    { margin: 12px 0; }
-  .gap-16     { gap: 10px; }
-  .mt-24      { margin-top: 16px; }
+  .form-group  { margin-bottom: 10px; }
+  .form-label  { font-size: 10px; }
+  .divider     { margin: 8px 0; }
+  .gap-16      { gap: 8px; }
+  .gap-8       { gap: 5px; }
+  .mt-24       { margin-top: 12px; }
+  .mt-16       { margin-top: 8px; }
+
+  /* Cards menores */
+  .card-sm { padding: 8px !important; }
 }
 
 @media (max-width: 380px) {

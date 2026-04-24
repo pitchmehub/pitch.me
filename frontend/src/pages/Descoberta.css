@@ -373,39 +373,85 @@
 
 /* ── RESPONSIVO ──────────────────────────── */
 @media (max-width: 767px) {
-  .dc-topbar      { padding: 12px 14px 10px; padding-left: 64px; flex-direction: column; align-items: stretch; gap: 8px; }
-  .dc-tabs        { justify-content: center; }
-  .dc-tab         { font-size: 12px; padding: 6px 12px; }
-  .dc-tab-icon    { font-size: 12px; }
-  .dc-search      { font-size: 13px; padding: 8px 12px 8px 34px; }
+  /* Topbar compacta */
+  .dc-topbar      { padding: 8px 12px; flex-direction: column; align-items: stretch; gap: 6px; }
+  .dc-tabs        { justify-content: flex-start; gap: 6px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 2px; }
+  .dc-tab         { font-size: 12px; padding: 5px 10px; flex-shrink: 0; }
+  .dc-tab-icon    { font-size: 11px; }
+
+  /* Busca compacta */
+  .dc-search      { font-size: 13px; padding: 7px 10px 7px 32px; }
   .dc-search-wrap { max-width: 100%; }
+  .dc-search-icon { left: 10px; font-size: 13px; }
 
-  .dc-generos     { padding: 10px 14px; gap: 6px; overflow-x: auto; flex-wrap: nowrap; }
-  .dc-genero-btn  { font-size: 11px; padding: 4px 10px; white-space: nowrap; }
+  /* Filtros de gênero — scroll horizontal */
+  .dc-generos     { padding: 6px 12px; gap: 5px; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .dc-generos::-webkit-scrollbar { display: none; }
+  .dc-genero-btn  { font-size: 11px; padding: 4px 10px; flex-shrink: 0; }
 
-  .dc-section        { padding: 0 14px 20px; }
-  .dc-section-title  { font-size: 14px; margin-bottom: 10px; }
+  /* Seções */
+  .dc-section        { padding: 0 12px 12px; }
+  .dc-section-title  { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
 
-  .dc-grid        { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .dc-card        { padding: 6px; }
-  .dc-card-cover  { margin-bottom: 6px; border-radius: 6px; }
-  .dc-card-note   { font-size: 22px; }
+  /* Grid de cards — scroll horizontal estilo Spotify */
+  .dc-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .dc-grid::-webkit-scrollbar { display: none; }
+  .dc-card        { flex-shrink: 0; width: 110px; padding: 6px; }
+  .dc-card-cover  { margin-bottom: 5px; border-radius: 4px; }
+  .dc-card-note   { font-size: 20px; }
   .dc-card-play   {
-    width: 30px; height: 30px; font-size: 11px;
+    width: 28px; height: 28px; font-size: 10px;
     bottom: 4px; right: 4px;
-    opacity: 1; transform: none;          /* sempre visível no mobile (sem hover) */
+    opacity: 1; transform: none;
   }
   .dc-card-nome   { font-size: 11px; margin-bottom: 1px; }
-  .dc-card-autor  { font-size: 10px; margin-bottom: 3px; }
-  .dc-card-preco  { font-size: 11px; }
+  .dc-card-autor  { font-size: 10px; margin-bottom: 2px; }
+  .dc-card-preco  { font-size: 10px; }
 
-  .dc-comp-grid       { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .dc-comp-avatar     { width: 56px; height: 56px; font-size: 18px; }
-  .dc-comp-nome       { font-size: 11px; }
-  .dc-comp-nivel      { font-size: 10px; }
+  /* Compositores */
+  .dc-comp-grid       { grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+  .dc-comp-card       { padding: 8px 4px; gap: 5px; }
+  .dc-comp-avatar     { width: 48px; height: 48px; font-size: 16px; }
+  .dc-comp-nome       { font-size: 10px; max-width: 70px; }
+  .dc-comp-nivel      { font-size: 9px; }
+
+  /* Perfil do compositor no mobile */
+  .dc-compositor-header   { padding: 12px; gap: 10px; margin-bottom: 12px; }
+  .dc-compositor-avatar   { width: 56px; height: 56px; font-size: 20px; }
+  .dc-compositor-nome     { font-size: 16px; }
+
+  /* Modal */
+  .dc-modal-overlay   { padding: 0; align-items: flex-end; }
+  .dc-modal           { max-width: 100%; border-radius: 12px 12px 0 0; max-height: 90vh; }
+  .dc-modal-header    { padding: 16px; gap: 12px; }
+  .dc-modal-cover     { width: 56px; height: 56px; font-size: 24px; }
+  .dc-modal-nome      { font-size: 18px; }
+  .dc-modal-autor     { font-size: 12px; }
+  .dc-modal-actions   { padding: 12px 16px; gap: 10px; }
+  .dc-modal-play-btn  { width: 42px; height: 42px; font-size: 15px; }
+  .dc-modal-section   { padding: 8px 16px 12px; }
+  .dc-modal-buy-bar   { margin: 6px 16px 16px; padding: 12px; }
+  .dc-modal-buy-valor { font-size: 20px; }
+  .dc-modal-buy-btn   { padding: 10px 18px; font-size: 13px; }
+
+  /* Estado vazio */
+  .dc-empty       { padding: 40px 20px; }
+  .dc-empty-icon  { font-size: 36px; }
+  .dc-empty-title { font-size: 15px; }
+
+  /* Resultados de busca */
+  .dc-search-results { padding: 10px 12px; }
 }
 
 @media (max-width: 380px) {
-  .dc-grid      { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .dc-comp-grid { grid-template-columns: repeat(2, 1fr); }
+  .dc-grid      { gap: 6px; }
+  .dc-card      { width: 96px; }
+  .dc-comp-grid { grid-template-columns: repeat(3, 1fr); }
 }
