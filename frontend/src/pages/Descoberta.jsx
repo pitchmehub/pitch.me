@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase'
 import { api } from '../lib/api'
 import './Descoberta.css'
 import NotificationBell from '../components/NotificationBell'
+import ArtistaHero, { ObrasLista } from '../components/ArtistaHero'
 
 function fmt(cents) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((cents ?? 0) / 100)
@@ -389,7 +390,7 @@ export default function Descoberta() {
         const [obras, comps, eds] = await Promise.all([
           api.get(`/catalogo/?q=${encodeURIComponent(q)}&per_page=12`).catch(() => []),
           supabase.from('perfis')
-            .select('id, nome, nome_artistico, avatar_url, nivel')
+            .select('id, nome, nome_artistico, avatar_url, capa_url, nivel, role, bio')
             .eq('role', 'compositor')
             .or(`nome.ilike.%${q}%,nome_artistico.ilike.%${q}%`)
             .limit(8).then(r => r.data ?? []).catch(() => []),
@@ -534,27 +535,22 @@ export default function Descoberta() {
       )}
 
       {compositor && !busca && (
-        <div className="dc-section">
-          <div className="dc-compositor-header">
-            <div className="dc-compositor-avatar" style={{ background: ObrgGrad(compositor.id) }}>
-              {compositor.avatar_url ? <img src={compositor.avatar_url} alt={compositor.nome} /> : compositor.nome?.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <div className="dc-compositor-nome">{compositor.nome_artistico || compositor.nome}</div>
-              <div className="dc-muted">{obrasDoCom.length} obra{obrasDoCom.length !== 1 ? 's' : ''} (titular ou coautor)</div>
-            </div>
-            <button className="dc-back-btn" onClick={() => setCompositor(null)}>← Voltar</button>
-          </div>
-          <div className="dc-grid">
-            {obrasDoCom.map(o => (
-              <ObraCard key={o.id} obra={o}
-                isActive={obraAtual?.id === o.id}
-                isPlaying={obraAtual?.id === o.id && playing}
-                onPlay={handlePlay}
-                onShowFicha={setFichaObra}
-                onAddHistorico={addHistorico} />
-            ))}
-            {obrasDoCom.length === 0 && <p className="dc-muted">Nenhuma obra publicada.</p>}
+        <div style={{ background: '#fff' }}>
+          <ArtistaHero
+            perfil={{ ...compositor, role: compositor.role || 'compositor' }}
+            totalObras={obrasDoCom.length}
+            fallbackGrad={ObrgGrad(compositor.id)}
+            onBack={() => setCompositor(null)}
+          />
+          <div style={{ padding: '20px 32px 40px' }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 16 }}>
+              Composições
+            </h2>
+            <ObrasLista
+              obras={obrasDoCom}
+              getGrad={ObrgGrad}
+              onSelect={o => navigate(`/comprar/${o.id}`)}
+            />
           </div>
         </div>
       )}
