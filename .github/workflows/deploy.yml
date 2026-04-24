@@ -1,0 +1,50 @@
+name: Trigger Deploys
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy-vercel:
+    name: Deploy Frontend (Vercel)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel deploy hook
+        env:
+          HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "VERCEL_DEPLOY_HOOK secret not configured. Skipping Vercel deploy."
+            exit 0
+          fi
+          echo "Triggering Vercel deploy..."
+          response=$(curl -s -o /tmp/vercel_response.json -w "%{http_code}" -X POST "$HOOK_URL")
+          echo "HTTP status: $response"
+          cat /tmp/vercel_response.json || true
+          if [ "$response" -ge 400 ]; then
+            echo "Vercel deploy failed."
+            exit 1
+          fi
+
+  deploy-render:
+    name: Deploy Backend (Render)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy hook
+        env:
+          HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "RENDER_DEPLOY_HOOK secret not configured. Skipping Render deploy."
+            exit 0
+          fi
+          echo "Triggering Render deploy..."
+          response=$(curl -s -o /tmp/render_response.json -w "%{http_code}" -X POST "$HOOK_URL")
+          echo "HTTP status: $response"
+          cat /tmp/render_response.json || true
+          if [ "$response" -ge 400 ]; then
+            echo "Render deploy failed."
+            exit 1
+          fi
