@@ -1,26 +1,26 @@
-import { supabase } from '../lib/supabase'
+import { api } from './api'
 
 const cache = new Map()
 
-export async function getAudioUrl(audioPath) {
-  if (!audioPath) return null
+export async function getAudioUrl(obraId) {
+  if (!obraId) return null
 
-  // Cache em memória por 50 minutos (URLs duram 1h)
-  if (cache.has(audioPath)) {
-    const { url, expires } = cache.get(audioPath)
+  if (cache.has(obraId)) {
+    const { url, expires } = cache.get(obraId)
     if (Date.now() < expires) return url
   }
 
-  const { data, error } = await supabase.storage
-    .from('obras-audio')
-    .createSignedUrl(audioPath, 3600) // 1 hora
+  try {
+    const { url } = await api.get(`/obras/${obraId}/preview-url`)
+    if (!url) return null
 
-  if (error || !data?.signedUrl) return null
+    cache.set(obraId, {
+      url,
+      expires: Date.now() + 50 * 60 * 1000,
+    })
 
-  cache.set(audioPath, {
-    url:     data.signedUrl,
-    expires: Date.now() + 50 * 60 * 1000,
-  })
-
-  return data.signedUrl
+    return url
+  } catch (_) {
+    return null
+  }
 }

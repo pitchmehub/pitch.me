@@ -63,7 +63,7 @@ export function PlayerProvider({ children }) {
     setCurrentTime(0)
     setDuration(0)
     setLoading(true)
-    const url = await getAudioUrl(obra.audio_path)
+    const url = await getAudioUrl(obra.id)
     if (!url) { setLoading(false); return }
     el.src = url
     el.load()
