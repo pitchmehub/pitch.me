@@ -9,7 +9,6 @@ const NAV_ITEMS = {
     { to: '/dashboard',   icon: '◈', label: 'Dashboard'       },
     { to: '/obras',       icon: '♫', label: 'Minhas obras'    },
     { to: '/obras/nova',  icon: '♪', label: 'Nova obra'       },
-    { to: '/biblioteca',  icon: '♡', label: 'Biblioteca'      },
     { to: '/analytics',   icon: '◐', label: 'Analytics', pro: true },
     { to: '/contratos',   icon: '§', label: 'Meus contratos'  },
     { to: '/saques',      icon: '◎', label: 'Saques' },
@@ -18,7 +17,6 @@ const NAV_ITEMS = {
   ],
   interprete: [
     { to: '/descoberta',  icon: '⊞', label: 'Descoberta'      },
-    { to: '/biblioteca',  icon: '♡', label: 'Biblioteca'      },
     { to: '/compras',     icon: '◉', label: 'Compras'         },
     { to: '/ofertas',     icon: '✉', label: 'Ofertas'         },
     { to: '/planos',      icon: '★', label: 'Planos'          },
@@ -49,7 +47,6 @@ const NAV_ITEMS = {
   ],
   artist: [
     { to: '/dashboard',   icon: '◈', label: 'Dashboard'       },
-    { to: '/biblioteca',  icon: '♡', label: 'Biblioteca'      },
     { to: '/contratos',   icon: '§', label: 'Meus contratos'  },
     { to: '/descoberta',  icon: '⊞', label: 'Descoberta'      },
   ],

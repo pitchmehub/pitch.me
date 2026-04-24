@@ -135,14 +135,20 @@ function EditoraCard({ editora, isAdmin, navigate }) {
 function FichaTecnica({ obra, onClose, onPlay, isPlaying, isActive }) {
   const navigate = useNavigate()
   const [coautores, setCoautores] = useState([])
+  const [letraOpen, setLetraOpen] = useState(false)
+  const [letra, setLetra] = useState(null)
+  const [loadingLetra, setLoadingLetra] = useState(false)
 
   useEffect(() => {
     function onKey(e) {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        if (letraOpen) setLetraOpen(false)
+        else onClose()
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [onClose, letraOpen])
 
   useEffect(() => {
     async function load() {
@@ -154,6 +160,24 @@ function FichaTecnica({ obra, onClose, onPlay, isPlaying, isActive }) {
     }
     load()
   }, [obra.id])
+
+  async function abrirLetra() {
+    setLetraOpen(true)
+    if (letra !== null) return
+    setLoadingLetra(true)
+    try {
+      const { data } = await supabase
+        .from('obras')
+        .select('letra')
+        .eq('id', obra.id)
+        .maybeSingle()
+      setLetra(data?.letra || '')
+    } catch (_) {
+      setLetra('')
+    } finally {
+      setLoadingLetra(false)
+    }
+  }
 
   return (
     <div className="dc-modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
@@ -177,6 +201,61 @@ function FichaTecnica({ obra, onClose, onPlay, isPlaying, isActive }) {
             <span className="dc-modal-action-label">
               {isActive && isPlaying ? 'Reproduzindo…' : 'Ouvir preview'}
             </span>
+          </div>
+        )}
+
+        <div className="dc-modal-actions" style={{ borderTop: 0, paddingTop: 0 }}>
+          <button
+            type="button"
+            onClick={abrirLetra}
+            style={{
+              width: '100%', padding: '12px 16px',
+              background: '#09090B', color: '#fff',
+              border: 'none', borderRadius: 8,
+              fontSize: 13, fontWeight: 700, letterSpacing: 0.4,
+              cursor: 'pointer', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', gap: 8,
+            }}>
+            <span style={{ fontSize: 15 }}>📖</span> Ler letra
+          </button>
+        </div>
+
+        {letraOpen && (
+          <div
+            className="dc-modal-overlay"
+            onClick={e => { if (e.target === e.currentTarget) setLetraOpen(false) }}
+            style={{ zIndex: 9999 }}>
+            <div className="dc-modal" style={{ maxWidth: 640, display: 'flex', flexDirection: 'column', maxHeight: '85vh' }}>
+              <button className="dc-modal-close" onClick={() => setLetraOpen(false)}>×</button>
+              <div className="dc-modal-header" style={{ background: ObrgGrad(obra.id) }}>
+                <div className="dc-modal-cover">📖</div>
+                <div>
+                  <div className="dc-modal-genre">Letra completa</div>
+                  <div className="dc-modal-nome">{obra.nome}</div>
+                  <div className="dc-modal-autor">{obra.titular_nome || obra.compositor_nome || ''}</div>
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: '20px 24px',
+                  overflowY: 'auto',
+                  flex: 1,
+                  whiteSpace: 'pre-wrap',
+                  fontSize: 15,
+                  lineHeight: 1.7,
+                  color: '#1F2937',
+                  fontFamily: 'Georgia, "Times New Roman", serif',
+                }}>
+                {loadingLetra
+                  ? <div style={{ color: '#6B7280', textAlign: 'center', padding: 24 }}>Carregando letra…</div>
+                  : (letra && letra.trim())
+                    ? letra
+                    : <div style={{ color: '#6B7280', textAlign: 'center', padding: 24 }}>
+                        Esta obra ainda não tem letra cadastrada.
+                      </div>
+                }
+              </div>
+            </div>
           </div>
         )}
 
