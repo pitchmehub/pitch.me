@@ -76,7 +76,10 @@ export function PlayerProvider({ children }) {
     setQueue(lista)
     setIndex(idx)
     setVisible(true)
-    setMinimized(false)
+    // No mobile, abrir já no modo minimizado (acima da bottom nav).
+    // No desktop continua na barra inferior padrão.
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+    setMinimized(isMobile)
     setExpanded(false)
   }, [])
 

@@ -185,6 +185,23 @@ export default function GlobalPlayer() {
           }
         </div>
 
+        {/* Card "Ler letra" — fica no topo do player maximizado */}
+        {!showQueue && (
+          <div
+            className="gp-letra-card"
+            onClick={abrirLetra}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="gp-letra-card-icon">📖</div>
+            <div className="gp-letra-card-text">
+              <div className="gp-letra-card-title">LER LETRA</div>
+              <div className="gp-letra-card-sub">Abrir letra · player continua tocando</div>
+            </div>
+            <div className="gp-letra-card-arrow">›</div>
+          </div>
+        )}
+
         {/* ── VIEW: TOCANDO ── */}
         {!showQueue && (
           <>
@@ -289,11 +306,6 @@ export default function GlobalPlayer() {
           </button>
           <button className="gp-exp-ctrl-btn" onClick={nextTrack}><NextIcon size={28} /></button>
         </div>
-
-        {/* LER LETRA — só na view Tocando */}
-        {!showQueue && (
-          <button className="gp-ler-letra-btn" onClick={abrirLetra}>📖 LER LETRA</button>
-        )}
 
         {/* Janela de letra */}
         {letraOpen && (

@@ -175,7 +175,13 @@ export default function SideMenu({ onCollapse }) {
 
   // ── MOBILE: barra de navegação inferior ──────────────────────
   if (isMobile) {
-    const mobileItems = items.slice(0, 5)
+    // Descoberta sempre fica como botão central destacado.
+    const descoberta = items.find(i => i.to === '/descoberta')
+                    ?? { to: '/descoberta', icon: '⊞', label: 'Descoberta' }
+    const semDescoberta = items.filter(i => i.to !== '/descoberta')
+    // 2 itens à esquerda, Descoberta no centro, 2 itens à direita (último é "Mais").
+    const left  = semDescoberta.slice(0, 2)
+    const right = semDescoberta.slice(2, 3) // 1 item, depois vem o "Mais"
     return (
       <>
         {mobileOpen && (
@@ -235,7 +241,27 @@ export default function SideMenu({ onCollapse }) {
         )}
 
         <nav className="mobile-bottom-nav">
-          {mobileItems.map(({ to, icon, label }) => (
+          {left.map(({ to, icon, label }) => (
+            <NavLink key={to} to={to}
+              className={({ isActive }) => `mobile-bottom-item ${isActive ? 'active' : ''}`}>
+              <span className="mobile-bottom-icon">{icon}</span>
+              <span className="mobile-bottom-label">{label}</span>
+            </NavLink>
+          ))}
+
+          {/* Botão central: Descoberta */}
+          <NavLink
+            key={descoberta.to}
+            to={descoberta.to}
+            className={({ isActive }) => `mobile-bottom-center ${isActive ? 'active' : ''}`}
+            aria-label="Descoberta">
+            <span className="mobile-bottom-center-circle">
+              <span className="mobile-bottom-center-icon">{descoberta.icon}</span>
+            </span>
+            <span className="mobile-bottom-center-label">{descoberta.label}</span>
+          </NavLink>
+
+          {right.map(({ to, icon, label }) => (
             <NavLink key={to} to={to}
               className={({ isActive }) => `mobile-bottom-item ${isActive ? 'active' : ''}`}>
               <span className="mobile-bottom-icon">{icon}</span>

@@ -298,4 +298,58 @@
     max-width: 56px;
     text-align: center;
   }
+
+  /* Botão central destacado: Descoberta */
+  .mobile-bottom-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
+    padding: 0 4px 6px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    cursor: pointer;
+    position: relative;
+  }
+  .mobile-bottom-center-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -22px;
+    box-shadow:
+      0 6px 18px rgba(225,29,72,.35),
+      0 0 0 4px var(--surface);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .mobile-bottom-center:active .mobile-bottom-center-circle {
+    transform: scale(.94);
+  }
+  .mobile-bottom-center.active .mobile-bottom-center-circle {
+    box-shadow:
+      0 8px 22px rgba(225,29,72,.5),
+      0 0 0 4px var(--surface);
+  }
+  .mobile-bottom-center-icon {
+    font-size: 24px;
+    line-height: 1;
+    color: #fff;
+  }
+  .mobile-bottom-center-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .mobile-bottom-center.active .mobile-bottom-center-label {
+    color: var(--brand);
+  }
 }

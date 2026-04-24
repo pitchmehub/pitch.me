@@ -32,14 +32,16 @@ function ObraCard({ obra, onPlay, onShowFicha, onExpand, isPlaying, isActive, on
     const now = Date.now()
     if (now - lastClick.current < 400) {
       lastClick.current = 0
-      // Duplo clique: abre player maximizado se tiver áudio
-      if (obra.audio_path) {
-        onExpand(obra)
-      } else {
-        onShowFicha(obra)
+      // Duplo clique: abre a ficha técnica.
+      // Se a obra tem áudio e ainda não está tocando, garante que o player continue tocando.
+      if (obra.audio_path && !isActive) {
+        onAddHistorico(obra.id)
+        onPlay(obra)
       }
+      onShowFicha(obra)
     } else {
       lastClick.current = now
+      // Clique simples: começa a tocar (player aparece minimizado no mobile).
       if (obra.audio_path) {
         onAddHistorico(obra.id)
         onPlay(obra)
