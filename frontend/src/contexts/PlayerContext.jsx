@@ -1,5 +1,18 @@
 import React, { createContext, useContext, useRef, useState, useEffect, useCallback } from 'react'
 import { getAudioUrl } from '../lib/audioUrl'
+import { api } from '../lib/api'
+
+// Quantas páginas (per_page=50) puxar ao montar a "fila global" de obras.
+// 4 × 50 = até 200 obras na fila. Suficiente pra navegação contínua.
+const GLOBAL_QUEUE_PAGES = 4
+
+function shuffleInPlace(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+}
 
 const PlayerContext = createContext(null)
 
@@ -26,6 +39,35 @@ export function PlayerProvider({ children }) {
   const repeatRef  = useRef(repeat)
   useEffect(() => { shuffleRef.current = shuffle }, [shuffle])
   useEffect(() => { repeatRef.current  = repeat  }, [repeat])
+
+  // Cache da fila global (todas as obras do site, embaralhadas).
+  // Carregada sob demanda na 1ª vez que o player é acionado.
+  const globalCacheRef = useRef(null)
+  const globalLoadingRef = useRef(null)
+
+  async function loadGlobalCatalog() {
+    if (globalCacheRef.current) return globalCacheRef.current
+    if (globalLoadingRef.current) return globalLoadingRef.current
+    globalLoadingRef.current = (async () => {
+      const acc = []
+      for (let p = 1; p <= GLOBAL_QUEUE_PAGES; p++) {
+        try {
+          const data = await api.get(`/catalogo/?page=${p}&per_page=50`)
+          if (!Array.isArray(data) || data.length === 0) break
+          acc.push(...data)
+          if (data.length < 50) break
+        } catch (_) { break }
+      }
+      const filtrado = acc.filter(o => o && o.id && o.audio_path)
+      globalCacheRef.current = filtrado
+      return filtrado
+    })()
+    try {
+      return await globalLoadingRef.current
+    } finally {
+      globalLoadingRef.current = null
+    }
+  }
 
   const obra = queue[index] ?? null
 
@@ -111,21 +153,39 @@ export function PlayerProvider({ children }) {
     if (opts.shuffle && lista.length > 1) {
       const start = lista[idx]
       const restantes = lista.filter((_, i) => i !== idx)
-      for (let i = restantes.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[restantes[i], restantes[j]] = [restantes[j], restantes[i]]
-      }
+      shuffleInPlace(restantes)
       fila = [start, ...restantes]
       inicio = 0
     }
+
+    // Inicia já com o que temos (resposta instantânea)
     setQueue(fila)
     setIndex(inicio)
     setVisible(true)
-    // No mobile, abrir já no modo minimizado (acima da bottom nav).
-    // No desktop continua na barra inferior padrão.
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
     setMinimized(isMobile)
     setExpanded(false)
+
+    // Em paralelo: enriquece a fila com TODAS as obras do site embaralhadas,
+    // pra que o usuário sempre tenha "próxima" disponível, mesmo que tenha
+    // clicado numa obra solta. Pode ser desativado com opts.fillFromCatalog=false.
+    if (opts.fillFromCatalog !== false) {
+      try {
+        const todas = await loadGlobalCatalog()
+        if (!todas || todas.length === 0) return
+        const inicial = fila[inicio]
+        const idsExistentes = new Set(fila.map(o => o.id))
+        const extras = todas.filter(o => !idsExistentes.has(o.id))
+        shuffleInPlace(extras)
+        const novaFila = [...fila, ...extras]
+        // Mantém o índice da obra que está tocando para não interromper o áudio.
+        const novoIdx = novaFila.findIndex(o => o.id === inicial?.id)
+        setQueue(novaFila)
+        if (novoIdx >= 0) setIndex(novoIdx)
+      } catch (_) {
+        /* sem internet → mantém só a fila local */
+      }
+    }
   }, [])
 
   const expandPlayer = useCallback(() => {
