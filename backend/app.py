@@ -34,6 +34,7 @@ def create_app() -> Flask:
     from routes.publishers       import publishers_bp
     from routes.agregados        import agregados_bp
     from routes.contratos_edicao import contratos_edicao_bp
+    from routes.keep_alive       import keep_alive_bp
 
     # ═══════════════════════════════════════════════════════════
     # SESSION CONFIGURATION
@@ -199,6 +200,9 @@ def create_app() -> Flask:
     app.register_blueprint(agregados_bp)
     app.register_blueprint(contratos_edicao_bp)
     app.register_blueprint(notificacoes_bp, url_prefix="/api/notificacoes")
+    app.register_blueprint(keep_alive_bp, url_prefix="/api")
+    csrf.exempt(keep_alive_bp)
+    limiter.exempt(keep_alive_bp)
 
     # Licenciamento de obras editadas por terceiras editoras
     from routes.ofertas_terceiros import ofertas_lic_bp
@@ -228,6 +232,15 @@ def create_app() -> Flask:
     @limiter.exempt
     def health():
         return jsonify({"status": "ok"}), 200
+
+    # ═══════════════════════════════════════════════════════════
+    # HEARTBEAT INTERNO (anti-sleep)
+    # ═══════════════════════════════════════════════════════════
+    try:
+        from services.heartbeat import start_heartbeat
+        start_heartbeat()
+    except Exception as _e:
+        app.logger.warning(f"Heartbeat não pôde ser iniciado: {_e}")
 
     return app
 

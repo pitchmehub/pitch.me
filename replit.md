@@ -29,6 +29,16 @@ Configured for Replit autoscale:
 - Build: `cd frontend && npm install && npm run build`
 - Run: gunicorn serves Flask on `127.0.0.1:8000`, Vite preview serves the built SPA on `0.0.0.0:5000` and proxies `/api` to gunicorn.
 
+## Keep-alive (anti-sleep)
+
+Three layers run together to keep the backend awake:
+
+1. **Backend routes** (`backend/routes/keep_alive.py`) — `GET /api/ping` and `GET /api/keep-alive`. Both are CSRF- and rate-limit-exempt. Use `/api/keep-alive` from external uptime monitors (UptimeRobot, BetterStack, Cron-job.org).
+2. **Internal heartbeat** (`backend/services/heartbeat.py`) — daemon thread started in `create_app()` that hits `http://127.0.0.1:8000/api/ping` every 240 s. Configurable via env vars `HEARTBEAT_ENABLED` (`1`/`0`), `HEARTBEAT_INTERVAL` (seconds), `HEARTBEAT_URL`.
+3. **Frontend pinger** (`frontend/src/lib/keepAlive.js`) — fires from `main.jsx` and pings `/ping` every 4 minutes while the tab is visible (auto-pauses when hidden).
+
+A standalone external pinger is also available at `scripts/external_pinger.py` for use in cron / GitHub Actions / a separate VM.
+
 ## Player
 
 Global audio player lives in `frontend/src/contexts/PlayerContext.jsx` and `frontend/src/components/GlobalPlayer.jsx`. Audio URLs are signed by the backend (`/api/obras/<id>/preview-url`) for private bucket access.
