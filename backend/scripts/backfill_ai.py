@@ -75,7 +75,16 @@ def backfill_letras(sb):
             sb.table("obras").update({"letra_status": "transcrevendo"}).eq("id", oid).execute()
 
             print("   ↓ baixando áudio...", flush=True)
-            audio_bytes = sb.storage.from_("obras-audio").download(o["audio_path"])
+            try:
+                audio_bytes = sb.storage.from_("obras-audio").download(o["audio_path"])
+            except Exception as down_err:
+                msg = str(down_err)
+                if "not found" in msg.lower() or "404" in msg or "400" in msg:
+                    sb.table("obras").update({"letra_status": "erro"}).eq("id", oid).execute()
+                    erros += 1
+                    print(f"   ⚠ áudio não existe no storage — pulando", flush=True)
+                    continue
+                raise
 
             print(f"   ✎ transcrevendo ({len(audio_bytes)//1024} KB)...", flush=True)
             t1 = time.time()
