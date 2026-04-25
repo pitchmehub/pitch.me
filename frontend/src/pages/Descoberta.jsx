@@ -47,6 +47,7 @@ function ObraCard({ obra, onPlay, onShowFicha, onExpand, isPlaying, isActive, on
  src={obra.cover_url}
  alt=""
  loading="lazy"
+ decoding="async"
  className="dc-card-cover-img"
  onError={e => { e.currentTarget.style.display = 'none' }}
  />

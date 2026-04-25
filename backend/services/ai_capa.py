@@ -3,19 +3,25 @@ Geração de capas de obra via Pollinations.ai (gratuito, sem chave).
 
 Estratégia MVP:
   • Constrói um prompt em inglês baseado no nome + gênero da obra
-  • Gera URL determinística do Pollinations.ai (a própria URL é a imagem)
-  • Salva a URL em obras.cover_url
+  • Gera URL determinística do Pollinations.ai
+  • Baixa a imagem e PERSISTE no Supabase Storage (bucket "capas")
+  • Salva a URL pública do Supabase em obras.cover_url
 
-Pollinations não exige chave nem cadastro. Para escala maior trocar
-por Hugging Face / OpenAI sem alterar o resto da app.
+Persistência local é necessária porque Pollinations.ai é lento/instável
+(timeouts e respostas vazias frequentes), o que fazia as capas não
+aparecerem no front quando o navegador carregava muitas ao mesmo tempo.
 """
 import logging
 import urllib.parse
+import requests
 from db.supabase_client import get_supabase
 
 log = logging.getLogger(__name__)
 
 POLLINATIONS_BASE = "https://image.pollinations.ai/prompt"
+COVERS_BUCKET = "capas"
+POLLINATIONS_TIMEOUT_S = 60
+POLLINATIONS_RETRIES = 3
 
 # =====================================================================
 # Estética obrigatória: NEO-MINIMALISMO
@@ -107,18 +113,69 @@ def gerar_url_capa(nome: str, genero: str, seed: int | None = None) -> str:
     return f"{POLLINATIONS_BASE}/{encoded}?{qs}"
 
 
+def _baixar_imagem_pollinations(url: str) -> bytes | None:
+    """Baixa imagem com retry — Pollinations às vezes responde vazio/timeout."""
+    for tentativa in range(1, POLLINATIONS_RETRIES + 1):
+        try:
+            r = requests.get(url, timeout=POLLINATIONS_TIMEOUT_S)
+            if r.status_code == 200 and r.content and len(r.content) > 1024:
+                return r.content
+            log.warning(
+                "[ai_capa] tentativa %d falhou: status=%s bytes=%s",
+                tentativa, r.status_code, len(r.content) if r.content else 0,
+            )
+        except Exception as e:
+            log.warning("[ai_capa] tentativa %d erro: %s", tentativa, e)
+    return None
+
+
+def _upload_supabase(obra_id: str, image_bytes: bytes) -> str | None:
+    """Faz upload da imagem no bucket público 'capas' e retorna a URL pública."""
+    try:
+        sb = get_supabase()
+        path = f"{obra_id}.jpg"
+        sb.storage.from_(COVERS_BUCKET).upload(
+            path=path,
+            file=image_bytes,
+            file_options={"content-type": "image/jpeg", "upsert": "true"},
+        )
+        public_url = sb.storage.from_(COVERS_BUCKET).get_public_url(path)
+        return public_url.rstrip("?")
+    except Exception as e:
+        log.exception("[ai_capa] upload pra Storage falhou (obra %s): %s", obra_id, e)
+        return None
+
+
 def gerar_e_salvar_capa(obra_id: str, nome: str, genero: str,
                         seed: int | None = None) -> str | None:
     """
-    Gera URL da capa e persiste em obras.cover_url.
-    Retorna a URL ou None em caso de erro.
+    Gera capa via Pollinations.ai, persiste no Supabase Storage e
+    grava a URL pública em obras.cover_url.
+
+    Se o download/upload falhar, salva a URL direta do Pollinations
+    como fallback (a imagem ainda funciona, só fica mais lenta).
+
+    Retorna a URL final ou None em caso de erro total.
     """
     try:
-        url = gerar_url_capa(nome, genero, seed=seed)
         sb = get_supabase()
-        sb.table("obras").update({"cover_url": url}).eq("id", obra_id).execute()
-        log.info("[ai_capa] capa gerada para obra %s", obra_id)
-        return url
+        poll_url = gerar_url_capa(nome, genero, seed=seed)
+
+        # 1) Baixa do Pollinations e tenta persistir no Storage
+        img_bytes = _baixar_imagem_pollinations(poll_url)
+        final_url: str | None = None
+        if img_bytes:
+            final_url = _upload_supabase(obra_id, img_bytes)
+            if final_url:
+                log.info("[ai_capa] capa persistida no Storage para obra %s", obra_id)
+
+        # 2) Fallback: usa a URL direta do Pollinations
+        if not final_url:
+            final_url = poll_url
+            log.warning("[ai_capa] usando URL direta do Pollinations para obra %s (fallback)", obra_id)
+
+        sb.table("obras").update({"cover_url": final_url}).eq("id", obra_id).execute()
+        return final_url
     except Exception as e:
         log.exception("[ai_capa] falha ao gerar capa para obra %s: %s", obra_id, e)
         return None
