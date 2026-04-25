@@ -137,8 +137,21 @@ export default function NovaObra() {
  setCoautores(prev => prev.filter(c => c.perfil_id !== id))
  }
 
+ // Bloqueia Enter em inputs (exceto textarea) para que o usuário NÃO submeta
+ // o formulário sem querer. A obra só vai pra base quando ele clicar em "Cadastrar obra".
+ function handleFormKeyDown(e) {
+ if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
+ e.preventDefault()
+ }
+ }
+
  async function handleSubmit(e) {
  e.preventDefault()
+ // Defesa em profundidade: só permite cadastrar se vier do botão "Cadastrar obra"
+ // (e não, por exemplo, de um Enter que escapou do bloqueio acima).
+ if (e.nativeEvent?.submitter?.dataset?.action !== 'cadastrar') {
+ return
+ }
  setError('')
 
  if (!audioFile) { setError('Selecione um arquivo de áudio.'); return }
@@ -203,7 +216,7 @@ export default function NovaObra() {
  Cadastre sua composição musical na plataforma.
  </p>
 
- <form onSubmit={handleSubmit}>
+ <form onSubmit={handleSubmit} onKeyDown={handleFormKeyDown}>
  {/* Áudio */}
  <div className="card" style={{ marginBottom: 20 }}>
  <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 14 }}> Arquivo de áudio</h2>
@@ -495,6 +508,7 @@ export default function NovaObra() {
 
  <div style={{ display: 'flex', gap: 12 }}>
  <button type="submit" className="btn btn-primary"
+ data-action="cadastrar"
  disabled={loading || !termosAceitos || obraEditada === null || (obraEditada === false && !contratoAceito) || (obraEditada === true && (!editoraTNome.trim() || !editoraTEmail.trim()))}>
  {loading ? 'Salvando…' : '✓ Cadastrar obra'}
  </button>

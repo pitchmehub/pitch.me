@@ -8,6 +8,8 @@
   color: var(--text-primary, #09090B);
   padding-bottom: 100px;
   min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* ── TOPBAR ──────────────────────────────── */
@@ -414,8 +416,9 @@
   /* Grid de cards — 2 colunas no mobile (lado a lado) */
   .dc-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
+    width: 100%;
   }
   .dc-card {
     display: flex;
@@ -427,6 +430,8 @@
     border-radius: 8px;
     transform: none !important;
     box-shadow: none !important;
+    min-width: 0;
+    overflow: hidden;
   }
   /* Mobile: sem destaque visual de card "ativo" — todas as obras
      ficam uniformes (mesmo tamanho, mesma borda) por enquanto. */
