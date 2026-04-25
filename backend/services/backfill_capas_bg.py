@@ -63,7 +63,7 @@ def _loop():
         sb = get_supabase()
         obras = sb.table("obras").select("id, nome, genero, cover_url").execute().data or []
         pendentes = [o for o in obras
-                     if "supabase.co/storage" not in (o.get("cover_url") or "")]
+                     if "/storage/v1/object/public/capas/" not in (o.get("cover_url") or "")]
         if not pendentes:
             log.info("[backfill_bg] nada a fazer — todas as capas já estão no Storage.")
             return
