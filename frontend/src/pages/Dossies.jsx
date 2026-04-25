@@ -267,7 +267,7 @@ export default function Dossies() {
  onClick={() => handleVisualizar(d)}
  style={btnStyle('transparent', selected?.id === d.id ? 'var(--brand)' : 'var(--text-muted)')}
  >
- {selected?.id === d.id ? '▲ Fechar' : '◎ Visualizar'}
+ {selected?.id === d.id ? 'Fechar' : 'Visualizar'}
  </button>
 
  <button

@@ -1,17 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
+import {
+  IconBell, IconMusic, IconDocument, IconCheckCircle, IconKey,
+  IconTag, IconDownload, IconWallet, IconXCircle,
+} from './Icons'
 import './NotificationBell.css'
 
 const ICONES = {
- obra_cadastrada: '',
- contrato_gerado: '',
- contrato_assinado: '',
- licenciamento: '',
- oferta: '',
- dossie_download: '',
- saque_confirmado: '◎',
- saque_cancelado: '',
+ obra_cadastrada: IconMusic,
+ contrato_gerado: IconDocument,
+ contrato_assinado: IconCheckCircle,
+ licenciamento: IconKey,
+ oferta: IconTag,
+ dossie_download: IconDownload,
+ saque_confirmado: IconWallet,
+ saque_cancelado: IconXCircle,
 }
 
 function tempoRelativo(iso) {
@@ -73,7 +77,7 @@ export default function NotificationBell() {
  onClick={() => setOpen(o => !o)}
  aria-label="Notificações"
  >
- 
+ <IconBell size={20} />
  {naoLidas > 0 && (
  <span className="notif-badge">{naoLidas > 9 ? '9+' : naoLidas}</span>
  )}
@@ -99,7 +103,9 @@ export default function NotificationBell() {
  className={`notif-item ${n.lida ? '' : 'notif-item-unread'}`}
  onClick={() => abrir(n)}
  >
- <div className="notif-icon">{ICONES[n.tipo] || ''}</div>
+ <div className="notif-icon">
+   {(() => { const Ic = ICONES[n.tipo] || IconBell; return <Ic size={18} /> })()}
+ </div>
  <div className="notif-content">
  <div className="notif-title">{n.titulo}</div>
  {n.mensagem && <div className="notif-msg">{n.mensagem}</div>}

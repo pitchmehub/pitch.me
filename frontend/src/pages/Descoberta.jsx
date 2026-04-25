@@ -322,11 +322,11 @@ export default function Descoberta() {
  <div className="dc-tabs">
  <button className={`dc-tab ${aba === 'catalogo' ? 'dc-tab-active' : ''}`}
  onClick={() => { setAba('catalogo'); setCompositor(null); setBusca('') }}>
- <span className="dc-tab-icon">⊞</span> Catálogo
+ <span className="dc-tab-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><rect x="14" y="14" width="7" height="7" rx="1.2"/></svg></span> Catálogo
  </button>
  <button className={`dc-tab ${aba === 'biblioteca' ? 'dc-tab-active' : ''}`}
  onClick={() => { setAba('biblioteca'); setCompositor(null); setBusca('') }}>
- <span className="dc-tab-icon"></span> Biblioteca
+ <span className="dc-tab-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg></span> Biblioteca
  </button>
  </div>
  <div className="dc-topbar-bell">

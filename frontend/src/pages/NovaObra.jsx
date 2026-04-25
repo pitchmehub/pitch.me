@@ -245,7 +245,7 @@ export default function NovaObra() {
 
  {/* Coautores */}
  <div className="card" style={{ marginBottom: 20 }}>
- <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 8 }}>◈ Coautores</h2>
+ <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 8 }}>Coautores</h2>
  <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
  Adicione os demais compositores que participaram da criação. Os ganhos serão divididos igualmente entre todos.
  </p>

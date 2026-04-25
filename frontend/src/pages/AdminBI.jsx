@@ -60,12 +60,12 @@ export default function AdminBI() {
  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
  gap: 14, marginBottom: 28,
  }}>
- <BiCard label="Total de Obras" value={resumo.total_obras} icon="" />
- <BiCard label="Usuários" value={resumo.total_usuarios} icon="◈" />
- <BiCard label="Vendas Confirmadas" value={resumo.total_vendas} icon="✓" color="var(--success)" />
- <BiCard label="Receita Bruta" value={fmt(resumo.receita_bruta_cents)} icon="◎" color="var(--brand)" />
- <BiCard label="Receita Plataforma" value={fmt(resumo.receita_plataforma_cents)} icon="▦" />
- <BiCard label="Ofertas Pendentes" value={resumo.ofertas_pendentes} icon="" color="var(--warning)" />
+ <BiCard label="Total de Obras" value={resumo.total_obras} />
+ <BiCard label="Usuários" value={resumo.total_usuarios} />
+ <BiCard label="Vendas Confirmadas" value={resumo.total_vendas} color="var(--success)" />
+ <BiCard label="Receita Bruta" value={fmt(resumo.receita_bruta_cents)} color="var(--brand)" />
+ <BiCard label="Receita Plataforma" value={fmt(resumo.receita_plataforma_cents)} />
+ <BiCard label="Ofertas Pendentes" value={resumo.ofertas_pendentes} color="var(--warning)" />
  </div>
 
  {/* Barra de distribuição de receita */}

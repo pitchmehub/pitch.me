@@ -42,7 +42,9 @@ export default function Compras() {
  padding: 60, textAlign: 'center',
  background: 'var(--surface-2)', borderRadius: 16,
  }}>
- <div style={{ fontSize: 48, opacity: .3, marginBottom: 12 }}>◉</div>
+ <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12, color: 'var(--text-muted)', opacity: .5 }}>
+   <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 8h14l-1.2 11a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M8.5 8V6a3.5 3.5 0 0 1 7 0v2"/></svg>
+ </div>
  <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Você ainda não comprou composições</h2>
  <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 16 }}>
  Explore o catálogo e adquira sua primeira licença.

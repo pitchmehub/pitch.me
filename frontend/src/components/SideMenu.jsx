@@ -2,54 +2,60 @@ import React, { useState, useEffect, useRef } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import GravanLogo from './GravanLogo'
+import {
+  IconCompass, IconGrid, IconMusic, IconPlus, IconChart, IconDocument,
+  IconWallet, IconTag, IconStar, IconBag, IconShield, IconEdit,
+  IconFolder, IconBuilding, IconLayers, IconUser, IconLogout,
+  IconChevronUp, IconChevronDown, IconMore,
+} from './Icons'
 import './SideMenu.css'
 
 const NAV_ITEMS = {
  compositor: [
- { to: '/descoberta', icon: '⊞', label: 'Descoberta' },
- { to: '/dashboard', icon: '◈', label: 'Dashboard' },
- { to: '/obras', icon: '', label: 'Minhas obras' },
- { to: '/obras/nova', icon: '', label: 'Nova obra' },
- { to: '/analytics', icon: '◐', label: 'Analytics', pro: true },
- { to: '/contratos', icon: '§', label: 'Meus contratos' },
- { to: '/saques', icon: '◎', label: 'Saques' },
- { to: '/ofertas', icon: '', label: 'Ofertas' },
- { to: '/planos', icon: '', label: 'Planos' },
+ { to: '/descoberta', Icon: IconCompass, label: 'Descoberta' },
+ { to: '/dashboard', Icon: IconGrid, label: 'Dashboard' },
+ { to: '/obras', Icon: IconMusic, label: 'Minhas obras' },
+ { to: '/obras/nova', Icon: IconPlus, label: 'Nova obra' },
+ { to: '/analytics', Icon: IconChart, label: 'Analytics', pro: true },
+ { to: '/contratos', Icon: IconDocument, label: 'Meus contratos' },
+ { to: '/saques', Icon: IconWallet, label: 'Saques' },
+ { to: '/ofertas', Icon: IconTag, label: 'Ofertas' },
+ { to: '/planos', Icon: IconStar, label: 'Planos' },
  ],
  interprete: [
- { to: '/descoberta', icon: '⊞', label: 'Descoberta' },
- { to: '/compras', icon: '◉', label: 'Compras' },
- { to: '/ofertas', icon: '', label: 'Ofertas' },
- { to: '/planos', icon: '', label: 'Planos' },
+ { to: '/descoberta', Icon: IconCompass, label: 'Descoberta' },
+ { to: '/compras', Icon: IconBag, label: 'Compras' },
+ { to: '/ofertas', Icon: IconTag, label: 'Ofertas' },
+ { to: '/planos', Icon: IconStar, label: 'Planos' },
  ],
  // ADMINISTRADOR: "Biblioteca" substituída por "Dossiês" conforme spec.
  administrador: [
- { to: '/admin', icon: '▦', label: 'Painel admin', highlight: true },
- { to: '/admin/landing', icon: '', label: 'Editar Landing' },
- { to: '/descoberta', icon: '⊞', label: 'Descoberta' },
- { to: '/dashboard', icon: '◈', label: 'Dashboard' },
- { to: '/obras', icon: '', label: 'Obras' },
- { to: '/obras/nova', icon: '', label: 'Nova obra' },
- { to: '/contratos', icon: '§', label: 'Contratos' },
- { to: '/dossies', icon: '', label: 'Dossiês' },
- { to: '/analytics', icon: '◐', label: 'Analytics' },
- { to: '/saques', icon: '◎', label: 'Saques' },
- { to: '/admin/editoras', icon: '', label: 'Editoras' },
- { to: '/ofertas', icon: '', label: 'Ofertas' },
- { to: '/planos', icon: '', label: 'Planos' },
+ { to: '/admin', Icon: IconShield, label: 'Painel admin', highlight: true },
+ { to: '/admin/landing', Icon: IconEdit, label: 'Editar Landing' },
+ { to: '/descoberta', Icon: IconCompass, label: 'Descoberta' },
+ { to: '/dashboard', Icon: IconGrid, label: 'Dashboard' },
+ { to: '/obras', Icon: IconMusic, label: 'Obras' },
+ { to: '/obras/nova', Icon: IconPlus, label: 'Nova obra' },
+ { to: '/contratos', Icon: IconDocument, label: 'Contratos' },
+ { to: '/dossies', Icon: IconFolder, label: 'Dossiês' },
+ { to: '/analytics', Icon: IconChart, label: 'Analytics' },
+ { to: '/saques', Icon: IconWallet, label: 'Saques' },
+ { to: '/admin/editoras', Icon: IconBuilding, label: 'Editoras' },
+ { to: '/ofertas', Icon: IconTag, label: 'Ofertas' },
+ { to: '/planos', Icon: IconStar, label: 'Planos' },
  ],
  publisher: [
- { to: '/editora/dashboard', icon: '◈', label: 'Dashboard' },
- { to: '/agregados', icon: '', label: 'Agregados' },
- { to: '/obras/nova', icon: '', label: 'Nova obra' },
- { to: '/obras', icon: '', label: 'Obras' },
- { to: '/contratos', icon: '§', label: 'Contratos' },
- { to: '/descoberta', icon: '⊞', label: 'Descoberta' },
+ { to: '/editora/dashboard', Icon: IconGrid, label: 'Dashboard' },
+ { to: '/agregados', Icon: IconLayers, label: 'Agregados' },
+ { to: '/obras/nova', Icon: IconPlus, label: 'Nova obra' },
+ { to: '/obras', Icon: IconMusic, label: 'Obras' },
+ { to: '/contratos', Icon: IconDocument, label: 'Contratos' },
+ { to: '/descoberta', Icon: IconCompass, label: 'Descoberta' },
  ],
  artist: [
- { to: '/dashboard', icon: '◈', label: 'Dashboard' },
- { to: '/contratos', icon: '§', label: 'Meus contratos' },
- { to: '/descoberta', icon: '⊞', label: 'Descoberta' },
+ { to: '/dashboard', Icon: IconGrid, label: 'Dashboard' },
+ { to: '/contratos', Icon: IconDocument, label: 'Meus contratos' },
+ { to: '/descoberta', Icon: IconCompass, label: 'Descoberta' },
  ],
 }
 
@@ -100,21 +106,23 @@ function UserMenu({ perfil, collapsed }) {
  </span>
  <span className="sidebar-user-role">{perfil.role}</span>
  </div>
- <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 'auto' }}>{open ? '▴' : '▾'}</span>
+ <span style={{ display: 'inline-flex', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+   {open ? <IconChevronUp size={12} /> : <IconChevronDown size={12} />}
+ </span>
  </>
  )}
  </div>
  {open && (
  <div className="sidebar-user-dropdown">
  <button className="sidebar-user-item" onClick={() => { setOpen(false); navigate('/perfil/editar') }}>
- <span></span> Editar informações
+ <span style={{ display: 'inline-flex' }}><IconUser size={16} /></span> Editar informações
  </button>
  <button className="sidebar-user-item" onClick={() => { setOpen(false); navigate('/planos') }}>
- <span></span> {isPro ? 'Gerenciar assinatura' : 'Assinar PRO'}
+ <span style={{ display: 'inline-flex' }}><IconStar size={16} /></span> {isPro ? 'Gerenciar assinatura' : 'Assinar PRO'}
  </button>
  <div className="sidebar-user-divider" />
  <button className="sidebar-user-item sidebar-user-item-danger" onClick={() => { setOpen(false); signOut() }}>
- <span>⏻</span> Sair da conta
+ <span style={{ display: 'inline-flex' }}><IconLogout size={16} /></span> Sair da conta
  </button>
  </div>
  )}
@@ -152,7 +160,7 @@ function AdminBadge({ collapsed }) {
  display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center',
  boxShadow: '0 4px 14px rgba(124,58,237,.25)',
  }}>
- <span style={{ fontSize: 13 }}></span>
+ <span style={{ display: 'inline-flex' }}><IconShield size={14} /></span>
  MODO ADMINISTRADOR
  </button>
  )
@@ -177,7 +185,7 @@ export default function SideMenu({ onCollapse }) {
  if (isMobile) {
  // Descoberta sempre fica como botão central destacado.
  const descoberta = items.find(i => i.to === '/descoberta')
- ?? { to: '/descoberta', icon: '⊞', label: 'Descoberta' }
+ ?? { to: '/descoberta', Icon: IconCompass, label: 'Descoberta' }
  const semDescoberta = items.filter(i => i.to !== '/descoberta')
  // 2 itens à esquerda, Descoberta no centro, 2 itens à direita (último é "Mais").
  const left = semDescoberta.slice(0, 2)
@@ -206,12 +214,12 @@ export default function SideMenu({ onCollapse }) {
 
  <nav className="sidebar-nav">
  {isAdmin && <AdminBadge collapsed={false} />}
- {items.map(({ to, icon, label, pro, highlight }) => (
+ {items.map(({ to, Icon, label, pro, highlight }) => (
  <NavLink key={to} to={to}
  className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
  style={highlight ? { fontWeight: 700 } : undefined}
  onClick={() => setMobileOpen(false)}>
- <span className="sidebar-icon">{icon}</span>
+ <span className="sidebar-icon">{Icon ? <Icon size={18} /> : null}</span>
  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
  {label}
  {pro && <span style={proTag}>PRO</span>}
@@ -222,14 +230,14 @@ export default function SideMenu({ onCollapse }) {
  <NavLink to="/perfil/editar"
  className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
  onClick={() => setMobileOpen(false)}>
- <span className="sidebar-icon"></span>
+ <span className="sidebar-icon"><IconUser size={18} /></span>
  <span>Editar informações</span>
  </NavLink>
  <button
  className="sidebar-link"
  onClick={() => { setMobileOpen(false); signOut() }}
  style={{ color: 'var(--error)' }}>
- <span className="sidebar-icon">⏻</span>
+ <span className="sidebar-icon"><IconLogout size={18} /></span>
  <span>Sair da conta</span>
  </button>
  </nav>
@@ -241,10 +249,10 @@ export default function SideMenu({ onCollapse }) {
  )}
 
  <nav className="mobile-bottom-nav">
- {left.map(({ to, icon, label }) => (
+ {left.map(({ to, Icon, label }) => (
  <NavLink key={to} to={to}
  className={({ isActive }) => `mobile-bottom-item ${isActive ? 'active' : ''}`}>
- <span className="mobile-bottom-icon">{icon}</span>
+ <span className="mobile-bottom-icon">{Icon ? <Icon size={22} /> : null}</span>
  <span className="mobile-bottom-label">{label}</span>
  </NavLink>
  ))}
@@ -256,15 +264,17 @@ export default function SideMenu({ onCollapse }) {
  className={({ isActive }) => `mobile-bottom-center ${isActive ? 'active' : ''}`}
  aria-label="Descoberta">
  <span className="mobile-bottom-center-circle">
- <span className="mobile-bottom-center-icon">{descoberta.icon}</span>
+ <span className="mobile-bottom-center-icon">
+   {descoberta.Icon ? <descoberta.Icon size={24} /> : null}
+ </span>
  </span>
  <span className="mobile-bottom-center-label">{descoberta.label}</span>
  </NavLink>
 
- {right.map(({ to, icon, label }) => (
+ {right.map(({ to, Icon, label }) => (
  <NavLink key={to} to={to}
  className={({ isActive }) => `mobile-bottom-item ${isActive ? 'active' : ''}`}>
- <span className="mobile-bottom-icon">{icon}</span>
+ <span className="mobile-bottom-icon">{Icon ? <Icon size={22} /> : null}</span>
  <span className="mobile-bottom-label">{label}</span>
  </NavLink>
  ))}
@@ -272,7 +282,7 @@ export default function SideMenu({ onCollapse }) {
  className="mobile-bottom-item"
  onClick={() => setMobileOpen(o => !o)}
  aria-label="Mais opções">
- <span className="mobile-bottom-icon"></span>
+ <span className="mobile-bottom-icon"><IconMore size={22} /></span>
  <span className="mobile-bottom-label">Mais</span>
  </button>
  </nav>
@@ -297,12 +307,12 @@ export default function SideMenu({ onCollapse }) {
  <nav className="sidebar-nav">
  {isAdmin && <AdminBadge collapsed={collapsed} />}
 
- {items.map(({ to, icon, label, pro, highlight }) => (
+ {items.map(({ to, Icon, label, pro, highlight }) => (
  <NavLink key={to} to={to}
  className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
  title={collapsed ? label : undefined}
  style={highlight ? { fontWeight: 700 } : undefined}>
- <span className="sidebar-icon">{icon}</span>
+ <span className="sidebar-icon">{Icon ? <Icon size={18} /> : null}</span>
  {!collapsed && (
  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
  {label}
@@ -317,7 +327,7 @@ export default function SideMenu({ onCollapse }) {
  <NavLink to="/perfil/editar"
  className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
  title={collapsed ? 'Editar informações' : undefined}>
- <span className="sidebar-icon"></span>
+ <span className="sidebar-icon"><IconUser size={18} /></span>
  {!collapsed && <span>Editar informações</span>}
  </NavLink>
 
@@ -326,7 +336,7 @@ export default function SideMenu({ onCollapse }) {
  onClick={() => signOut()}
  title={collapsed ? 'Sair da conta' : undefined}
  style={{ color: 'var(--error)' }}>
- <span className="sidebar-icon">⏻</span>
+ <span className="sidebar-icon"><IconLogout size={18} /></span>
  {!collapsed && <span>Sair da conta</span>}
  </button>
  </nav>

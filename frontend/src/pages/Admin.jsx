@@ -7,12 +7,12 @@ function fmt(cents) {
 }
 
 const ABAS = [
- { id: 'analiticos', label: 'Analíticos', icon: '▦' },
- { id: 'receita', label: 'Receita', icon: '◎' },
+ { id: 'analiticos', label: 'Analíticos', icon: '' },
+ { id: 'receita', label: 'Receita', icon: '' },
  { id: 'obras', label: 'Obras', icon: '' },
  { id: 'generos', label: 'Gêneros mais procurados', icon: '' },
  { id: 'saques', label: 'Autorizar saques', icon: '' },
- { id: 'auditoria', label: 'Auditoria de splits', icon: '⊟' },
+ { id: 'auditoria', label: 'Auditoria de splits', icon: '' },
  { id: 'seguranca', label: 'Segurança', icon: '' },
 ]
 
