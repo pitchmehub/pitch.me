@@ -160,6 +160,12 @@
   margin-bottom: 12px;
   position: relative; overflow: hidden;
 }
+.dc-card-cover-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
 .dc-card-note { font-size: 32px; color: rgba(255,255,255,.7); }
 
 .dc-card-play {
@@ -422,9 +428,11 @@
     transform: none !important;
     box-shadow: none !important;
   }
+  /* Mobile: sem destaque visual de card "ativo" — todas as obras
+     ficam uniformes (mesmo tamanho, mesma borda) por enquanto. */
   .dc-card-active {
-    border-color: var(--brand) !important;
-    box-shadow: 0 4px 12px rgba(12,68,124,.12) !important;
+    border-color: var(--border) !important;
+    box-shadow: none !important;
   }
 
   .dc-card-cover {
@@ -434,7 +442,9 @@
     border-radius: 6px;
     flex-shrink: 0;
     position: relative;
+    overflow: hidden;
   }
+  .dc-card-cover-img { border-radius: 6px; }
   .dc-card-note { font-size: 26px; }
   .dc-card-play {
     position: absolute;

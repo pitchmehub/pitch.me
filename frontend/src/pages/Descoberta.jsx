@@ -42,7 +42,17 @@ function ObraCard({ obra, onPlay, onShowFicha, onExpand, isPlaying, isActive, on
  return (
  <div className={`dc-card ${isActive ? 'dc-card-active' : ''}`} onClick={handleClick}>
  <div className="dc-card-cover" style={{ background: ObrgGrad(obra.id) }}>
+ {obra.cover_url ? (
+ <img
+ src={obra.cover_url}
+ alt=""
+ loading="lazy"
+ className="dc-card-cover-img"
+ onError={e => { e.currentTarget.style.display = 'none' }}
+ />
+ ) : (
  <span className="dc-card-note"></span>
+ )}
  {obra.audio_path && (
  <button
  className={`dc-card-play ${isActive ? 'dc-card-play-active' : ''}`}
