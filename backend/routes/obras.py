@@ -126,6 +126,21 @@ def criar_obra():
         editora_terceira_id=editora_terceira_id,
     )
 
+    # IA grátis: gera capa via Pollinations.ai (apenas URL, sem download)
+    try:
+        from services.ai_capa import gerar_e_salvar_capa
+        import secrets as _sec
+        capa_url = gerar_e_salvar_capa(
+            obra_id=obra["id"],
+            nome=obra.get("nome") or nome,
+            genero=obra.get("genero") or genero,
+            seed=_sec.randbelow(10_000_000),
+        )
+        if capa_url:
+            obra["cover_url"] = capa_url
+    except Exception as _e:
+        print(f"[obras] geração de capa falhou: {_e}")
+
     sb = get_supabase()
 
     # Obra editada por terceiros: NÃO geramos contrato de edição com a Gravan.

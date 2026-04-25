@@ -31,6 +31,8 @@ export default function NovaObra() {
 
  const [loading, setLoading] = useState(false)
  const [error, setError] = useState('')
+ const [transcrevendo, setTranscrevendo] = useState(false)
+ const [transcError, setTranscError] = useState('')
  const [termosAceitos, setTermosAceitos] = useState(false)
  const [contratoAceito, setContratoAceito] = useState(false)
  const [obraEditada, setObraEditada] = useState(null)
@@ -103,6 +105,26 @@ export default function NovaObra() {
  if (!file.name.toLowerCase().endsWith('.mp3')) { setAudioError('Apenas arquivos .mp3.'); return }
  if (file.size > MAX_BYTES) { setAudioError('Arquivo excede 10 MB.'); return }
  setAudioFile(file)
+ }
+
+ async function transcreverComIA() {
+ if (!audioFile) { setTranscError('Selecione o áudio antes de transcrever.'); return }
+ setTranscError('')
+ setTranscrevendo(true)
+ try {
+ const form = new FormData()
+ form.append('audio', audioFile)
+ const r = await api.upload('/ai/transcrever', form)
+ if (r?.letra) {
+ setLetra(r.letra)
+ } else {
+ setTranscError('Não conseguimos extrair a letra deste áudio.')
+ }
+ } catch (err) {
+ setTranscError(err.message || 'Falha ao transcrever.')
+ } finally {
+ setTranscrevendo(false)
+ }
  }
 
  function addCoautor(c) {
@@ -207,9 +229,27 @@ export default function NovaObra() {
  </div>
 
  <div className="form-group">
- <label className="form-label">Letra completa *</label>
+ <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, gap: 8, flexWrap: 'wrap' }}>
+ <label className="form-label" style={{ margin: 0 }}>Letra completa *</label>
+ <button
+ type="button"
+ className="btn btn-secondary btn-sm"
+ onClick={transcreverComIA}
+ disabled={!audioFile || transcrevendo}
+ title={!audioFile ? 'Selecione o áudio primeiro' : 'Transcrever automaticamente com IA (grátis)'}
+ style={{ fontSize: 12, padding: '6px 12px' }}
+ >
+ {transcrevendo ? '⏳ Transcrevendo…' : '✨ Transcrever com IA'}
+ </button>
+ </div>
  <textarea className="input" placeholder="Cole aqui a letra completa da composição…"
  value={letra} onChange={e => setLetra(e.target.value)} style={{ minHeight: 180 }} />
+ {transcError && <small style={{ color: 'var(--error)', fontSize: 12 }}>{transcError}</small>}
+ {transcrevendo && (
+ <small style={{ color: 'var(--text-muted)', fontSize: 12, display: 'block', marginTop: 4 }}>
+ Transcrição local pode levar de 30 segundos a 2 minutos. Você poderá editar o texto depois.
+ </small>
+ )}
  </div>
 
  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>

@@ -19,6 +19,7 @@ export default function MinhasObras() {
  const [selected, setSelected] = useState(null)
  const [excluindo, setExcluindo] = useState(false)
  const [confirmarExcluir, setConfirmarExcluir] = useState(false)
+ const [regerandoCapa, setRegerandoCapa] = useState(null)
 
  useEffect(() => { load() }, [])
 
@@ -27,7 +28,7 @@ export default function MinhasObras() {
  try {
  const { data } = await supabase
  .from('coautorias')
- .select('share_pct, is_titular, obras(id, nome, genero, preco_cents, status, audio_path, titular_id, created_at)')
+ .select('share_pct, is_titular, obras(id, nome, genero, preco_cents, status, audio_path, titular_id, created_at, cover_url)')
  .eq('perfil_id', perfil.id)
  setObras((data ?? [])
  .filter(c => c.obras)
@@ -60,6 +61,20 @@ export default function MinhasObras() {
  alert('Erro ao excluir: ' + e.message)
  } finally {
  setExcluindo(false)
+ }
+ }
+
+ async function regerarCapa(obra) {
+ setRegerandoCapa(obra.id)
+ try {
+ const r = await api.post(`/ai/obras/${obra.id}/gerar-capa`)
+ if (r?.cover_url) {
+ setObras(prev => prev.map(o => o.id === obra.id ? { ...o, cover_url: r.cover_url } : o))
+ }
+ } catch (e) {
+ alert('Erro ao gerar capa: ' + e.message)
+ } finally {
+ setRegerandoCapa(null)
  }
  }
 
@@ -99,16 +114,38 @@ export default function MinhasObras() {
  transition: 'all .15s',
  }}>
  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+ <div style={{ position: 'relative', width: 44, height: 44, flexShrink: 0 }}>
+ {obra.cover_url ? (
+ <img
+ src={obra.cover_url}
+ alt=""
+ loading="lazy"
+ style={{
+ width: 44, height: 44, borderRadius: 8,
+ objectFit: 'cover', display: 'block',
+ background: 'var(--surface-2)',
+ }}
+ onError={e => { e.currentTarget.style.display = 'none' }}
+ />
+ ) : (
+ <div style={{
+ width: 44, height: 44, borderRadius: 8,
+ background: 'linear-gradient(135deg,#083257,#09090B)',
+ }} />
+ )}
  <button
  onClick={e => { e.stopPropagation(); playObra(obra) }}
  style={{
- width: 44, height: 44, borderRadius: 8,
- background: 'linear-gradient(135deg,#083257,#09090B)',
+ position: 'absolute', inset: 0,
+ borderRadius: 8,
+ background: 'rgba(0,0,0,0.45)',
  color: '#fff', border: 'none', cursor: 'pointer',
- fontSize: 14, flexShrink: 0,
+ fontSize: 14, display: 'flex',
+ alignItems: 'center', justifyContent: 'center',
  }}>
  {isPlaying ? '⏸' : '▶'}
  </button>
+ </div>
  <div style={{ flex: 1, minWidth: 0 }}>
  <div style={{ fontSize: 15, fontWeight: 700 }}>{obra.nome}</div>
  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
@@ -135,11 +172,21 @@ export default function MinhasObras() {
  }}>
  {obra.sou_titular ? (
  !confirmarExcluir ? (
+ <>
+ <button
+ className="btn btn-secondary btn-sm"
+ onClick={e => { e.stopPropagation(); regerarCapa(obra) }}
+ disabled={regerandoCapa === obra.id}
+ title="Gerar nova capa com IA (Pollinations.ai, grátis)"
+ style={{ marginRight: 'auto' }}>
+ {regerandoCapa === obra.id ? '⏳ Gerando…' : '✨ Regerar capa'}
+ </button>
  <button
  className="btn btn-danger btn-sm"
  onClick={e => { e.stopPropagation(); setConfirmarExcluir(true) }}>
  Excluir composição
  </button>
+ </>
  ) : (
  <>
  <span style={{ fontSize: 13, color: 'var(--error)', alignSelf: 'center', marginRight: 'auto' }}>

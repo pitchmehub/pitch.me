@@ -204,6 +204,11 @@ def create_app() -> Flask:
     csrf.exempt(keep_alive_bp)
     limiter.exempt(keep_alive_bp)
 
+    # IA gratuita: Whisper local (transcrição) + Pollinations.ai (capa)
+    from routes.ai import ai_bp
+    app.register_blueprint(ai_bp, url_prefix="/api/ai")
+    csrf.exempt(ai_bp)
+
     # Licenciamento de obras editadas por terceiras editoras
     from routes.ofertas_terceiros import ofertas_lic_bp
     app.register_blueprint(ofertas_lic_bp)

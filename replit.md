@@ -39,6 +39,19 @@ Three layers run together to keep the backend awake:
 
 A standalone external pinger is also available at `scripts/external_pinger.py` for use in cron / GitHub Actions / a separate VM.
 
+## AI features (free stack)
+
+For MVP scale (~100 obras/month) the AI stack is fully free:
+
+1. **Lyric transcription** — `faster-whisper` (model `base`, CPU `int8`) running in-process. Singleton model loaded lazily on first call. Service: `backend/services/ai_letra.py`. Endpoint: `POST /api/ai/transcrever` (sync, ~30s–2min per audio) and `POST /api/ai/obras/<id>/transcrever` (async, runs in background thread). Override model with env `WHISPER_MODEL` (default `base`).
+2. **Cover art** — Pollinations.ai (no key, no signup). The URL itself returns the image. Service: `backend/services/ai_capa.py`. Endpoint: `POST /api/ai/obras/<id>/gerar-capa` (regenerate). Auto-triggered after `POST /api/obras/`. Genre → visual style mapping in `GENERO_STYLE` dict.
+
+Database additions (see `sql/02_ai_capa_letra.sql`): `obras.cover_url` (text) and `obras.letra_status` (text, default `pendente`, check constraint).
+
+Frontend:
+- `NovaObra.jsx` — "✨ Transcrever com IA" button next to the lyric textarea (calls `/ai/transcrever` synchronously with the selected audio).
+- `MinhasObras.jsx` — shows `cover_url` as the play-button thumbnail with overlay; "✨ Regerar capa" button when an obra is selected.
+
 ## Player
 
 Global audio player lives in `frontend/src/contexts/PlayerContext.jsx` and `frontend/src/components/GlobalPlayer.jsx`. Audio URLs are signed by the backend (`/api/obras/<id>/preview-url`) for private bucket access.
