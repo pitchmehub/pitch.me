@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useRef, useState, useEffect, useCallback } from 'react'
-import { getAudioUrl } from '../lib/audioUrl'
+import { getAudioUrl, prefetchAudioUrl } from '../lib/audioUrl'
 import { api } from '../lib/api'
 
 // Quantas páginas (per_page=50) puxar ao montar a "fila global" de obras.
@@ -32,7 +32,12 @@ export function PlayerProvider({ children }) {
   // 'off' | 'all' (repete a fila) | 'one' (repete a obra atual)
   const [repeat,      setRepeat]     = useState('off')
 
-  const audioRef = useRef(new Audio())
+  const audioRef = useRef(null)
+  if (audioRef.current === null) {
+    const a = new Audio()
+    a.preload = 'auto'
+    audioRef.current = a
+  }
   // Refs p/ que listeners do <audio> sempre leiam o valor mais recente
   // sem precisar reanexar a cada toggle.
   const shuffleRef = useRef(shuffle)
@@ -142,9 +147,22 @@ export function PlayerProvider({ children }) {
     if (!url) { setLoading(false); return }
     el.src = url
     el.load()
-    if (autoplay) { try { await el.play() } catch (_) {} }
-    setLoading(false)
+    if (autoplay) { el.play().catch(() => {}) }
   }
+
+  function prefetchNeighbors() {
+    if (queue.length <= 1) return
+    const nextIdx = (index + 1) % queue.length
+    const prevIdx = (index - 1 + queue.length) % queue.length
+    if (queue[nextIdx]?.id) prefetchAudioUrl(queue[nextIdx].id)
+    if (queue[prevIdx]?.id) prefetchAudioUrl(queue[prevIdx].id)
+  }
+
+  useEffect(() => {
+    if (!obra) return
+    const t = setTimeout(prefetchNeighbors, 150)
+    return () => clearTimeout(t)
+  }, [obra?.id, queue.length, index])
 
   const playObra = useCallback(async (obraOuLista, idx = 0, opts = {}) => {
     const lista = Array.isArray(obraOuLista) ? obraOuLista : [obraOuLista]
@@ -157,6 +175,10 @@ export function PlayerProvider({ children }) {
       fila = [start, ...restantes]
       inicio = 0
     }
+
+    // Dispara o pedido da URL imediatamente (em paralelo com a renderização)
+    // pra que quando o loadTrack rodar, a URL já esteja pronta no cache.
+    if (fila[inicio]?.id) prefetchAudioUrl(fila[inicio].id)
 
     // Inicia já com o que temos (resposta instantânea)
     setQueue(fila)

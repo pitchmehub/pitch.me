@@ -5,6 +5,7 @@ import { usePlayer } from '../contexts/PlayerContext'
 import BotaoCurtir from '../components/BotaoCurtir'
 import { supabase } from '../lib/supabase'
 import { api } from '../lib/api'
+import { prefetchAudioUrl } from '../lib/audioUrl'
 import './Descoberta.css'
 import NotificationBell from '../components/NotificationBell'
 import ArtistaHero, { ObrasLista } from '../components/ArtistaHero'
@@ -50,8 +51,17 @@ function ObraCard({ obra, onPlay, onShowFicha, onExpand, isPlaying, isActive, on
  onPlay(obra)
  }
 
+ function handlePrefetch() {
+ if (obra.id && obra.audio_path) prefetchAudioUrl(obra.id)
+ }
+
  return (
- <div className={`dc-card ${isActive ? 'dc-card-active' : ''}`} onClick={handleClick}>
+ <div
+ className={`dc-card ${isActive ? 'dc-card-active' : ''}`}
+ onClick={handleClick}
+ onMouseEnter={handlePrefetch}
+ onTouchStart={handlePrefetch}
+ >
  <div className="dc-card-cover" style={{ background: ObrgGrad(obra.id) }}>
  {obra.cover_url ? (
  <img
