@@ -2,6 +2,7 @@
 from flask import Blueprint, jsonify, request, g, abort
 from middleware.auth import require_auth
 from db.supabase_client import get_supabase
+from services.migrations_status import summary as migrations_summary
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -11,6 +12,19 @@ def _check_admin():
     r = sb.table("perfis").select("role").eq("id", g.user.id).single().execute()
     if not r.data or r.data.get("role") != "administrador":
         abort(403, description="Acesso restrito a administradores.")
+
+
+@admin_bp.route("/migrations-status", methods=["GET"])
+@require_auth
+def migrations_status():
+    """
+    Retorna o status de cada migração SQL conhecida:
+      - applied  → tabela/colunas detectadas no banco
+      - missing  → migração ainda não rodada
+      - unknown  → erro inesperado ao consultar (ver campo `error`)
+    """
+    _check_admin()
+    return jsonify(migrations_summary()), 200
 
 
 @admin_bp.route("/bi/resumo", methods=["GET"])
