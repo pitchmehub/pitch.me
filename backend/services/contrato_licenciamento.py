@@ -413,7 +413,10 @@ def gerar_contrato_trilateral_agregado(
         .replace("{{editora_email}}",          editora.get("email") or "—")
         .replace("{{editora_endereco}}",       editora_endereco)
         .replace("{{interprete_nome}}",        buyer.get("nome_completo") or buyer.get("nome") or "—")
+        .replace("{{interprete_nome_artistico}}", buyer.get("nome_artistico") or "Não informado")
         .replace("{{interprete_cpf}}",         _decrypt(buyer.get("cpf","")) or "Não informado")
+        .replace("{{interprete_rg}}",          _decrypt(buyer.get("rg","")) or "Não informado")
+        .replace("{{interprete_email}}",       buyer.get("email") or "Não informado")
         .replace("{{interprete_endereco}}",    _endereco(buyer))
         .replace("{{interprete_cidade_uf}}",   _cidade_uf(buyer))
         .replace("{{obra_nome}}",              obra.get("nome", "—"))
@@ -540,7 +543,10 @@ do Rio de Janeiro/RJ, doravante "GRAVAN".
 
 LICENCIADO (INTÉRPRETE/PRODUTOR):
 Nome/Razão Social: {{interprete_nome}}
+Nome Artístico: {{interprete_nome_artistico}}
 CPF/CNPJ: {{interprete_cpf}}
+RG: {{interprete_rg}}
+E-mail: {{interprete_email}}
 Endereço: {{interprete_endereco}}
 Cidade/UF: {{interprete_cidade_uf}}
 
@@ -681,7 +687,10 @@ def gerar_contrato_trilateral(oferta_id: str) -> dict | None:
         .replace("{{editora_email}}",          editora_t.get("email") or of["editora_terceira_email"])
         .replace("{{editora_endereco}}",       editora_endereco)
         .replace("{{interprete_nome}}",        buyer.get("nome_completo") or buyer.get("nome") or "—")
+        .replace("{{interprete_nome_artistico}}", buyer.get("nome_artistico") or "Não informado")
         .replace("{{interprete_cpf}}",         _decrypt(buyer.get("cpf","")) or "Não informado")
+        .replace("{{interprete_rg}}",          _decrypt(buyer.get("rg","")) or "Não informado")
+        .replace("{{interprete_email}}",       buyer.get("email") or "Não informado")
         .replace("{{interprete_endereco}}",    _endereco(buyer))
         .replace("{{interprete_cidade_uf}}",   _cidade_uf(buyer))
         .replace("{{obra_nome}}",              obra.get("nome", "—"))
