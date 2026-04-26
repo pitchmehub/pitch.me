@@ -417,28 +417,28 @@ select.input {
 
 /* ── Entrada de página ── */
 @keyframes gv-page-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .page-enter {
-  animation: gv-page-in .28s cubic-bezier(.2,.8,.4,1) both;
+  animation: gv-page-in .70s cubic-bezier(.2,.8,.4,1) both;
 }
 
 /* ── Fade simples ── */
 @keyframes gv-fade-up {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(22px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.fade-in-up        { animation: gv-fade-up .30s cubic-bezier(.2,.8,.4,1) both; }
-.fade-in-up.delay1 { animation-delay: .06s; }
-.fade-in-up.delay2 { animation-delay: .12s; }
-.fade-in-up.delay3 { animation-delay: .18s; }
-.fade-in-up.delay4 { animation-delay: .24s; }
-.fade-in-up.delay5 { animation-delay: .30s; }
+.fade-in-up        { animation: gv-fade-up .75s cubic-bezier(.2,.8,.4,1) both; }
+.fade-in-up.delay1 { animation-delay: .15s; }
+.fade-in-up.delay2 { animation-delay: .30s; }
+.fade-in-up.delay3 { animation-delay: .45s; }
+.fade-in-up.delay4 { animation-delay: .60s; }
+.fade-in-up.delay5 { animation-delay: .75s; }
 
 /* Ativação automática para cards e itens de lista */
 .card {
-  animation: gv-fade-up .28s cubic-bezier(.2,.8,.4,1) both;
+  animation: gv-fade-up .70s cubic-bezier(.2,.8,.4,1) both;
 }
 
 /* ── Botões — feedback de pressão ── */
@@ -463,11 +463,11 @@ button[data-shape="circle"],
 
 /* ── Page transition: slide up (subida) ao trocar de página ── */
 @keyframes gv-page-slide-up {
-  from { opacity: 0; transform: translateY(28px); }
+  from { opacity: 0; transform: translateY(40px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .page-slide-up {
-  animation: gv-page-slide-up .34s cubic-bezier(.2,.85,.35,1) both;
+  animation: gv-page-slide-up .85s cubic-bezier(.2,.85,.35,1) both;
   will-change: transform, opacity;
 }
 
@@ -513,13 +513,13 @@ a { transition: color .15s, opacity .15s; }
 .spin { animation: gv-spin .7s linear infinite; display: inline-block; }
 
 /* ── Entrada de itens em listas (stagger via nth-child) ── */
-.stagger-list > *:nth-child(1)  { animation-delay: .04s; }
-.stagger-list > *:nth-child(2)  { animation-delay: .08s; }
-.stagger-list > *:nth-child(3)  { animation-delay: .12s; }
-.stagger-list > *:nth-child(4)  { animation-delay: .16s; }
-.stagger-list > *:nth-child(5)  { animation-delay: .20s; }
-.stagger-list > *:nth-child(6)  { animation-delay: .24s; }
-.stagger-list > * { animation: gv-fade-up .28s cubic-bezier(.2,.8,.4,1) both; }
+.stagger-list > *:nth-child(1)  { animation-delay: .10s; }
+.stagger-list > *:nth-child(2)  { animation-delay: .20s; }
+.stagger-list > *:nth-child(3)  { animation-delay: .30s; }
+.stagger-list > *:nth-child(4)  { animation-delay: .40s; }
+.stagger-list > *:nth-child(5)  { animation-delay: .50s; }
+.stagger-list > *:nth-child(6)  { animation-delay: .60s; }
+.stagger-list > * { animation: gv-fade-up .70s cubic-bezier(.2,.8,.4,1) both; }
 
 /* Respeita preferência do sistema por movimento reduzido */
 @media (prefers-reduced-motion: reduce) {
