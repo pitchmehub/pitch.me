@@ -364,13 +364,6 @@
 .dc-modal-comp-nome  { font-size: 13px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
 .dc-modal-comp-nivel { font-size: 10px; color: var(--text-muted); text-transform: capitalize; }
 .dc-modal-comp-share { font-size: 12px; font-weight: 700; color: var(--brand); flex-shrink: 0; }
-.dc-titular-badge {
-  font-size: 9px; font-weight: 700;
-  background: var(--brand); color: #fff;
-  padding: 2px 6px; border-radius: 0;
-  letter-spacing: .4px; text-transform: uppercase;
-}
-
 .dc-modal-buy-bar {
   margin: 6px 18px 18px; padding: 12px;
   background: var(--brand-light);
