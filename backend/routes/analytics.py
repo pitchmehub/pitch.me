@@ -153,6 +153,64 @@ def resumo():
     receita_liquida_total_cents = int(round(receita_total_cents * (1 - fee_rate)))
     receita_liquida_mes_cents = int(round(receita_mes_cents * (1 - fee_rate)))
 
+    # ── Ofertas: pendentes / aceitas / recusadas / expiradas / pagas ──
+    ofertas_resumo = {
+        "pendentes": 0, "aceitas": 0, "recusadas": 0,
+        "expiradas": 0, "contra_proposta": 0, "pagas": 0,
+        "valor_pendentes_cents": 0, "valor_aceitas_cents": 0,
+        "valor_pagas_cents": 0,
+        "taxa_conversao_pct": 0.0,
+        "obras_com_oferta": 0,
+    }
+    if obra_ids:
+        try:
+            ofs = (
+                sb.table("ofertas")
+                .select("id, obra_id, status, valor_cents, tipo")
+                .in_("obra_id", obra_ids)
+                .execute()
+                .data
+                or []
+            )
+            obras_com = set()
+            for of in ofs:
+                st = of.get("status")
+                v = int(of.get("valor_cents") or 0)
+                if st in ofertas_resumo:
+                    ofertas_resumo[st] += 1
+                if st == "pendente":
+                    ofertas_resumo["valor_pendentes_cents"] += v
+                if st == "aceita":
+                    ofertas_resumo["valor_aceitas_cents"] += v
+                if st == "paga":
+                    ofertas_resumo["valor_pagas_cents"] += v
+                obras_com.add(of["obra_id"])
+            ofertas_resumo["obras_com_oferta"] = len(obras_com)
+            total_decididas = (ofertas_resumo["aceitas"] + ofertas_resumo["pagas"]
+                               + ofertas_resumo["recusadas"] + ofertas_resumo["expiradas"])
+            if total_decididas > 0:
+                aceitas_eff = ofertas_resumo["aceitas"] + ofertas_resumo["pagas"]
+                ofertas_resumo["taxa_conversao_pct"] = round(
+                    (aceitas_eff / total_decididas) * 100, 1
+                )
+        except Exception:
+            pass
+
+    # Obras sob exclusividade
+    obras_exclusivas = sum(1 for o in obras_resp.data or [] if o.get("is_exclusive"))
+    try:
+        # Como `obras_resp` original não trouxe is_exclusive, refaz uma contagem barata
+        ex_resp = (
+            sb.table("obras")
+            .select("id", count="exact")
+            .eq("titular_id", g.user.id)
+            .eq("is_exclusive", True)
+            .execute()
+        )
+        obras_exclusivas = ex_resp.count or 0
+    except Exception:
+        pass
+
     return jsonify({
         "is_pro": is_pro_user,
         "plano": perfil.get("plano") or "STARTER",
@@ -175,6 +233,12 @@ def resumo():
         "receita_liquida_mes_cents": receita_liquida_mes_cents,
         "receita_liquida_total_cents": receita_liquida_total_cents,
         "ranking_receita": ranking_receita,
+
+        # Ofertas
+        "ofertas": ofertas_resumo,
+
+        # Exclusividade
+        "obras_exclusivas": obras_exclusivas,
     }), 200
 
 

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
+import OfertaModal from './OfertaModal'
 import '../pages/Descoberta.css'
 
 const GRADIENTS = [
@@ -27,7 +29,12 @@ const grad = id => GRADIENTS[(id?.charCodeAt(0) ?? 0) % GRADIENTS.length]
  */
 export default function FichaTecnica({ obra, onClose }) {
   const navigate = useNavigate()
+  const { perfil } = useAuth()
+  const isInterprete = perfil?.role === 'interprete'
   const [coautores, setCoautores] = useState([])
+  const [titularPro, setTitularPro] = useState(false)
+  const [showOferta, setShowOferta] = useState(false)
+  const isExclusiva = !!obra?.is_exclusive
 
   useEffect(() => {
     function onKey(e) { if (e.key === 'Escape') onClose() }
@@ -45,6 +52,21 @@ export default function FichaTecnica({ obra, onClose }) {
     }
     load()
   }, [obra.id])
+
+  useEffect(() => {
+    async function checkPro() {
+      if (!obra?.titular_id) return
+      const { data } = await supabase
+        .from('perfis')
+        .select('plano, status_assinatura')
+        .eq('id', obra.titular_id)
+        .maybeSingle()
+      const pro = data?.plano === 'PRO'
+        && ['ativa', 'cancelada', 'past_due'].includes(data?.status_assinatura)
+      setTitularPro(!!pro)
+    }
+    checkPro()
+  }, [obra?.titular_id])
 
   return createPortal(
     <div className="dc-modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
@@ -66,7 +88,27 @@ export default function FichaTecnica({ obra, onClose }) {
         </div>
 
         <div className="ft-titulo">
-          <div className="dc-modal-genre">{obra.genero || 'Composição'}</div>
+          <div className="dc-modal-genre">
+            {obra.genero || 'Composição'}
+            {isExclusiva && (
+              <span style={{
+                marginLeft: 8, padding: '2px 8px', borderRadius: 99,
+                background: '#7c3aed', color: '#fff', fontSize: 11, fontWeight: 700,
+                letterSpacing: 0.4, textTransform: 'uppercase',
+              }}>
+                Exclusiva
+              </span>
+            )}
+            {titularPro && (
+              <span style={{
+                marginLeft: 6, padding: '2px 8px', borderRadius: 99,
+                background: '#0C447C', color: '#fff', fontSize: 11, fontWeight: 700,
+                letterSpacing: 0.4,
+              }}>
+                PRO
+              </span>
+            )}
+          </div>
           <div className="dc-modal-nome">{obra.nome}</div>
         </div>
 
@@ -104,16 +146,49 @@ export default function FichaTecnica({ obra, onClose }) {
           </div>
         </div>
 
-        <div className="dc-modal-buy-bar" style={{ justifyContent: 'center' }}>
-          <button
-            className="dc-modal-buy-btn"
-            style={{ width: '100%' }}
-            onClick={() => { onClose(); navigate(`/comprar/${obra.id}`) }}
-          >
-            Licenciar composição
-          </button>
+        <div className="dc-modal-buy-bar" style={{ justifyContent: 'center', flexDirection: 'column', gap: 8 }}>
+          {isExclusiva ? (
+            <div style={{
+              padding: '12px 16px', borderRadius: 8, background: '#f5f3ff',
+              color: '#5b21b6', fontSize: 13, textAlign: 'center', fontWeight: 600,
+            }}>
+              Esta obra está sob exclusividade até{' '}
+              {obra.exclusive_until
+                ? new Date(obra.exclusive_until).toLocaleDateString('pt-BR')
+                : '—'}.
+            </div>
+          ) : (
+            <>
+              <button
+                className="dc-modal-buy-btn"
+                style={{ width: '100%' }}
+                onClick={() => { onClose(); navigate(`/comprar/${obra.id}`) }}
+              >
+                Comprar pelo valor cheio
+              </button>
+              {isInterprete && (
+                <button
+                  onClick={() => setShowOferta(true)}
+                  style={{
+                    width: '100%', padding: '11px 16px', borderRadius: 8,
+                    background: '#fff', border: '2px solid #0C447C', color: '#0C447C',
+                    fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                  }}
+                >
+                  Fazer oferta
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
+      {showOferta && (
+        <OfertaModal
+          obra={{ ...obra, titular_pro: titularPro }}
+          onClose={() => setShowOferta(false)}
+          onCriada={() => { setShowOferta(false); navigate('/ofertas') }}
+        />
+      )}
     </div>,
     document.body
   )

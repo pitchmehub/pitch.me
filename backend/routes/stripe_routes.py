@@ -41,6 +41,7 @@ def criar_checkout():
 
     data = request.get_json(force=True, silent=True) or {}
     obra_id = data.get("obra_id")
+    oferta_id = data.get("oferta_id")  # opcional: paga uma oferta aceita
     metodo  = data.get("metodo", "credito")
     concordou_contrato = bool(data.get("concordo_contrato", True))  # default True p/ backcompat
 
@@ -54,17 +55,36 @@ def criar_checkout():
     if not concordou_contrato:
         abort(422, description="Marque a caixa de concordância com o contrato antes de prosseguir.")
 
+    sb = get_supabase()
+
+    # Se foi passado oferta_id, valida e usa o valor da oferta no lugar de preco_cents
+    oferta = None
+    if oferta_id:
+        oferta = sb.table("ofertas").select(
+            "id, obra_id, interprete_id, valor_cents, status, tipo, aguardando_resposta_de"
+        ).eq("id", oferta_id).single().execute().data
+        if not oferta:
+            abort(404, description="Oferta não encontrada.")
+        if oferta["interprete_id"] != g.user.id:
+            abort(403, description="Esta oferta não pertence a você.")
+        if oferta["status"] != "aceita":
+            abort(409, description=f"Oferta em status '{oferta['status']}' — só ofertas aceitas podem ser pagas.")
+        # Vincula obra_id da oferta (sobrescreve qualquer obra_id do body)
+        obra_id = oferta["obra_id"]
+
     # Proteção anti-auto-compra: titular não pode comprar sua propria obra
-    obra_check = sb_check.table("obras").select("titular_id").eq("id", obra_id).single().execute()
+    obra_check = sb_check.table("obras").select("titular_id, is_exclusive, exclusive_to_id").eq("id", obra_id).single().execute()
     if obra_check.data and obra_check.data.get("titular_id") == g.user.id:
         abort(422, description="Voce nao pode comprar uma obra de sua propria autoria.")
+    # Bloqueia compras em obra sob exclusividade (exceto se for o próprio exclusivista)
+    if obra_check.data and obra_check.data.get("is_exclusive"):
+        if obra_check.data.get("exclusive_to_id") != g.user.id:
+            abort(409, description="Esta obra está sob contrato de exclusividade ativa.")
 
     if not obra_id:
         abort(422, description="obra_id obrigatório.")
     if metodo not in METODO_TO_STRIPE:
         abort(422, description=f"Método inválido: {metodo}")
-
-    sb = get_supabase()
 
     # Busca a obra
     obra_resp = (
@@ -81,6 +101,9 @@ def criar_checkout():
         abort(422, description="Obra não está publicada.")
     if not obra.get("preco_cents") or obra["preco_cents"] < 100:
         abort(422, description="Obra com preço inválido.")
+
+    # Se houver oferta, usa o valor pactuado (sobrescreve preco_cents)
+    valor_unit = oferta["valor_cents"] if oferta else obra["preco_cents"]
 
     # Nome e plano do compositor titular (fee depende do plano)
     try:
@@ -105,9 +128,16 @@ def criar_checkout():
         coautorias = [{"perfil_id": obra["titular_id"], "share_pct": 100}]
 
     try:
-        split = calcular_split(obra["preco_cents"], coautorias, plano_titular=plano_titular)
+        split = calcular_split(valor_unit, coautorias, plano_titular=plano_titular)
     except ValueError as e:
         abort(422, description=str(e))
+
+    # Descrição do produto: distingue licença normal de exclusividade
+    eh_exclusividade = bool(oferta and oferta.get("tipo") == "exclusividade")
+    nome_produto = (f"Licença EXCLUSIVA (5 anos): {obra['nome']}"
+                    if eh_exclusividade else f"Licença: {obra['nome']}")
+    desc_produto = (f"Exclusividade adquirida via oferta — composição de {titular_nome}"
+                    if eh_exclusividade else f"Composição musical de {titular_nome}")
 
     # Cria a sessão Stripe
     try:
@@ -118,10 +148,10 @@ def criar_checkout():
                 "price_data": {
                     "currency": "brl",
                     "product_data": {
-                        "name": f"Licença: {obra['nome']}",
-                        "description": f"Composição musical de {titular_nome}",
+                        "name": nome_produto,
+                        "description": desc_produto,
                     },
-                    "unit_amount": obra["preco_cents"],
+                    "unit_amount": valor_unit,
                 },
                 "quantity": 1,
             }],
@@ -132,6 +162,8 @@ def criar_checkout():
                 "obra_id":      obra_id,
                 "comprador_id": g.user.id,
                 "metodo":       metodo,
+                "oferta_id":    (oferta or {}).get("id", ""),
+                "oferta_tipo":  (oferta or {}).get("tipo", ""),
             },
         )
     except stripe.error.StripeError as e:
@@ -159,6 +191,8 @@ def criar_checkout():
                 "aceite_ip_hash":  hash_ip(request.remote_addr or ""),
                 "aceite_at":       datetime.now(timezone.utc).isoformat(),
                 "aceite_user_agent": (request.headers.get("User-Agent") or "")[:200],
+                "oferta_id":       (oferta or {}).get("id"),
+                "oferta_tipo":     (oferta or {}).get("tipo"),
             },
         }).execute()
     except Exception as e:
@@ -280,6 +314,24 @@ def webhook():
                 trans["obra_id"],
                 trans["valor_cents"]
             )
+
+            # Se a compra veio de uma oferta, marca-a como paga.
+            # Se for oferta de exclusividade, aplica exclusividade na obra.
+            try:
+                meta_oferta_id = (meta or {}).get("oferta_id") or ""
+                meta_oferta_tipo = (meta or {}).get("oferta_tipo") or ""
+                if meta_oferta_id:
+                    sb.table("ofertas").update({
+                        "status": "paga",
+                    }).eq("id", meta_oferta_id).execute()
+                if meta_oferta_tipo == "exclusividade":
+                    from services.ofertas import aplicar_exclusividade_em_obra
+                    aplicar_exclusividade_em_obra(
+                        obra_id=trans["obra_id"],
+                        comprador_id=trans["comprador_id"],
+                    )
+            except Exception as _e:
+                logger.warning("Falha ao processar pós-pagamento de oferta: %s", _e)
 
             # Dispara geração do Contrato de Licenciamento (Cláusulas ECAD/split/etc)
             try:

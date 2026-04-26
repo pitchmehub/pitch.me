@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -17,6 +17,9 @@ export default function Comprar() {
  const { obraId } = useParams()
  const navigate = useNavigate()
  const { perfil } = useAuth()
+ const [searchParams] = useSearchParams()
+ const ofertaId = searchParams.get('oferta_id') || null
+ const [oferta, setOferta] = useState(null)
 
  // Bloqueia compra se o cadastro inicial ainda não foi preenchido (fluxo pós-login).
  useEffect(() => {
@@ -42,11 +45,28 @@ export default function Comprar() {
  const [contratoTpl, setContratoTpl] = useState('')
 
  useEffect(() => {
- api.get(`/catalogo/${obraId}`)
- .then(setObra)
- .catch(() => navigate('/descoberta'))
- .finally(() => setLoading(false))
- }, [obraId])
+ async function load() {
+ try {
+ const o = await api.get(`/catalogo/${obraId}`)
+ setObra(o)
+ if (ofertaId) {
+ try {
+ const of = await api.get(`/catalogo/ofertas/${ofertaId}`)
+ setOferta(of)
+ } catch (_) { /* segue sem oferta */ }
+ }
+ } catch (_) {
+ navigate('/descoberta')
+ } finally {
+ setLoading(false)
+ }
+ }
+ load()
+ }, [obraId, ofertaId])
+
+ // Valor exibido = valor da oferta aceita (se houver) ou preço cheio
+ const valorFinal = (oferta?.status === 'aceita' ? oferta.valor_cents : obra?.preco_cents) || 0
+ const eExclusiva = oferta?.tipo === 'exclusividade'
 
  async function confirmar() {
  if (!concordo) {
@@ -55,9 +75,9 @@ export default function Comprar() {
  }
  setPagando(true); setErro('')
  try {
- const { checkout_url } = await api.post('/stripe/checkout', {
- obra_id: obraId, metodo, concordo_contrato: true,
- })
+ const payload = { obra_id: obraId, metodo, concordo_contrato: true }
+ if (ofertaId && oferta?.status === 'aceita') payload.oferta_id = ofertaId
+ const { checkout_url } = await api.post('/stripe/checkout', payload)
  window.location.href = checkout_url
  } catch (e) {
  setErro(e.message)
@@ -129,13 +149,28 @@ export default function Comprar() {
  </div>
  )}
 
+ {oferta?.status === 'aceita' && (
+ <div style={{
+ padding: '10px 14px', borderRadius: 8,
+ background: eExclusiva ? '#f5f3ff' : '#eff6ff',
+ color: eExclusiva ? '#5b21b6' : '#1e40af',
+ fontSize: 13, fontWeight: 600, marginBottom: 12,
+ }}>
+ {eExclusiva
+ ? `Pagamento de licença EXCLUSIVA (5 anos) · oferta aceita pelo compositor`
+ : `Pagamento da sua oferta aceita · ${oferta.valor_cents !== obra.preco_cents
+ ? `valor pactuado de ${fmt(oferta.valor_cents)} (catálogo: ${fmt(obra.preco_cents)})`
+ : 'valor cheio'}`}
+ </div>
+ )}
+
  <div style={{
  display: 'flex', justifyContent: 'space-between',
  fontWeight: 700, fontSize: 22,
  borderTop: '1px solid var(--border)', paddingTop: 16, marginTop: 8,
  }}>
  <span>Total</span>
- <span style={{ color: 'var(--brand)' }}>{fmt(obra.preco_cents)}</span>
+ <span style={{ color: 'var(--brand)' }}>{fmt(valorFinal)}</span>
  </div>
  </div>
 
@@ -225,7 +260,7 @@ export default function Comprar() {
  data-testid="btn-pagar"
  title={!concordo ? 'Marque a concordância com o contrato para prosseguir.' : undefined}
  >
- {pagando ? 'Redirecionando…' : ` Pagar com Stripe · ${fmt(obra.preco_cents)}`}
+ {pagando ? 'Redirecionando…' : ` Pagar com Stripe · ${fmt(valorFinal)}`}
  </button>
 
  <div style={{

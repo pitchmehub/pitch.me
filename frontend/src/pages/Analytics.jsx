@@ -175,6 +175,86 @@ export default function Analytics() {
             />
           </Section>
 
+          {/* ── 5. OFERTAS E EXCLUSIVIDADE ─────────────── */}
+          {data.ofertas && (
+            <Section
+              title="Ofertas e exclusividade"
+              subtitle="Propostas recebidas de intérpretes nas suas obras."
+            >
+              <div style={kpiGrid}>
+                <KPI
+                  label="Pendentes"
+                  value={data.ofertas.pendentes ?? 0}
+                  testid="kpi-ofertas-pendentes"
+                  accent="#d97706"
+                />
+                <KPI
+                  label="Aceitas"
+                  value={data.ofertas.aceitas ?? 0}
+                  testid="kpi-ofertas-aceitas"
+                  accent="#10b981"
+                />
+                <KPI
+                  label="Pagas"
+                  value={data.ofertas.pagas ?? 0}
+                  testid="kpi-ofertas-pagas"
+                  accent="#1e3a8a"
+                />
+                <KPI
+                  label="Taxa de conversão"
+                  value={
+                    data.ofertas.taxa_conversao_pct != null
+                      ? `${data.ofertas.taxa_conversao_pct}%`
+                      : '—'
+                  }
+                  testid="kpi-ofertas-conversao"
+                />
+              </div>
+
+              <div style={kpiGrid}>
+                <KPI
+                  label="Valor pendente"
+                  value={fmtBRL(data.ofertas.valor_pendentes_cents)}
+                  testid="kpi-ofertas-valor-pendente"
+                />
+                <KPI
+                  label="Valor pago em ofertas"
+                  value={fmtBRL(data.ofertas.valor_pagas_cents)}
+                  testid="kpi-ofertas-valor-pago"
+                  accent="#10b981"
+                />
+                <KPI
+                  label="Contrapropostas"
+                  value={data.ofertas.contra_proposta ?? 0}
+                  testid="kpi-ofertas-contra"
+                />
+                <KPI
+                  label="Obras exclusivas"
+                  value={data.obras_exclusivas ?? 0}
+                  testid="kpi-obras-exclusivas"
+                  accent="#7c3aed"
+                />
+              </div>
+
+              <div style={contextBox}>
+                {(data.ofertas.pendentes ?? 0) > 0 ? (
+                  <>
+                    Você tem <b>{data.ofertas.pendentes}</b> oferta(s) aguardando resposta
+                    {' '}({fmtBRL(data.ofertas.valor_pendentes_cents)} em jogo).{' '}
+                    <button onClick={() => navigate('/ofertas')} style={linkBtn}>
+                      Responder agora →
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Quanto mais rápido você responde a uma oferta, maior a chance dela virar venda.
+                    {!isPro && ' Plano PRO desbloqueia ofertas de exclusividade (5 anos).'}
+                  </>
+                )}
+              </div>
+            </Section>
+          )}
+
           {/* CTA final pra STARTER */}
           {!isPro && (
             <div style={{
