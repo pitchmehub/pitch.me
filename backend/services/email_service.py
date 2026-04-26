@@ -308,3 +308,74 @@ def render_saque_cancelado_email(nome: str, valor_brl: str, motivo: str) -> tupl
     </ul>
     """
     return _wrap_html("Saque cancelado", body), f"Saque {valor_brl} cancelado. Motivo: {motivo}"
+
+
+def render_rescisao_exclusividade_email(
+    nome_destinatario: str,
+    papel: str,
+    nome_obra: str,
+    nome_comprador: str,
+    data_venda_brt: str,
+) -> tuple[str, str]:
+    """
+    E-mail formal de rescisão dos demais contratos de licenciamento da obra
+    em razão de venda de exclusividade. Enviado ao compositor, coautores e à
+    editora (agregada ou terceira).
+
+    `papel`: 'compositor' | 'coautor' | 'editora' — usado só pra personalizar o tom.
+    """
+    saudacao = {
+        "compositor": "compositor(a)",
+        "coautor":    "coautor(a)",
+        "editora":    "editora",
+    }.get(papel, "parte interessada")
+
+    body = f"""
+    <h2 style="margin:0 0 8px">Comunicação formal de rescisão</h2>
+    <p style="color:#444;font-size:14px">
+      Prezado(a) {nome_destinatario or saudacao},
+    </p>
+    <p style="color:#444;font-size:14px">
+      Comunicamos formalmente, na qualidade de plataforma intermediária dos
+      licenciamentos da obra <strong>"{nome_obra}"</strong>, a
+      <strong>rescisão</strong> de todos os contratos de licenciamento até então
+      vigentes referentes a esta obra.
+    </p>
+    <div style="margin:16px 0;padding:14px 16px;background:#FEF2F2;border-left:4px solid #BE123C;border-radius:6px">
+      <p style="margin:0;color:#7F1D1D;font-size:13px">
+        <strong>Motivo:</strong> venda da licença de <strong>EXCLUSIVIDADE</strong> da obra
+        a {nome_comprador or 'novo licenciado'}, formalizada em {data_venda_brt}
+        por meio da plataforma GRAVAN.
+      </p>
+    </div>
+    <p style="color:#444;font-size:14px">
+      Em conformidade com a CLÁUSULA 3 (bilateral) / CLÁUSULA 5 (trilateral) dos
+      contratos vigentes — Parágrafo Primeiro (Rescisão) — esta comunicação
+      observa o prazo de <strong>30 (trinta) dias</strong> de antecedência. As
+      explorações comerciais já realizadas, e aquelas realizadas até o término
+      desse prazo, permanecem válidas e definitivas.
+    </p>
+    <p style="color:#444;font-size:14px">
+      A partir desta data, a obra passa a constar como
+      <strong>indisponível para novos licenciamentos</strong> no catálogo da
+      GRAVAN, pelo período de exclusividade contratado (5 anos).
+    </p>
+    <p style="color:#666;font-size:12px;margin-top:24px">
+      Em caso de dúvidas, responda a este e-mail ou entre em contato com o
+      suporte da Gravan.
+    </p>
+    """
+    text = (
+        f"Gravan — Comunicação formal de rescisão\n\n"
+        f"Prezado(a) {nome_destinatario or saudacao},\n\n"
+        f"Comunicamos formalmente a rescisão dos contratos de licenciamento da "
+        f"obra \"{nome_obra}\".\n\n"
+        f"Motivo: venda da licença de EXCLUSIVIDADE a {nome_comprador or 'novo licenciado'}, "
+        f"formalizada em {data_venda_brt} pela plataforma GRAVAN.\n\n"
+        f"Esta comunicação observa o prazo de 30 dias de antecedência previsto na "
+        f"CLÁUSULA 3/5 — Parágrafo Primeiro dos contratos. As explorações já "
+        f"realizadas e as realizadas até o término desse prazo permanecem válidas.\n\n"
+        f"A obra passa a constar como indisponível para novos licenciamentos pelo "
+        f"período de exclusividade contratado (5 anos).\n"
+    )
+    return _wrap_html(f"Rescisão — \"{nome_obra}\"", body), text

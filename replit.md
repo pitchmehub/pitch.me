@@ -1,5 +1,21 @@
 # Gravan — Marketplace de Obras Musicais
 
+### Contratos — Prazo, Rescisão e Exclusividade (abr/2026)
+- Bilateral (CLÁUSULA 3) e trilateral / intermediação (CLÁUSULA 5) agora preveem:
+  validade de 5 anos, rescisão por comunicação formal via e-mail com 30 dias de
+  antecedência, e — quando a licença for de exclusividade — 5 anos de
+  exclusividade. As cláusulas estão em `backend/services/contrato_licenciamento.py`
+  (`TEMPLATE_LICENCIAMENTO`, `TEMPLATE_TRILATERAL`).
+- Cláusula 8 do bilateral foi suavizada para "IRRETRATABILIDADE DA EXPLORAÇÃO",
+  ressalvando o direito de rescisão da Cláusula 3.
+- Quando uma exclusividade é vendida, `services.ofertas.aplicar_exclusividade_em_obra`
+  marca `is_exclusive=true` (catálogo automaticamente bloqueia novos
+  licenciamentos) e dispara, via `services.email_service.render_rescisao_exclusividade_email`,
+  comunicação formal de rescisão por e-mail ao compositor, coautores e à
+  editora envolvida (agregada — `perfis.publisher_id` — ou terceira —
+  `obras.editora_terceira_email`), apontando como motivo a venda de
+  exclusividade. Idempotente (não reenvia em retry de webhook).
+
 ### Assinatura PRO — Dunning automático (abr/2026)
 - Renovação mensal recorrente no Stripe (Subscriptions).
 - Em falha de cobrança (`invoice.payment_failed`), o perfil entra em
