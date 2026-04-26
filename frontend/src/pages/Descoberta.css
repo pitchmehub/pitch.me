@@ -490,9 +490,9 @@
   .dc-compositor-avatar   { width: 56px; height: 56px; font-size: 20px; }
   .dc-compositor-nome     { font-size: 16px; }
 
-  /* Modal */
-  .dc-modal-overlay   { padding: 0; align-items: flex-end; }
-  .dc-modal           { max-width: 100%; border-radius: 28px 28px 0 0; max-height: 90vh; }
+  /* Modal — centralizado em todas as telas */
+  .dc-modal-overlay   { padding: 16px; align-items: center; }
+  .dc-modal           { max-width: 480px; border-radius: 28px; max-height: 88vh; }
   .dc-modal-header    { padding: 16px; gap: 12px; }
   .dc-modal-cover     { width: 56px; height: 56px; font-size: 24px; }
   .dc-modal-nome      { font-size: 18px; }
