@@ -4,14 +4,32 @@
 --            janela de 48h, exclusividade de 5 anos em obras.
 -- ----------------------------------------------------------------------------
 -- IDEMPOTENTE: pode rodar mais de uma vez sem quebrar nada.
--- Execute por inteiro no SQL Editor do Supabase.
+-- IMPORTANTE: rode o arquivo INTEIRO de uma vez no SQL Editor do Supabase.
+--             A Parte 1 NÃO pode ficar dentro de transação (limitação do
+--             PostgreSQL para ALTER TYPE ... ADD VALUE).
 -- ============================================================================
+
+
+-- =========================================================================
+-- PARTE 1 — ENUM `oferta_status`: adicionar valores novos
+-- (FORA de transação por exigência do PostgreSQL.)
+-- =========================================================================
+
+ALTER TYPE public.oferta_status ADD VALUE IF NOT EXISTS 'contra_proposta';
+ALTER TYPE public.oferta_status ADD VALUE IF NOT EXISTS 'cancelada';
+ALTER TYPE public.oferta_status ADD VALUE IF NOT EXISTS 'paga';
+ALTER TYPE public.oferta_status ADD VALUE IF NOT EXISTS 'expirada';
+
+
+-- =========================================================================
+-- PARTE 2 — Schema novo (em transação)
+-- =========================================================================
 
 BEGIN;
 
--- =========================================================================
--- 1. TABELA `ofertas` — novas colunas
--- =========================================================================
+-- -------------------------------------------------------------------------
+-- 2.1  Tabela `ofertas` — colunas novas
+-- -------------------------------------------------------------------------
 
 ALTER TABLE public.ofertas
   ADD COLUMN IF NOT EXISTS tipo TEXT NOT NULL DEFAULT 'padrao';
@@ -33,38 +51,29 @@ ALTER TABLE public.ofertas
 ALTER TABLE public.ofertas
   ADD COLUMN IF NOT EXISTS responded_at TIMESTAMPTZ;
 
--- Garante default para linhas pré-existentes que ficaram NULL
-UPDATE public.ofertas SET expires_at = created_at + INTERVAL '48 hours'
-  WHERE expires_at IS NULL;
+-- Garante valor de expiração para linhas antigas
+UPDATE public.ofertas
+   SET expires_at = created_at + INTERVAL '48 hours'
+ WHERE expires_at IS NULL;
 
--- =========================================================================
--- 2. CHECK CONSTRAINTS — recriar para incluir novos valores
--- =========================================================================
+-- -------------------------------------------------------------------------
+-- 2.2  CHECK constraints para as colunas TEXT novas
+--      (status NÃO é check — é ENUM, já tratado na Parte 1.)
+-- -------------------------------------------------------------------------
 
--- status: pendente, aceita, recusada, expirada, contra_proposta, cancelada, paga
-ALTER TABLE public.ofertas DROP CONSTRAINT IF EXISTS ofertas_status_check;
-ALTER TABLE public.ofertas
-  ADD CONSTRAINT ofertas_status_check
-  CHECK (status IN (
-    'pendente','aceita','recusada','expirada',
-    'contra_proposta','cancelada','paga'
-  ));
-
--- tipo: padrao | exclusividade
 ALTER TABLE public.ofertas DROP CONSTRAINT IF EXISTS ofertas_tipo_check;
 ALTER TABLE public.ofertas
   ADD CONSTRAINT ofertas_tipo_check
   CHECK (tipo IN ('padrao','exclusividade'));
 
--- aguardando_resposta_de: compositor | interprete
 ALTER TABLE public.ofertas DROP CONSTRAINT IF EXISTS ofertas_aguardando_check;
 ALTER TABLE public.ofertas
   ADD CONSTRAINT ofertas_aguardando_check
   CHECK (aguardando_resposta_de IN ('compositor','interprete'));
 
--- =========================================================================
--- 3. TABELA `obras` — flag de exclusividade
--- =========================================================================
+-- -------------------------------------------------------------------------
+-- 2.3  Tabela `obras` — flag de exclusividade
+-- -------------------------------------------------------------------------
 
 ALTER TABLE public.obras
   ADD COLUMN IF NOT EXISTS is_exclusive BOOLEAN NOT NULL DEFAULT false;
@@ -76,9 +85,9 @@ ALTER TABLE public.obras
   ADD COLUMN IF NOT EXISTS exclusive_to_id UUID
     REFERENCES public.perfis(id) ON DELETE SET NULL;
 
--- =========================================================================
--- 4. ÍNDICES de performance
--- =========================================================================
+-- -------------------------------------------------------------------------
+-- 2.4  Índices de performance
+-- -------------------------------------------------------------------------
 
 CREATE INDEX IF NOT EXISTS idx_ofertas_obra_status
   ON public.ofertas (obra_id, status);
