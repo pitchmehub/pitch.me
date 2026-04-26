@@ -76,13 +76,9 @@ O LICENCIADO pagará ao(s) AUTOR(ES) o valor de {{valor_buyout_extenso}} referen
 5.2 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
 
 Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão distribuídos da seguinte forma:
-- 80% (oitenta por cento) para o(s) AUTOR(ES) e coautores;
+- 85% (oitenta e cinco por cento) para o(s) AUTOR(ES) e coautores;
 - 10% (dez por cento) para o INTÉRPRETE;
-- 10% (dez por cento) para a EDITORA GRAVAN.
-
-5.3 — ROYALTIES DE FONOGRAMA
-
-O(s) AUTOR(ES) fará(ão) jus a 2% (dois por cento) sobre a receita do fonograma. Forma de pagamento: diretamente pela distribuidora digital do LICENCIADO.
+- 5% (cinco por cento) para a EDITORA GRAVAN.
 
 CLÁUSULA 6 — CRÉDITOS E IDENTIFICAÇÃO
 
@@ -592,12 +588,13 @@ CLÁUSULA 5 — TERRITÓRIO E PRAZO
 Autorização mundial, pelo prazo integral de proteção dos direitos autorais
 (Lei 9.610/98), em caráter definitivo, irrevogável e irretratável.
 
-CLÁUSULA 6 — ROYALTIES (ECAD)
+CLÁUSULA 6 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
 
 Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão
-distribuídos conforme cadastro junto ao órgão, observando-se a divisão entre
-AUTOR(ES) e EDITORA TERCEIRA já registrada e a participação do INTÉRPRETE
-nos termos legais.
+distribuídos da seguinte forma:
+- 85% (oitenta e cinco por cento) para o(s) AUTOR(ES) e coautores;
+- 10% (dez por cento) para o INTÉRPRETE;
+- 5% (cinco por cento) para a EDITORA GRAVAN.
 
 CLÁUSULA 7 — DIVISÃO DECLARADA (SPLIT) ENTRE AUTORES
 {{split_lista}}

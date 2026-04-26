@@ -6,6 +6,105 @@ function fmt(cents) {
  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((cents ?? 0) / 100)
 }
 
+function fmtData(iso) {
+ if (!iso) return '—'
+ try {
+   return new Date(iso).toLocaleString('pt-BR', {
+     day: '2-digit', month: '2-digit', year: 'numeric',
+     hour: '2-digit', minute: '2-digit',
+   })
+ } catch { return iso }
+}
+
+function HistoricoLicenciamentos() {
+ const [data, setData] = useState(null)
+ const [erro, setErro] = useState('')
+
+ useEffect(() => {
+   api.get('/publishers/historico-licenciamentos')
+     .then(setData)
+     .catch(e => setErro(e.message))
+ }, [])
+
+ if (erro) return null
+ if (!data) {
+   return (
+     <div style={{ marginBottom: 28 }}>
+       <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>Histórico de licenciamentos</h2>
+       <div style={{ padding: 16, color: 'var(--text-muted)', fontSize: 13 }}>Carregando…</div>
+     </div>
+   )
+ }
+
+ const itens = data.itens || []
+
+ return (
+   <div style={{ marginBottom: 28 }}>
+     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+       <h2 style={{ fontSize: 18, fontWeight: 700 }}>
+         Histórico de licenciamentos
+       </h2>
+       <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+         {itens.length === 0
+           ? 'Nenhum licenciamento ainda'
+           : <>Total recebido: <strong style={{ color: 'var(--brand)' }}>{fmt(data.total_cents)}</strong> · {data.total_transacoes} transação(ões)</>}
+       </div>
+     </div>
+
+     {itens.length === 0 ? (
+       <div style={{
+         padding: 18, background: 'var(--surface)', border: '1px solid var(--border)',
+         borderRadius: 12, fontSize: 13, color: 'var(--text-muted)',
+       }}>
+         Quando uma obra de um agregado seu for licenciada, a sua participação
+         de 10% aparecerá aqui automaticamente.
+       </div>
+     ) : (
+       <div style={{
+         background: 'var(--surface)', border: '1px solid var(--border)',
+         borderRadius: 12, overflow: 'hidden',
+       }}>
+         <div style={{ overflowX: 'auto' }}>
+           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+             <thead>
+               <tr style={{ background: 'rgba(0,0,0,.04)', textAlign: 'left' }}>
+                 <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)' }}>Data</th>
+                 <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)' }}>Obra</th>
+                 <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)' }}>Titular (agregado)</th>
+                 <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)' }}>Comprador</th>
+                 <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)', textAlign: 'right' }}>Valor da venda</th>
+                 <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)', textAlign: 'right' }}>Sua comissão</th>
+               </tr>
+             </thead>
+             <tbody>
+               {itens.map(it => (
+                 <tr key={it.id} style={{ borderTop: '1px solid var(--border)' }}>
+                   <td style={{ padding: '10px 14px', whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>{fmtData(it.data)}</td>
+                   <td style={{ padding: '10px 14px', fontWeight: 600 }}>{it.obra?.nome || '—'}</td>
+                   <td style={{ padding: '10px 14px' }}>{it.titular?.nome || '—'}</td>
+                   <td style={{ padding: '10px 14px' }}>{it.comprador?.nome || '—'}</td>
+                   <td style={{ padding: '10px 14px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                     {it.valor_total_cents != null ? fmt(it.valor_total_cents) : '—'}
+                   </td>
+                   <td style={{ padding: '10px 14px', textAlign: 'right', whiteSpace: 'nowrap', fontWeight: 800, color: 'var(--brand)' }}>
+                     {fmt(it.comissao_cents)}
+                     {it.share_pct != null && (
+                       <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)' }}>
+                         {Number(it.share_pct).toFixed(0)}%
+                       </div>
+                     )}
+                   </td>
+                 </tr>
+               ))}
+             </tbody>
+           </table>
+         </div>
+       </div>
+     )}
+   </div>
+ )
+}
+
 function StatCard({ label, value, sub, accent }) {
  return (
  <div style={{
@@ -114,6 +213,8 @@ export default function PublisherDashboard() {
  <StatCard label="Faturamento bruto" value={fmt(data.faturamento_cents)} accent />
  <StatCard label="Fee devido (5%)" value={fmt(data.fee_devido_cents)} sub="Plataforma GRAVAN" />
  </div>
+
+ <HistoricoLicenciamentos />
 
  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
  <Link to="/agregados" className="btn btn-primary">Gerir agregados</Link>

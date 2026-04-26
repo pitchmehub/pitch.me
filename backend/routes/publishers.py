@@ -212,3 +212,107 @@ def dashboard():
         "faturamento_cents":    faturamento_cents,
         "fee_devido_cents":     int(faturamento_cents * 0.05),
     })
+
+
+# ──────────────────── HISTÓRICO DE LICENCIAMENTOS ────────────────────
+@publishers_bp.get("/historico-licenciamentos")
+@require_auth
+def historico_licenciamentos():
+    """
+    Retorna o histórico de licenciamentos em que a editora logada recebeu
+    comissão (10% sobre obras de seus agregados), em ordem decrescente.
+
+    Cada item:
+      - data, obra (id, nome), titular (id, nome), comprador (id, nome),
+        valor_total_cents (transação), comissao_cents (recebido pela editora),
+        share_pct
+    """
+    sb = get_supabase()
+    me = sb.table("perfis").select("role").eq("id", g.user.id).single().execute()
+    if not me.data or me.data.get("role") != "publisher":
+        abort(403, description="Apenas editoras.")
+
+    # Pagamentos creditados à editora
+    pagamentos = (sb.table("pagamentos_compositores")
+                    .select("id, transacao_id, valor_cents, share_pct, created_at")
+                    .eq("perfil_id", g.user.id)
+                    .order("created_at", desc=True)
+                    .limit(200)
+                    .execute()).data or []
+
+    if not pagamentos:
+        return jsonify({"itens": [], "total_cents": 0, "total_transacoes": 0})
+
+    tx_ids = list({p["transacao_id"] for p in pagamentos if p.get("transacao_id")})
+
+    # Carrega transações (com obra e comprador)
+    tx_map = {}
+    if tx_ids:
+        try:
+            tx = (sb.table("transacoes")
+                    .select("id, valor_cents, status, created_at, obra_id, comprador_id, "
+                            "obras(id, nome, titular_id), "
+                            "comprador:perfis!comprador_id(id, nome_completo, nome_artistico)")
+                    .in_("id", tx_ids).execute()).data or []
+            tx_map = {t["id"]: t for t in tx}
+        except Exception:
+            # Fallback simples sem joins
+            try:
+                tx = (sb.table("transacoes")
+                        .select("id, valor_cents, status, created_at, obra_id, comprador_id")
+                        .in_("id", tx_ids).execute()).data or []
+                tx_map = {t["id"]: t for t in tx}
+            except Exception:
+                tx_map = {}
+
+    # Coleta titular_ids para resolver nomes
+    titular_ids = set()
+    for t in tx_map.values():
+        obra = t.get("obras") or {}
+        if obra.get("titular_id"):
+            titular_ids.add(obra["titular_id"])
+
+    titular_map = {}
+    if titular_ids:
+        try:
+            tit = (sb.table("perfis")
+                     .select("id, nome_completo, nome_artistico")
+                     .in_("id", list(titular_ids)).execute()).data or []
+            titular_map = {p["id"]: p for p in tit}
+        except Exception:
+            pass
+
+    itens = []
+    total_cents = 0
+    for p in pagamentos:
+        t = tx_map.get(p.get("transacao_id")) or {}
+        obra = t.get("obras") or {}
+        titular = titular_map.get(obra.get("titular_id")) or {}
+        comprador = t.get("comprador") or {}
+        itens.append({
+            "id":                p["id"],
+            "data":              p.get("created_at"),
+            "transacao_id":      p.get("transacao_id"),
+            "valor_total_cents": t.get("valor_cents"),
+            "comissao_cents":    p.get("valor_cents", 0),
+            "share_pct":         p.get("share_pct"),
+            "obra": {
+                "id":   obra.get("id"),
+                "nome": obra.get("nome"),
+            },
+            "titular": {
+                "id":   titular.get("id"),
+                "nome": titular.get("nome_artistico") or titular.get("nome_completo"),
+            },
+            "comprador": {
+                "id":   comprador.get("id"),
+                "nome": comprador.get("nome_artistico") or comprador.get("nome_completo"),
+            },
+        })
+        total_cents += p.get("valor_cents", 0)
+
+    return jsonify({
+        "itens":            itens,
+        "total_cents":      total_cents,
+        "total_transacoes": len(tx_ids),
+    })

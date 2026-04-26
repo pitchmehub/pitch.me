@@ -18,6 +18,17 @@ Plataforma premium que conecta compositores e compradores de obras musicais com 
   `backend/services/repasses.py` (cobre tanto o crédito em wallet quanto os
   Transfers via Stripe Connect). A cláusula correspondente é injetada no
   contrato trilateral agregado em `backend/services/contrato_licenciamento.py`.
+- **Royalties autorais (ECAD) — execução pública (atualizado abr/2026):**
+  todos os contratos (bilateral e trilateral) preveem o seguinte rateio dos
+  rendimentos do ECAD:
+  - **85%** para os autores/coautores
+  - **10%** para o intérprete
+  - **5%** para a EDITORA GRAVAN
+  A antiga cláusula 5.3 (royalties de fonograma) foi removida dos contratos.
+- **Histórico de licenciamentos da editora:** endpoint
+  `GET /api/publishers/historico-licenciamentos` lista todas as transações em
+  que a editora logada recebeu sua comissão de 10%, com obra, titular agregado,
+  comprador e valor. Renderizado no `PublisherDashboard.jsx`.
 
 ## Arquitetura
 
