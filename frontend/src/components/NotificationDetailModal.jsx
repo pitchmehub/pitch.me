@@ -287,7 +287,7 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
         )}
 
         {/* ── AÇÕES padrão ── */}
-        {!isConvitePendente && !acao && (
+        {!isConvitePendente && !acao && !loadingExtra && (
           <footer className="ndm-actions">
             {notif.lida
               ? <button className="btn btn-ghost ndm-btn-ghost" onClick={() => marcarLida(false)}>Marcar como não-lida</button>
