@@ -37,16 +37,16 @@ export default function FaleConoscoModal({ onClose }) {
 
   const inputStyle = {
     width: '100%', padding: '11px 14px',
-    background: 'rgba(255,255,255,0.07)',
-    border: '1px solid rgba(255,255,255,0.13)',
-    borderRadius: 9, color: '#e8f0f8', fontSize: 14,
+    background: 'rgba(255,255,255,0.70)',
+    border: '1px solid var(--border, #E4E4E7)',
+    borderRadius: 9, color: 'var(--text-primary, #09090B)', fontSize: 14,
     outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit',
     transition: 'border-color .15s',
   }
 
   const labelStyle = {
     display: 'block', fontSize: 10, fontWeight: 700, marginBottom: 6,
-    color: 'rgba(180,200,225,0.50)',
+    color: 'var(--text-muted, #71717A)',
     letterSpacing: '0.12em', textTransform: 'uppercase',
   }
 
@@ -67,23 +67,23 @@ export default function FaleConoscoModal({ onClose }) {
         <div className="gv-modal-body">
           <div style={{
             padding: '10px 14px', borderRadius: 10,
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'rgba(0,0,0,0.03)',
+            border: '1px solid rgba(0,0,0,0.07)',
             marginBottom: 20, fontSize: 13,
           }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(180,200,225,0.45)', marginBottom: 4 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted, #71717A)', marginBottom: 4 }}>
               Email da plataforma
             </div>
-            <a href={`mailto:${EMAIL_SUPORTE}`} style={{ color: 'rgba(200,215,235,0.85)', textDecoration: 'none', fontWeight: 600 }}>
+            <a href={`mailto:${EMAIL_SUPORTE}`} style={{ color: 'var(--brand, #0C447C)', textDecoration: 'none', fontWeight: 600 }}>
               {EMAIL_SUPORTE}
             </a>
           </div>
 
           {enviado ? (
             <div style={{ padding: '24px 0', textAlign: 'center' }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: '#86efac' }}>Mensagem enviada!</h3>
-              <p style={{ color: 'rgba(200,215,235,0.60)', fontSize: 14 }}>
+              <div style={{ fontSize: 40, marginBottom: 12, color: '#15803d' }}>✓</div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: '#15803d' }}>Mensagem enviada!</h3>
+              <p style={{ color: 'var(--text-secondary, #52525B)', fontSize: 14 }}>
                 Em breve entraremos em contato pelo email informado.
               </p>
             </div>
@@ -122,7 +122,7 @@ export default function FaleConoscoModal({ onClose }) {
                   rows={5}
                   style={{ ...inputStyle, resize: 'vertical', minHeight: 110 }}
                 />
-                <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(180,200,225,0.35)', marginTop: 4 }}>
+                <div style={{ textAlign: 'right', fontSize: 11, color: 'var(--text-muted, #71717A)', marginTop: 4 }}>
                   {mensagem.length} / {MAX_MSG}
                 </div>
               </div>
@@ -130,9 +130,9 @@ export default function FaleConoscoModal({ onClose }) {
               {erro && (
                 <div style={{
                   padding: '10px 12px', marginBottom: 14,
-                  background: 'rgba(220,38,38,0.15)',
+                  background: 'rgba(220,38,38,0.10)',
                   border: '1px solid rgba(220,38,38,0.30)',
-                  borderRadius: 10, fontSize: 13, color: '#fca5a5',
+                  borderRadius: 10, fontSize: 13, color: '#dc2626',
                 }}>{erro}</div>
               )}
 

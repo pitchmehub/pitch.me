@@ -83,14 +83,14 @@ export default function SaqueOTPModal({ meta, onClose, onConfirmado }) {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
           <div>
-            <h2 id="otp-titulo" style={{ fontSize: 20, fontWeight: 800, marginBottom: 4, color: '#fff' }}>
+            <h2 id="otp-titulo" style={{ fontSize: 20, fontWeight: 800, marginBottom: 4, color: 'var(--text-primary, #09090B)' }}>
               Confirme seu saque
             </h2>
-            <p style={{ fontSize: 13, color: 'rgba(200,215,235,0.65)', margin: 0 }}>
-              Enviamos um código para <strong style={{ color: 'rgba(200,215,235,0.9)' }}>{emailMask}</strong>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary, #52525B)', margin: 0 }}>
+              Enviamos um código para <strong style={{ color: 'var(--text-primary, #09090B)' }}>{emailMask}</strong>
             </p>
-            <p style={{ fontSize: 13, color: 'rgba(200,215,235,0.65)', margin: '2px 0 0' }}>
-              Valor: <strong style={{ color: '#86efac' }}>{fmt(meta.valor_cents)}</strong>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary, #52525B)', margin: '2px 0 0' }}>
+              Valor: <strong style={{ color: '#15803d' }}>{fmt(meta.valor_cents)}</strong>
             </p>
           </div>
           <button className="gv-modal-close" onClick={onClose} aria-label="Fechar">×</button>
@@ -108,8 +108,8 @@ export default function SaqueOTPModal({ meta, onClose, onConfirmado }) {
             style={{
               width: '100%', padding: '16px 12px', fontSize: 28, textAlign: 'center',
               letterSpacing: 12, fontFamily: 'monospace', fontWeight: 700,
-              border: '2px solid rgba(55,138,221,0.40)', borderRadius: 12, marginBottom: 10,
-              color: '#a8d4ff', background: 'rgba(255,255,255,0.06)',
+              border: '2px solid var(--brand-border, rgba(12,68,124,.25))', borderRadius: 12, marginBottom: 10,
+              color: 'var(--brand, #0C447C)', background: 'rgba(255,255,255,0.70)',
               boxSizing: 'border-box', outline: 'none',
               transition: 'border-color .15s',
             }}
@@ -117,7 +117,7 @@ export default function SaqueOTPModal({ meta, onClose, onConfirmado }) {
 
           <div style={{
             fontSize: 12,
-            color: restante > 60 ? 'rgba(200,215,235,0.50)' : '#fca5a5',
+            color: restante > 60 ? 'var(--text-muted, #71717A)' : '#dc2626',
             textAlign: 'center', marginBottom: 14,
           }}>
             {restante > 0
@@ -128,9 +128,9 @@ export default function SaqueOTPModal({ meta, onClose, onConfirmado }) {
           {erro && (
             <div style={{
               padding: '10px 12px',
-              background: 'rgba(220,38,38,0.15)',
+              background: 'rgba(220,38,38,0.10)',
               border: '1px solid rgba(220,38,38,0.30)',
-              color: '#fca5a5',
+              color: '#dc2626',
               borderRadius: 10, fontSize: 13, marginBottom: 12, textAlign: 'center',
             }}>{erro}</div>
           )}
@@ -157,14 +157,14 @@ export default function SaqueOTPModal({ meta, onClose, onConfirmado }) {
           <button
             className="gv-btn-ghost"
             onClick={cancelar}
-            style={{ fontSize: 12, color: '#fca5a5', borderColor: 'rgba(220,38,38,0.25)' }}
+            style={{ fontSize: 12, color: '#dc2626', borderColor: 'rgba(220,38,38,0.25)' }}
           >
             Cancelar
           </button>
         </div>
 
-        <p style={{ fontSize: 11, color: 'rgba(180,200,225,0.40)', marginTop: 16, lineHeight: 1.5 }}>
-          Seu saque só é efetivado <strong style={{ color: 'rgba(180,200,225,0.65)' }}>24h após a confirmação</strong>.
+        <p style={{ fontSize: 11, color: 'var(--text-muted, #71717A)', marginTop: 16, lineHeight: 1.5 }}>
+          Seu saque só é efetivado <strong style={{ color: 'var(--text-secondary, #52525B)' }}>24h após a confirmação</strong>.
           Durante esse tempo, você pode cancelar pelo link enviado ao seu e-mail.
         </p>
       </div>

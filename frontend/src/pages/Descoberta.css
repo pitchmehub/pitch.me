@@ -390,6 +390,35 @@
 }
 .dc-modal-buy-btn:hover { background: var(--brand-dark); }
 
+/* ── HERO da Ficha Técnica (capa quadrada grande) ──────────── */
+.ft-hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 320px;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--brand-light);
+}
+.ft-hero-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ft-hero-iniciais {
+  font-size: 96px; font-weight: 800;
+  color: rgba(255,255,255,.92);
+  letter-spacing: -2px;
+  text-shadow: 0 4px 24px rgba(0,0,0,.30);
+}
+.ft-titulo {
+  padding: 16px 18px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.ft-titulo .dc-modal-genre { margin-bottom: 4px; }
+.ft-titulo .dc-modal-nome  { margin-bottom: 0; }
+
 /* ── RESPONSIVO ──────────────────────────── */
 @media (max-width: 767px) {
   /* Topbar compacta */

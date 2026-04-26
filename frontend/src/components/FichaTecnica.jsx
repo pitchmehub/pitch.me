@@ -16,16 +16,16 @@ const grad = id => GRADIENTS[(id?.charCodeAt(0) ?? 0) % GRADIENTS.length]
 
 /**
  * Modal de Ficha Técnica de uma obra.
- * Mostra capa, compositores, botão de tocar (opcional) e licenciar composição.
+ * Mostra capa grande, nome, gênero, compositores e botão de licenciar.
  *
  * Props:
- *  - obra: objeto da obra (com id, nome, genero, audio_path)
+ *  - obra: objeto da obra (com id, nome, genero, cover_url)
  *  - onClose: () => void
- *  - onPlay?: (obra) => void  (opcional — esconde o botão se não passado)
+ *  - onPlay?: (obra) => void  (mantido por compatibilidade — não é usado visualmente)
  *  - isPlaying?: boolean
  *  - isActive?: boolean
  */
-export default function FichaTecnica({ obra, onClose, onPlay, isPlaying, isActive }) {
+export default function FichaTecnica({ obra, onClose }) {
   const navigate = useNavigate()
   const [coautores, setCoautores] = useState([])
 
@@ -51,27 +51,24 @@ export default function FichaTecnica({ obra, onClose, onPlay, isPlaying, isActiv
       <div className="dc-modal">
         <button className="dc-modal-close" onClick={onClose}>×</button>
 
-        <div className="dc-modal-header" style={{ background: grad(obra.id) }}>
-          <div className="dc-modal-cover">{(obra.nome || '?').charAt(0).toUpperCase()}</div>
-          <div>
-            <div className="dc-modal-genre">{obra.genero || 'Composição'}</div>
-            <div className="dc-modal-nome">{obra.nome}</div>
-          </div>
+        {/* Capa grande no topo (mesmo formato do card da Descoberta) */}
+        <div className="ft-hero" style={{ background: grad(obra.id) }}>
+          {obra.cover_url ? (
+            <img
+              src={obra.cover_url}
+              alt={obra.nome}
+              className="ft-hero-img"
+              onError={e => { e.currentTarget.style.display = 'none' }}
+            />
+          ) : (
+            <span className="ft-hero-iniciais">{(obra.nome || '?').charAt(0).toUpperCase()}</span>
+          )}
         </div>
 
-        {obra.audio_path && onPlay && (
-          <div className="dc-modal-actions">
-            <button className="dc-modal-play-btn" onClick={() => onPlay(obra)} aria-label={isPlaying ? 'Pausar' : 'Tocar'}>
-              {isPlaying
-                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21" /></svg>
-              }
-            </button>
-            <span className="dc-modal-action-label">
-              {isActive && isPlaying ? 'Reproduzindo…' : 'Ouvir preview'}
-            </span>
-          </div>
-        )}
+        <div className="ft-titulo">
+          <div className="dc-modal-genre">{obra.genero || 'Composição'}</div>
+          <div className="dc-modal-nome">{obra.nome}</div>
+        </div>
 
         <div className="dc-modal-section">
           <h3 className="dc-modal-section-title">Compositores</h3>

@@ -223,10 +223,18 @@ export default function SideMenu({ onCollapse }) {
  // Descoberta sempre fica como botão central destacado.
  const descoberta = items.find(i => i.to === '/descoberta')
  ?? { to: '/descoberta', Icon: IconCompass, label: 'Descoberta' }
- const semDescoberta = items.filter(i => i.to !== '/descoberta')
- // 2 itens à esquerda, Descoberta no centro, 2 itens à direita (último é "Mais").
- const left = semDescoberta.slice(0, 2)
- const right = semDescoberta.slice(2, 3) // 1 item, depois vem o "Mais"
+ // Drawer "Mais": esconde Descoberta (já é o botão central) e Nova obra
+ // (criada pela tela "Minhas obras", não precisa de atalho).
+ const drawerItems = items.filter(i =>
+ i.to !== '/descoberta' && i.to !== '/obras/nova'
+ )
+ // Item principal (à esquerda do botão central): prioriza "Minhas obras",
+ // depois "Dashboard", senão o primeiro item disponível do drawer.
+ const principal =
+ drawerItems.find(i => i.to === '/obras') ??
+ drawerItems.find(i => i.to === '/dashboard') ??
+ drawerItems.find(i => i.to === '/editora/dashboard') ??
+ drawerItems[0]
  return (
  <>
  {mobileOpen && (
@@ -262,7 +270,7 @@ export default function SideMenu({ onCollapse }) {
 
  <nav className="sidebar-nav">
  {isAdmin && <AdminBadge collapsed={false} />}
- {items.map(({ to, Icon, label, pro, highlight }) => (
+ {drawerItems.map(({ to, Icon, label, pro, highlight }) => (
  <NavLink key={to} to={to}
  className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
  style={highlight ? { fontWeight: 700 } : undefined}
@@ -297,15 +305,18 @@ export default function SideMenu({ onCollapse }) {
  )}
 
  <nav className="mobile-bottom-nav">
- {left.map(({ to, Icon, label }) => (
- <NavLink key={to} to={to}
+ {/* Esquerda: item principal (Minhas obras / Dashboard / etc.) */}
+ {principal && (
+ <NavLink key={principal.to} to={principal.to}
  className={({ isActive }) => `mobile-bottom-item ${isActive ? 'active' : ''}`}>
- <span className="mobile-bottom-icon">{Icon ? <Icon size={22} /> : null}</span>
- <span className="mobile-bottom-label">{label}</span>
+ <span className="mobile-bottom-icon">
+ {principal.Icon ? <principal.Icon size={22} /> : null}
+ </span>
+ <span className="mobile-bottom-label">{principal.label}</span>
  </NavLink>
- ))}
+ )}
 
- {/* Botão central: Descoberta */}
+ {/* Centro: Descoberta (botão destacado) */}
  <NavLink
  key={descoberta.to}
  to={descoberta.to}
@@ -319,13 +330,7 @@ export default function SideMenu({ onCollapse }) {
  <span className="mobile-bottom-center-label">{descoberta.label}</span>
  </NavLink>
 
- {right.map(({ to, Icon, label }) => (
- <NavLink key={to} to={to}
- className={({ isActive }) => `mobile-bottom-item ${isActive ? 'active' : ''}`}>
- <span className="mobile-bottom-icon">{Icon ? <Icon size={22} /> : null}</span>
- <span className="mobile-bottom-label">{label}</span>
- </NavLink>
- ))}
+ {/* Direita: Mais (drawer) */}
  <button
  className="mobile-bottom-item"
  onClick={() => setMobileOpen(o => !o)}
