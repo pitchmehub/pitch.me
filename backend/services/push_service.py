@@ -10,6 +10,7 @@ Configuração via variáveis de ambiente (Replit Secrets):
 import json
 import logging
 import os
+from datetime import datetime
 from typing import Optional
 
 from db.supabase_client import get_supabase
@@ -103,7 +104,7 @@ def send_push(perfil_id: str, *,
 
     if enviados:
         try:
-            sb.table("push_subscriptions").update({"last_used_at": "now()"}) \
+            sb.table("push_subscriptions").update({"last_used_at": datetime.utcnow().isoformat() + "Z"}) \
               .eq("perfil_id", perfil_id).execute()
         except Exception:
             pass

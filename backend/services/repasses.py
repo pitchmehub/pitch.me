@@ -10,6 +10,7 @@ balance_transaction como base de cálculo, então todos pagam proporcionalmente.
 """
 import os
 import logging
+from datetime import datetime
 from decimal import Decimal, ROUND_DOWN
 from typing import Optional
 
@@ -413,7 +414,7 @@ def gerar_repasses_para_transacao(transacao_id: str) -> dict:
                 )
                 ed_row["stripe_transfer_id"] = tr.id
                 ed_row["status"] = "enviado"
-                ed_row["enviado_at"] = "now()"
+                ed_row["enviado_at"] = datetime.utcnow().isoformat() + "Z"
                 sb.table("repasses").insert(ed_row).execute()
                 enviados += 1
             except stripe.StripeError as e:
@@ -473,7 +474,7 @@ def gerar_repasses_para_transacao(transacao_id: str) -> dict:
             )
             repasse_row["stripe_transfer_id"] = tr.id
             repasse_row["status"] = "enviado"
-            repasse_row["enviado_at"] = "now()"
+            repasse_row["enviado_at"] = datetime.utcnow().isoformat() + "Z"
             sb.table("repasses").insert(repasse_row).execute()
             enviados += 1
         except stripe.StripeError as e:
@@ -534,8 +535,8 @@ def liberar_repasses_retidos(perfil_id: str) -> dict:
                 "stripe_transfer_id": tr.id,
                 "stripe_account_id":  perfil["stripe_account_id"],
                 "status":             "enviado",
-                "enviado_at":         "now()",
-                "liberado_at":        "now()",
+                "enviado_at":         datetime.utcnow().isoformat() + "Z",
+                "liberado_at":        datetime.utcnow().isoformat() + "Z",
             }).eq("id", rep["id"]).execute()
             enviados += 1
         except stripe.StripeError as e:

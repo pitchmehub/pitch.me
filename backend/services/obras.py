@@ -8,6 +8,7 @@ CORREÇÕES DE VULNERABILIDADES:
 """
 import uuid
 import hashlib
+from datetime import datetime
 from flask import abort
 from db.supabase_client import get_supabase
 from utils.audio_validator import validate_mp3, MAX_AUDIO_BYTES
@@ -95,7 +96,7 @@ class ObraService:
                 "audio_bytes":      len(audio_bytes),
                 "status":           "publicada",
                 "termos_aceitos":   termos_aceitos,
-                "termos_aceitos_em": "now()" if termos_aceitos else None,
+                "termos_aceitos_em": datetime.utcnow().isoformat() + "Z" if termos_aceitos else None,
                 "audio_hash":       audio_hash,
                 "letra_hash":       letra_hash,
                 "obra_editada_terceiros":    bool(obra_editada_terceiros),

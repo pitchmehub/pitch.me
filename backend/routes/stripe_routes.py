@@ -9,6 +9,7 @@ import os
 import stripe
 import json
 import logging
+from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify, g, abort
 from middleware.auth import require_auth
 from db.supabase_client import get_supabase
@@ -182,7 +183,6 @@ def criar_checkout():
 
     # Salva transação como pendente
     from utils.crypto import hash_ip
-    from datetime import datetime, timezone
     try:
         sb.table("transacoes").insert({
             "obra_id":           obra_id,
@@ -311,7 +311,7 @@ def webhook():
         result = sb.table("transacoes").update({
             "status":                "confirmada",
             "stripe_payment_intent": payment_intent,
-            "confirmed_at":          "now()",
+            "confirmed_at":          datetime.utcnow().isoformat() + "Z",
         }).eq("stripe_session_id", session_id).execute()
 
         # CORREÇÃO #14 (MÉDIA): Audit log
@@ -445,7 +445,7 @@ def webhook():
             "stripe_charges_enabled":      charges_ok,
             "stripe_payouts_enabled":      payouts_ok,
             "stripe_onboarding_completo":  details_ok and charges_ok,
-            "stripe_account_atualizado_em": "now()",
+            "stripe_account_atualizado_em": datetime.utcnow().isoformat() + "Z",
         }).eq("stripe_account_id", acc_id).execute()
 
         # Wallet+saque manual: nada a liberar automaticamente quando a conta fica apta.
@@ -560,7 +560,7 @@ def verificar_sucesso(session_id):
             sb.table("transacoes").update({
                 "status":                "confirmada",
                 "stripe_payment_intent": session.payment_intent,
-                "confirmed_at":          "now()",
+                "confirmed_at":          datetime.utcnow().isoformat() + "Z",
             }).eq("stripe_session_id", session_id).execute()
             trans["status"] = "confirmada"
     except Exception as e:

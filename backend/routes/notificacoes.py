@@ -1,4 +1,5 @@
 """Rotas REST para notificações do usuário logado."""
+from datetime import datetime
 from flask import Blueprint, jsonify, g, request
 from middleware.auth import require_auth
 from db.supabase_client import get_supabase
@@ -81,7 +82,7 @@ def contar_nao_lidas():
 def marcar_lida(nid):
     sb = get_supabase()
     sb.table("notificacoes") \
-      .update({"lida": True, "lida_em": "now()"}) \
+      .update({"lida": True, "lida_em": datetime.utcnow().isoformat() + "Z"}) \
       .eq("id", nid) \
       .eq("perfil_id", _user_id()) \
       .execute()
@@ -93,7 +94,7 @@ def marcar_lida(nid):
 def marcar_todas():
     sb = get_supabase()
     sb.table("notificacoes") \
-      .update({"lida": True, "lida_em": "now()"}) \
+      .update({"lida": True, "lida_em": datetime.utcnow().isoformat() + "Z"}) \
       .eq("perfil_id", _user_id()) \
       .eq("lida", False) \
       .execute()

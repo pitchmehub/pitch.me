@@ -7,6 +7,7 @@ Cada autor/coautor precisa completar o onboarding antes de receber transfers.
 import os
 import time
 import logging
+from datetime import datetime
 import stripe
 from flask import Blueprint, request, jsonify, g, abort
 
@@ -215,7 +216,7 @@ def status_conta():
         "stripe_charges_enabled":      charges_enabled,
         "stripe_payouts_enabled":      payouts_enabled,
         "stripe_onboarding_completo":  details_submitted and charges_enabled,
-        "stripe_account_atualizado_em": "now()",
+        "stripe_account_atualizado_em": datetime.utcnow().isoformat() + "Z",
     })
 
     return jsonify({
