@@ -8,6 +8,15 @@ Marketplace for music rights/licensing built with React + Vite (frontend) and Fl
 - `backend/` — Flask 3 API with CSRF, CORS, rate limiting, Supabase admin client, Stripe, PayPal, email, etc.
 - `sql/` — SQL schema/migrations for Supabase.
 
+## Database migration status
+
+All Supabase migrations have been applied (Apr/2026):
+
+- Baseline schema in `backend/db/setup_all.sql` (PASSO 1–8).
+- Pending notification/push/aggregator migrations in `sql/RODAR_PENDENTES.sql`.
+- Consolidated remaining migrations in `sql/MIGRACOES_FALTANTES.sql` (16 sections), executed via the Supabase SQL Editor in 7 chunks.
+  - Optional pieces still NOT applied: full legal contract templates (`landing_content` rows for `contrato_edicao_template` / `contrato_edicao_publisher_template`) and the `mv_catalogo` materialized view + refresh trigger. The app works without these; they can be applied later if needed.
+
 ## Replit Setup
 
 Two workflows are configured:
