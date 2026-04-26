@@ -3,9 +3,23 @@ import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useAuth } from '../contexts/AuthContext'
+import {
+  IconBell, IconMusic, IconDocument, IconCheckCircle, IconKey,
+  IconTag, IconDownload, IconWallet, IconXCircle,
+} from './Icons'
 import './NotificationDetailModal.css'
 
-/* ------------------- helpers ------------------- */
+const ICONES = {
+  obra_cadastrada:  IconMusic,
+  contrato_gerado:  IconDocument,
+  contrato_assinado: IconCheckCircle,
+  licenciamento:    IconKey,
+  oferta:           IconTag,
+  dossie_download:  IconDownload,
+  saque_confirmado: IconWallet,
+  saque_cancelado:  IconXCircle,
+  convite_editora:  IconDocument,
+}
 
 function fmtCompleto(iso) {
   if (!iso) return '—'
@@ -17,10 +31,6 @@ function fmtCompleto(iso) {
   } catch { return iso }
 }
 
-/**
- * Devolve um "preset" de detalhe baseado no tipo da notificação.
- * Retorna { titulo, lead, dicas?, acoes:[ {label, kind, onClick} ] }
- */
 function detalhePadrao(n, navigate) {
   const ir = (path) => () => navigate(path || n.link || '/dashboard')
 
@@ -33,8 +43,8 @@ function detalhePadrao(n, navigate) {
           'Adicione capa e descrição para chamar mais atenção na Descoberta.',
         ],
         acoes: [
-          { label: 'Ver obra',           kind: 'primary', onClick: ir(n.link || '/obras') },
-          { label: 'Ir para a Descoberta', kind: 'ghost', onClick: ir('/descoberta') },
+          { label: 'Ver obra',            kind: 'primary', onClick: ir(n.link || '/obras') },
+          { label: 'Ir para a Descoberta', kind: 'ghost',  onClick: ir('/descoberta') },
         ],
       }
     case 'contrato_gerado':
@@ -44,9 +54,7 @@ function detalhePadrao(n, navigate) {
           'Leia atentamente as cláusulas antes de assinar.',
           'A assinatura é eletrônica e fica registrada com data, hora e IP.',
         ],
-        acoes: [
-          { label: 'Abrir contrato', kind: 'primary', onClick: ir(n.link) },
-        ],
+        acoes: [{ label: 'Abrir contrato', kind: 'primary', onClick: ir(n.link) }],
       }
     case 'contrato_assinado':
       return {
@@ -60,8 +68,8 @@ function detalhePadrao(n, navigate) {
       return {
         lead: 'Uma de suas obras acabou de ser licenciada. O valor entra na sua aba de Saques após a confirmação do pagamento.',
         acoes: [
-          { label: 'Ver detalhes', kind: 'primary', onClick: ir(n.link || '/contratos') },
-          { label: 'Ir para Saques', kind: 'ghost', onClick: ir('/saques') },
+          { label: 'Ver detalhes',   kind: 'primary', onClick: ir(n.link || '/contratos') },
+          { label: 'Ir para Saques', kind: 'ghost',   onClick: ir('/saques') },
         ],
       }
     case 'oferta':
@@ -71,9 +79,7 @@ function detalhePadrao(n, navigate) {
           'Compare o valor com o piso sugerido pela plataforma.',
           'Verifique o uso pretendido (mídia, território, prazo).',
         ],
-        acoes: [
-          { label: 'Ver oferta', kind: 'primary', onClick: ir(n.link || '/ofertas') },
-        ],
+        acoes: [{ label: 'Ver oferta', kind: 'primary', onClick: ir(n.link || '/ofertas') }],
       }
     case 'dossie_download':
       return {
@@ -98,22 +104,18 @@ function detalhePadrao(n, navigate) {
   }
 }
 
-/* ============================================================
-   COMPONENTE
-   ============================================================ */
 export default function NotificationDetailModal({ notif, onClose, onChange }) {
   const navigate = useNavigate()
   const { perfil } = useAuth()
 
-  const [detalheExtra, setDetalheExtra] = useState(null)   // termo do convite, etc.
+  const [detalheExtra, setDetalheExtra] = useState(null)
   const [loadingExtra, setLoadingExtra] = useState(false)
   const [erro, setErro]                 = useState('')
-  const [acao, setAcao]                 = useState(null)   // 'aceitar' | 'recusar' | null
+  const [acao, setAcao]                 = useState(null)
   const [assinatura, setAssinatura]     = useState('')
   const [salvando, setSalvando]         = useState(false)
   const [feedback, setFeedback]         = useState('')
 
-  /* Carrega detalhe extra para tipos que precisam */
   useEffect(() => {
     if (!notif) return
     setDetalheExtra(null); setErro(''); setAcao(null); setFeedback('')
@@ -129,8 +131,8 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
   if (!notif) return null
 
   const padrao = detalhePadrao(notif, navigate)
+  const IcTipo = ICONES[notif.tipo] || IconBell
 
-  /* ações inline para convite_editora */
   async function confirmarConvite() {
     if (acao === 'aceitar' && !assinatura.trim()) {
       setErro('Digite seu nome completo como assinatura digital.')
@@ -146,7 +148,6 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
         await api.post(`/agregados/convites/${cid}/recusar`)
         setFeedback('Convite recusado.')
       }
-      // recarrega o detalhe para refletir o novo status
       const t = await api.get(`/agregados/convites/${cid}/termo`).catch(() => null)
       if (t) setDetalheExtra(t)
       setAcao(null); setAssinatura('')
@@ -157,8 +158,8 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
 
   async function marcarLida(lida) {
     try {
-      if (lida)  await api.patch(`/notificacoes/${notif.id}/marcar-lida`)
-      else       await api.patch(`/notificacoes/${notif.id}/marcar-nao-lida`)
+      if (lida) await api.patch(`/notificacoes/${notif.id}/marcar-lida`)
+      else      await api.patch(`/notificacoes/${notif.id}/marcar-nao-lida`)
       onChange?.()
     } catch (e) { setErro(e.message) }
   }
@@ -172,30 +173,44 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
     } catch (e) { setErro(e.message) }
   }
 
-  /* Renderização ----------------------------------------- */
   const isConvitePendente =
     notif.tipo === 'convite_editora'
     && detalheExtra?.status === 'pendente'
-    && detalheExtra?.editora_id !== perfil?.id   // editora não aceita o próprio convite
+    && detalheExtra?.editora_id !== perfil?.id
 
   return createPortal(
     <div className="ndm-bg" onClick={() => { if (!salvando) onClose() }}>
       <div className="ndm-box" onClick={e => e.stopPropagation()}>
+
+        {/* ── CABEÇALHO ── */}
         <header className="ndm-head">
-          <div>
-            <h3>{notif.titulo}</h3>
-            <p className="ndm-time">{fmtCompleto(notif.criada_em)}</p>
+          <div className="ndm-head-left">
+            <div className="ndm-icon-block">
+              <IcTipo size={22} />
+            </div>
+            <div className="ndm-head-text">
+              <h3>{notif.titulo}</h3>
+              <p className="ndm-time">{fmtCompleto(notif.criada_em)}</p>
+            </div>
           </div>
-          <button className="ndm-close" onClick={onClose} aria-label="Fechar">×</button>
+          <button className="ndm-close" onClick={onClose} aria-label="Fechar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
         </header>
 
+        {/* ── ALERTAS ── */}
         {feedback && <div className="ndm-alert ok">{feedback}</div>}
         {erro     && <div className="ndm-alert err">{erro}</div>}
 
+        {/* ── CORPO ── */}
         <div className="ndm-body">
           <p className="ndm-lead">{padrao.lead}</p>
+
           {notif.mensagem && notif.mensagem !== padrao.lead && (
-            <p className="ndm-msg">“{notif.mensagem}”</p>
+            <p className="ndm-msg">"{notif.mensagem}"</p>
           )}
 
           {padrao.dicas && padrao.dicas.length > 0 && (
@@ -204,7 +219,7 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
             </ul>
           )}
 
-          {/* DETALHE EXTRA: convite editora ------------------ */}
+          {/* DETALHE EXTRA: convite editora */}
           {notif.tipo === 'convite_editora' && (
             <div className="ndm-extra">
               {loadingExtra && <p className="ndm-muted">Carregando termo…</p>}
@@ -216,17 +231,15 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
                       {detalheExtra.status}
                     </strong>
                   </div>
-
                   <details className="ndm-details">
                     <summary>Ler texto integral do termo jurídico</summary>
                     <div className="ndm-termo"
                          dangerouslySetInnerHTML={{ __html: detalheExtra.termo_html }} />
                   </details>
-
                   {detalheExtra.termo_aceito_pelo_artista_em && (
                     <p className="ndm-muted small">
                       Assinado em {fmtCompleto(detalheExtra.termo_aceito_pelo_artista_em)} como
-                      “{detalheExtra.assinatura_artista_nome}”.
+                      "{detalheExtra.assinatura_artista_nome}".
                     </p>
                   )}
                 </>
@@ -235,11 +248,11 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
           )}
         </div>
 
-        {/* AÇÕES inline (convite pendente) ------------------ */}
+        {/* ── AÇÕES inline convite pendente ── */}
         {isConvitePendente && !acao && (
           <footer className="ndm-actions">
-            <button className="btn btn-ghost"   onClick={() => setAcao('recusar')} disabled={salvando}>Recusar</button>
-            <button className="btn btn-primary"
+            <button className="btn btn-ghost ndm-btn-ghost" onClick={() => setAcao('recusar')} disabled={salvando}>Recusar</button>
+            <button className="btn btn-primary ndm-btn-primary"
                     onClick={() => { setAcao('aceitar'); setAssinatura(perfil?.nome_completo || perfil?.nome_artistico || '') }}
                     disabled={salvando}>
               Aceitar e assinar
@@ -253,8 +266,8 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
             <input value={assinatura} onChange={e => setAssinatura(e.target.value)}
                    placeholder="Seu nome completo" />
             <div className="ndm-actions">
-              <button className="btn btn-ghost"   onClick={() => setAcao(null)} disabled={salvando}>Voltar</button>
-              <button className="btn btn-primary" onClick={confirmarConvite} disabled={salvando}>
+              <button className="btn btn-ghost ndm-btn-ghost" onClick={() => setAcao(null)} disabled={salvando}>Voltar</button>
+              <button className="btn btn-primary ndm-btn-primary" onClick={confirmarConvite} disabled={salvando}>
                 {salvando ? 'Confirmando…' : 'Confirmar aceite'}
               </button>
             </div>
@@ -265,25 +278,25 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
           <div className="ndm-confirm danger">
             <p>Tem certeza que deseja <strong>recusar</strong> este convite? A editora será avisada.</p>
             <div className="ndm-actions">
-              <button className="btn btn-ghost"  onClick={() => setAcao(null)} disabled={salvando}>Voltar</button>
-              <button className="btn btn-danger" onClick={confirmarConvite} disabled={salvando}>
+              <button className="btn btn-ghost ndm-btn-ghost" onClick={() => setAcao(null)} disabled={salvando}>Voltar</button>
+              <button className="btn btn-danger ndm-btn-danger" onClick={confirmarConvite} disabled={salvando}>
                 {salvando ? 'Enviando…' : 'Sim, recusar'}
               </button>
             </div>
           </div>
         )}
 
-        {/* AÇÕES padrão (não convite pendente) -------------- */}
-        {!isConvitePendente && !acao && (padrao.acoes.length > 0 || true) && (
+        {/* ── AÇÕES padrão ── */}
+        {!isConvitePendente && !acao && (
           <footer className="ndm-actions">
             {notif.lida
-              ? <button className="btn btn-ghost" onClick={() => marcarLida(false)}>Marcar como não-lida</button>
-              : <button className="btn btn-ghost" onClick={() => marcarLida(true)}>Marcar como lida</button>}
-            <button className="btn btn-ghost ndm-danger" onClick={excluir}>Excluir</button>
+              ? <button className="btn btn-ghost ndm-btn-ghost" onClick={() => marcarLida(false)}>Marcar como não-lida</button>
+              : <button className="btn btn-ghost ndm-btn-ghost" onClick={() => marcarLida(true)}>Marcar como lida</button>}
+            <button className="btn btn-ghost ndm-btn-ghost ndm-danger" onClick={excluir}>Excluir</button>
             <div style={{ flex: 1 }} />
             {padrao.acoes.map((a, i) => (
               <button key={i}
-                      className={`btn btn-${a.kind}`}
+                      className={`btn ${a.kind === 'primary' ? 'ndm-btn-primary' : 'ndm-btn-ghost'}`}
                       onClick={() => { a.onClick(); if (a.kind === 'primary') onClose() }}>
                 {a.label}
               </button>
