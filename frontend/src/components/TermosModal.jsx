@@ -30,60 +30,24 @@ export default function TermosModal({ onClose }) {
 
   const node = (
     <div
+      className="gv-modal-bg"
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
-      style={{
-        position: 'fixed', inset: 0,
-        background: 'rgba(20,25,40,.35)',
-        backdropFilter: 'blur(28px) saturate(140%)',
-        WebkitBackdropFilter: 'blur(28px) saturate(140%)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: 1000, padding: 24,
-        animation: 'gv-fade-in .22s ease',
-      }}
     >
-      <div style={{
-        background: 'rgba(255,255,255,.78)',
-        backdropFilter: 'blur(40px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-        border: '1px solid rgba(255,255,255,.5)',
-        borderRadius: 28,
-        boxShadow: '0 30px 80px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.6)',
-        width: '100%', maxWidth: 680,
-        maxHeight: '85vh', display: 'flex', flexDirection: 'column',
-        overflow: 'hidden',
-        animation: 'gv-pop-in .32s cubic-bezier(.18,1.2,.4,1)',
-      }}>
-        <div style={{
-          padding: '20px 24px',
-          borderBottom: '1px solid rgba(0,0,0,.06)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        }}>
-          <div>
-            <h2 style={{ fontSize: 18, fontWeight: 700 }}>{conteudo.titulo}</h2>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Versão {conteudo.versao}</p>
+      <div className="gv-modal-box" style={{ maxWidth: 680 }}>
+        <div className="gv-modal-head">
+          <div className="gv-modal-head-info">
+            <h2>{conteudo.titulo}</h2>
+            <p>Versão {conteudo.versao}</p>
           </div>
-          <button onClick={onClose} aria-label="Fechar" style={{
-            background: 'rgba(0,0,0,.04)', border: 'none', fontSize: 20,
-            cursor: 'pointer', color: 'var(--text-muted)',
-            width: 36, height: 36, borderRadius: 999,
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          }}>×</button>
+          <button className="gv-modal-close" onClick={onClose} aria-label="Fechar">×</button>
         </div>
 
-        <div style={{
-          padding: '20px 24px', overflowY: 'auto', flex: 1,
-          fontSize: 13, lineHeight: 1.7, color: 'var(--text-secondary)',
-          whiteSpace: 'pre-wrap', fontFamily: 'inherit',
-        }}>
-          {conteudo.texto}
+        <div className="gv-modal-body" style={{ whiteSpace: 'pre-wrap' }}>
+          {conteudo.texto || 'Carregando termos…'}
         </div>
 
-        <div style={{
-          padding: '14px 24px',
-          borderTop: '1px solid rgba(0,0,0,.06)',
-          display: 'flex', justifyContent: 'flex-end',
-        }}>
-          <button className="btn btn-primary" onClick={onClose}>Fechar</button>
+        <div className="gv-modal-footer">
+          <button className="gv-btn-primary" onClick={onClose}>Fechar</button>
         </div>
       </div>
     </div>

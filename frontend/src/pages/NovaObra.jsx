@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
@@ -42,6 +42,9 @@ export default function NovaObra() {
  const [editoraTTelefone, setEditoraTTelefone] = useState('')
  // Status do lookup: 'idle' | 'checking' | 'found' | 'not_found' | 'error'
  const [editoraLookup, setEditoraLookup] = useState({ status: 'idle' })
+ // Editora agregada do artista (se houver)
+ const [editoraAgregada, setEditoraAgregada] = useState(null)
+ const [usarEditoraAgregada, setUsarEditoraAgregada] = useState(false)
 
  async function checarEditoraPorEmail() {
  const email = editoraTEmail.trim().toLowerCase()
@@ -72,6 +75,14 @@ export default function NovaObra() {
  if (perfil && !perfil.cadastro_completo) {
  navigate('/perfil/completar', { replace: true })
  }
+ }, [perfil])
+
+ // Busca a editora à qual o artista está agregado (se houver)
+ useEffect(() => {
+ if (!perfil) return
+ api.get('/agregados/minha-editora')
+  .then(data => { if (data) setEditoraAgregada(data) })
+  .catch(() => {})
  }, [perfil])
 
  const [buscaErro, setBuscaErro] = useState('')
@@ -405,24 +416,68 @@ export default function NovaObra() {
  background: 'var(--surface-2)', border: '1px solid var(--border)',
  borderRadius: 8,
  }}>
- <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10, lineHeight: 1.5 }}>
- A obra será publicada no catálogo. Quando alguém fizer uma oferta, a editora terceira informada abaixo
+ <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.5 }}>
+ A obra será publicada no catálogo. Quando alguém fizer uma oferta, a editora informada abaixo
  será convidada por e-mail a aceitar a licença em até 72h úteis. Sem o aceite dela, a oferta é cancelada
  automaticamente e o valor estornado ao comprador.
  </div>
+
+ {/* Checkbox para usar editora agregada */}
+ {editoraAgregada && (
+ <label style={{
+  display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer',
+  padding: '10px 12px', borderRadius: 8, marginBottom: 12,
+  background: usarEditoraAgregada ? 'var(--brand-light)' : 'var(--surface)',
+  border: `1.5px solid ${usarEditoraAgregada ? 'var(--brand-border)' : 'var(--border)'}`,
+  transition: 'background .15s, border-color .15s',
+ }}>
+  <input
+  type="checkbox"
+  checked={usarEditoraAgregada}
+  onChange={e => {
+   const checked = e.target.checked
+   setUsarEditoraAgregada(checked)
+   if (checked) {
+   setEditoraTNome(editoraAgregada.nome || '')
+   setEditoraTEmail(editoraAgregada.email || '')
+   setEditoraTTelefone(editoraAgregada.telefone || '')
+   setEditoraLookup({ status: 'idle' })
+   } else {
+   setEditoraTNome('')
+   setEditoraTEmail('')
+   setEditoraTTelefone('')
+   }
+  }}
+  style={{ marginTop: 2, width: 16, height: 16, accentColor: 'var(--brand)', flexShrink: 0, cursor: 'pointer' }}
+  />
+  <div>
+  <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)' }}>
+   Usar minha editora agregada
+  </div>
+  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 1 }}>
+   {editoraAgregada.nome}{editoraAgregada.email ? ` · ${editoraAgregada.email}` : ''}
+  </div>
+  </div>
+ </label>
+ )}
+
  <div style={{ display: 'grid', gap: 10 }}>
- <input className="input" placeholder="Nome / razão social da editora terceira *"
- value={editoraTNome} onChange={e => setEditoraTNome(e.target.value)} />
+ <input className="input" placeholder="Nome / razão social da editora *"
+ value={editoraTNome} onChange={e => { setEditoraTNome(e.target.value); setUsarEditoraAgregada(false) }}
+ readOnly={usarEditoraAgregada} style={usarEditoraAgregada ? { opacity: 0.6 } : {}} />
  <input
  className="input"
  type="email"
- placeholder="E-mail da editora terceira *"
+ placeholder="E-mail da editora *"
  value={editoraTEmail}
+ readOnly={usarEditoraAgregada}
+ style={usarEditoraAgregada ? { opacity: 0.6 } : {}}
  onChange={e => {
  setEditoraTEmail(e.target.value)
+ setUsarEditoraAgregada(false)
  if (editoraLookup.status !== 'idle') setEditoraLookup({ status: 'idle' })
  }}
- onBlur={checarEditoraPorEmail}
+ onBlur={!usarEditoraAgregada ? checarEditoraPorEmail : undefined}
  />
  {editoraLookup.status === 'checking' && (
  <div style={{ fontSize: 13, color: '#666' }}>
@@ -458,7 +513,10 @@ export default function NovaObra() {
  </div>
  )}
  <input className="input" placeholder="Telefone (opcional)"
- value={editoraTTelefone} onChange={e => setEditoraTTelefone(e.target.value)} />
+ value={editoraTTelefone}
+ readOnly={usarEditoraAgregada}
+ style={usarEditoraAgregada ? { opacity: 0.6 } : {}}
+ onChange={e => { setEditoraTTelefone(e.target.value); setUsarEditoraAgregada(false) }} />
  </div>
  </div>
  )}

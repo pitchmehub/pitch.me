@@ -7,13 +7,6 @@ function fmt(cents) {
     .format((cents ?? 0) / 100)
 }
 
-/**
- * Modal de confirmação de saque por OTP.
- * Props:
- *   meta: { saque_id, expira_em_segundos, email_destino_mascarado, valor_cents }
- *   onClose()
- *   onConfirmado(saque)
- */
 export default function SaqueOTPModal({ meta, onClose, onConfirmado }) {
   const [codigo, setCodigo]       = useState('')
   const [erro, setErro]           = useState('')
@@ -73,43 +66,35 @@ export default function SaqueOTPModal({ meta, onClose, onConfirmado }) {
     if (!confirm('Cancelar esta solicitação? Você poderá iniciar outra a qualquer momento.')) return
     try {
       await api.post(`/saques/${saqueId}/cancelar`, { motivo: 'Cancelado no modal de OTP' })
-    } catch { /* ignore */ }
+    } catch { }
     onClose()
   }
 
   const node = (
     <div
+      className="gv-modal-bg"
       role="dialog" aria-modal="true" aria-labelledby="otp-titulo"
-      style={{
-        position: 'fixed', inset: 0,
-        background: 'rgba(20,25,40,.35)',
-        backdropFilter: 'blur(28px) saturate(140%)',
-        WebkitBackdropFilter: 'blur(28px) saturate(140%)',
-        display: 'grid', placeItems: 'center', padding: 16, zIndex: 1000,
-        animation: 'gv-fade-in .22s ease',
-      }}
       onClick={onClose}
     >
       <div
+        className="gv-modal-box"
+        style={{ maxWidth: 420, padding: 28, display: 'block' }}
         onClick={e => e.stopPropagation()}
-        style={{
-          background: 'rgba(255,255,255,.82)',
-          backdropFilter: 'blur(40px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-          border: '1px solid rgba(255,255,255,.5)',
-          borderRadius: 28, padding: 28,
-          maxWidth: 440, width: '100%',
-          boxShadow: '0 30px 80px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.6)',
-          animation: 'gv-pop-in .32s cubic-bezier(.18,1.2,.4,1)',
-        }}
       >
-        <h2 id="otp-titulo" style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>
-          Confirme seu saque
-        </h2>
-        <p style={{ fontSize: 13, color: '#555', marginBottom: 16 }}>
-          Enviamos um código de 6 dígitos para <strong>{emailMask}</strong>.
-          Valor da solicitação: <strong>{fmt(meta.valor_cents)}</strong>.
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+          <div>
+            <h2 id="otp-titulo" style={{ fontSize: 20, fontWeight: 800, marginBottom: 4, color: '#fff' }}>
+              Confirme seu saque
+            </h2>
+            <p style={{ fontSize: 13, color: 'rgba(200,215,235,0.65)', margin: 0 }}>
+              Enviamos um código para <strong style={{ color: 'rgba(200,215,235,0.9)' }}>{emailMask}</strong>
+            </p>
+            <p style={{ fontSize: 13, color: 'rgba(200,215,235,0.65)', margin: '2px 0 0' }}>
+              Valor: <strong style={{ color: '#86efac' }}>{fmt(meta.valor_cents)}</strong>
+            </p>
+          </div>
+          <button className="gv-modal-close" onClick={onClose} aria-label="Fechar">×</button>
+        </div>
 
         <form onSubmit={confirmar}>
           <input
@@ -123,31 +108,38 @@ export default function SaqueOTPModal({ meta, onClose, onConfirmado }) {
             style={{
               width: '100%', padding: '16px 12px', fontSize: 28, textAlign: 'center',
               letterSpacing: 12, fontFamily: 'monospace', fontWeight: 700,
-              border: '2px solid #083257', borderRadius: 14, marginBottom: 12,
-              color: '#083257', background: 'rgba(255,255,255,.7)',
-              boxSizing: 'border-box',
+              border: '2px solid rgba(55,138,221,0.40)', borderRadius: 12, marginBottom: 10,
+              color: '#a8d4ff', background: 'rgba(255,255,255,0.06)',
+              boxSizing: 'border-box', outline: 'none',
+              transition: 'border-color .15s',
             }}
           />
 
-          <div style={{ fontSize: 12, color: restante > 60 ? '#666' : '#B91C1C',
-                        textAlign: 'center', marginBottom: 14 }}>
-            {restante > 0 ? <>Código expira em <strong>{fmtTempo(restante)}</strong></>
-                          : 'Código expirado — peça reenvio.'}
+          <div style={{
+            fontSize: 12,
+            color: restante > 60 ? 'rgba(200,215,235,0.50)' : '#fca5a5',
+            textAlign: 'center', marginBottom: 14,
+          }}>
+            {restante > 0
+              ? <>Código expira em <strong>{fmtTempo(restante)}</strong></>
+              : 'Código expirado — peça reenvio.'}
           </div>
 
           {erro && (
             <div style={{
-              padding: 10, background: 'rgba(254,226,226,.85)',
-              color: '#B91C1C', borderRadius: 10,
-              fontSize: 13, marginBottom: 12, textAlign: 'center',
-            }}> {erro}</div>
+              padding: '10px 12px',
+              background: 'rgba(220,38,38,0.15)',
+              border: '1px solid rgba(220,38,38,0.30)',
+              color: '#fca5a5',
+              borderRadius: 10, fontSize: 13, marginBottom: 12, textAlign: 'center',
+            }}>{erro}</div>
           )}
 
           <button
-            type="submit" className="btn btn-primary"
+            type="submit" className="gv-btn-primary"
             disabled={enviando || codigo.length !== 6 || restante === 0}
             data-testid="saque-otp-confirmar"
-            style={{ width: '100%' }}
+            style={{ width: '100%', justifyContent: 'center' }}
           >
             {enviando ? 'Confirmando…' : '✓ Confirmar saque'}
           </button>
@@ -155,7 +147,7 @@ export default function SaqueOTPModal({ meta, onClose, onConfirmado }) {
 
         <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'space-between' }}>
           <button
-            className="btn btn-ghost"
+            className="gv-btn-ghost"
             disabled={reenviando}
             onClick={reenviar}
             style={{ fontSize: 12 }}
@@ -163,18 +155,17 @@ export default function SaqueOTPModal({ meta, onClose, onConfirmado }) {
             {reenviando ? 'Reenviando…' : 'Não recebi — reenviar'}
           </button>
           <button
-            className="btn btn-ghost"
+            className="gv-btn-ghost"
             onClick={cancelar}
-            style={{ fontSize: 12, color: '#B91C1C' }}
+            style={{ fontSize: 12, color: '#fca5a5', borderColor: 'rgba(220,38,38,0.25)' }}
           >
-            Cancelar solicitação
+            Cancelar
           </button>
         </div>
 
-        <p style={{ fontSize: 11, color: '#888', marginTop: 16, lineHeight: 1.5 }}>
-          Seu saque só é efetivado <strong>24 h após a confirmação</strong>. Durante
-          esse tempo, você receberá um e-mail com link para cancelar caso não tenha
-          sido você quem solicitou.
+        <p style={{ fontSize: 11, color: 'rgba(180,200,225,0.40)', marginTop: 16, lineHeight: 1.5 }}>
+          Seu saque só é efetivado <strong style={{ color: 'rgba(180,200,225,0.65)' }}>24h após a confirmação</strong>.
+          Durante esse tempo, você pode cancelar pelo link enviado ao seu e-mail.
         </p>
       </div>
     </div>

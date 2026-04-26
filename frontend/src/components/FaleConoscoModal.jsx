@@ -35,180 +35,117 @@ export default function FaleConoscoModal({ onClose }) {
     } finally { setEnviando(false) }
   }
 
+  const inputStyle = {
+    width: '100%', padding: '11px 14px',
+    background: 'rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.13)',
+    borderRadius: 9, color: '#e8f0f8', fontSize: 14,
+    outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit',
+    transition: 'border-color .15s',
+  }
+
+  const labelStyle = {
+    display: 'block', fontSize: 10, fontWeight: 700, marginBottom: 6,
+    color: 'rgba(180,200,225,0.50)',
+    letterSpacing: '0.12em', textTransform: 'uppercase',
+  }
+
   const node = (
     <div
+      className="gv-modal-bg"
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
-      style={{
-        position: 'fixed', inset: 0,
-        background: 'rgba(20,25,40,.35)',
-        backdropFilter: 'blur(28px) saturate(140%)',
-        WebkitBackdropFilter: 'blur(28px) saturate(140%)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: 1000, padding: 20,
-        animation: 'gv-fade-in .22s ease',
-      }}
     >
-      <div style={{
-        background: 'rgba(255,255,255,.82)',
-        backdropFilter: 'blur(40px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-        border: '1px solid rgba(255,255,255,.5)',
-        borderRadius: 28,
-        boxShadow: '0 30px 80px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.6)',
-        width: '100%', maxWidth: 520,
-        maxHeight: '90vh', overflow: 'auto',
-        color: '#09090B',
-        animation: 'gv-pop-in .32s cubic-bezier(.18,1.2,.4,1)',
-      }}>
-        {/* Header */}
-        <div style={{ padding: '24px 28px', borderBottom: '1px solid rgba(0,0,0,.06)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", letterSpacing: '-0.02em' }}>
-              Fale Conosco
-            </h2>
-            <button onClick={onClose} aria-label="Fechar" style={{
-              background: 'rgba(0,0,0,.04)', border: 'none', color: '#71717A',
-              fontSize: 20, cursor: 'pointer', lineHeight: 1,
-              width: 36, height: 36, borderRadius: 999,
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            }}>×</button>
+      <div className="gv-modal-box" style={{ maxWidth: 500 }}>
+        <div className="gv-modal-head">
+          <div className="gv-modal-head-info">
+            <h2>Fale Conosco</h2>
+            <p>Resposta via e-mail em até 48h úteis</p>
           </div>
+          <button className="gv-modal-close" onClick={onClose} aria-label="Fechar">×</button>
+        </div>
+
+        <div className="gv-modal-body">
           <div style={{
-            marginTop: 14,
-            padding: '12px 14px',
-            background: 'rgba(255,255,255,.55)',
-            border: '1px solid rgba(0,0,0,.06)',
-            borderRadius: 12,
-            fontSize: 13,
+            padding: '10px 14px', borderRadius: 10,
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            marginBottom: 20, fontSize: 13,
           }}>
-            <div style={{
-              color: '#71717A', fontSize: 10, fontWeight: 700,
-              letterSpacing: '0.12em', marginBottom: 4, textTransform: 'uppercase',
-            }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(180,200,225,0.45)', marginBottom: 4 }}>
               Email da plataforma
             </div>
-            <a href={`mailto:${EMAIL_SUPORTE}`} style={{
-              color: '#09090B', textDecoration: 'none', fontWeight: 600,
-            }}>
+            <a href={`mailto:${EMAIL_SUPORTE}`} style={{ color: 'rgba(200,215,235,0.85)', textDecoration: 'none', fontWeight: 600 }}>
               {EMAIL_SUPORTE}
             </a>
           </div>
-        </div>
 
-        {/* Body */}
-        {enviado ? (
-          <div style={{ padding: 40, textAlign: 'center' }}>
-            <div style={{
-              fontSize: 36, marginBottom: 12, color: '#16A34A',
-              fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700,
-            }}>✓</div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Mensagem enviada!</h3>
-            <p style={{ color: '#71717A', fontSize: 14 }}>
-              Em breve entraremos em contato pelo email informado.
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={enviar} style={{ padding: 24 }}>
-            <div style={{ marginBottom: 16 }}>
-              <label style={{
-                display: 'block', fontSize: 11, fontWeight: 600, marginBottom: 6,
-                color: '#3F3F46', letterSpacing: '0.12em', textTransform: 'uppercase',
-              }}>
-                Nome *
-              </label>
-              <input
-                value={nome}
-                onChange={e => setNome(e.target.value)}
-                required
-                maxLength={120}
-                placeholder="Seu nome"
-                style={{
-                  width: '100%', padding: '12px 14px',
-                  background: 'rgba(255,255,255,.7)',
-                  border: '1px solid rgba(0,0,0,.08)',
-                  borderRadius: 10, color: '#09090B', fontSize: 14,
-                  outline: 'none', boxSizing: 'border-box',
-                  fontFamily: 'inherit',
-                }}
-              />
+          {enviado ? (
+            <div style={{ padding: '24px 0', textAlign: 'center' }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: '#86efac' }}>Mensagem enviada!</h3>
+              <p style={{ color: 'rgba(200,215,235,0.60)', fontSize: 14 }}>
+                Em breve entraremos em contato pelo email informado.
+              </p>
             </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <label style={{
-                display: 'block', fontSize: 11, fontWeight: 600, marginBottom: 6,
-                color: '#3F3F46', letterSpacing: '0.12em', textTransform: 'uppercase',
-              }}>
-                Email *
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                maxLength={200}
-                placeholder="seu@email.com"
-                style={{
-                  width: '100%', padding: '12px 14px',
-                  background: 'rgba(255,255,255,.7)',
-                  border: '1px solid rgba(0,0,0,.08)',
-                  borderRadius: 10, color: '#09090B', fontSize: 14,
-                  outline: 'none', boxSizing: 'border-box',
-                  fontFamily: 'inherit',
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <label style={{
-                display: 'block', fontSize: 11, fontWeight: 600, marginBottom: 6,
-                color: '#3F3F46', letterSpacing: '0.12em', textTransform: 'uppercase',
-              }}>
-                Mensagem *
-              </label>
-              <textarea
-                value={mensagem}
-                onChange={e => setMensagem(e.target.value.slice(0, MAX_MSG))}
-                required
-                minLength={10}
-                maxLength={MAX_MSG}
-                placeholder="Descreva seu contato…"
-                rows={6}
-                style={{
-                  width: '100%', padding: '12px 14px',
-                  background: 'rgba(255,255,255,.7)',
-                  border: '1px solid rgba(0,0,0,.08)',
-                  borderRadius: 10, color: '#09090B', fontSize: 14,
-                  outline: 'none', boxSizing: 'border-box',
-                  resize: 'vertical', minHeight: 120, fontFamily: 'inherit',
-                }}
-              />
-              <div style={{ textAlign: 'right', fontSize: 11, color: '#71717A', marginTop: 4 }}>
-                {mensagem.length} / {MAX_MSG}
+          ) : (
+            <form onSubmit={enviar}>
+              <div style={{ marginBottom: 14 }}>
+                <label style={labelStyle}>Nome *</label>
+                <input
+                  value={nome}
+                  onChange={e => setNome(e.target.value)}
+                  required maxLength={120}
+                  placeholder="Seu nome"
+                  style={inputStyle}
+                />
               </div>
-            </div>
 
-            {erro && (
-              <div style={{
-                padding: 10, marginBottom: 14,
-                background: 'rgba(220,38,38,.10)',
-                border: '1px solid rgba(220,38,38,.3)',
-                borderRadius: 10, fontSize: 13, color: '#DC2626',
-              }}>{erro}</div>
-            )}
+              <div style={{ marginBottom: 14 }}>
+                <label style={labelStyle}>Email *</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required maxLength={200}
+                  placeholder="seu@email.com"
+                  style={inputStyle}
+                />
+              </div>
 
-            <button type="submit" disabled={enviando} style={{
-              width: '100%', padding: '14px',
-              background: '#0C447C',
-              color: '#fff', border: '1px solid #0C447C', borderRadius: 12,
-              fontSize: 13, fontWeight: 700, cursor: 'pointer',
-              opacity: enviando ? .6 : 1,
-              letterSpacing: '0.08em', textTransform: 'uppercase',
-              fontFamily: 'inherit',
-            }}>
-              {enviando ? 'Enviando…' : 'Enviar mensagem'}
-            </button>
-          </form>
-        )}
+              <div style={{ marginBottom: 16 }}>
+                <label style={labelStyle}>Mensagem *</label>
+                <textarea
+                  value={mensagem}
+                  onChange={e => setMensagem(e.target.value.slice(0, MAX_MSG))}
+                  required minLength={10} maxLength={MAX_MSG}
+                  placeholder="Descreva seu contato…"
+                  rows={5}
+                  style={{ ...inputStyle, resize: 'vertical', minHeight: 110 }}
+                />
+                <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(180,200,225,0.35)', marginTop: 4 }}>
+                  {mensagem.length} / {MAX_MSG}
+                </div>
+              </div>
+
+              {erro && (
+                <div style={{
+                  padding: '10px 12px', marginBottom: 14,
+                  background: 'rgba(220,38,38,0.15)',
+                  border: '1px solid rgba(220,38,38,0.30)',
+                  borderRadius: 10, fontSize: 13, color: '#fca5a5',
+                }}>{erro}</div>
+              )}
+
+              <button
+                type="submit" className="gv-btn-primary"
+                disabled={enviando}
+                style={{ width: '100%', justifyContent: 'center', padding: '13px' }}
+              >
+                {enviando ? 'Enviando…' : 'Enviar mensagem'}
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   )

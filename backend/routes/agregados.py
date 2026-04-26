@@ -642,3 +642,28 @@ def dashboard_agregado(aid):
         "ganhos_cents":     ganhos_total,
         "ganhos_retidos_cents": ganhos_retidos,
     })
+
+
+@agregados_bp.get("/minha-editora")
+@require_auth
+def minha_editora():
+    """Retorna a editora à qual o artista autenticado está agregado, se houver."""
+    sb = get_supabase()
+    meu = sb.table("perfis").select("id,publisher_id").eq("id", g.user.id).single().execute()
+    if not meu.data:
+        abort(404)
+    pid = meu.data.get("publisher_id")
+    if not pid:
+        return jsonify(None)
+    editora = sb.table("perfis").select(
+        "id,nome,nome_fantasia,razao_social,email,telefone"
+    ).eq("id", pid).maybe_single().execute()
+    if not editora.data:
+        return jsonify(None)
+    d = editora.data
+    return jsonify({
+        "id":    d.get("id"),
+        "nome":  d.get("razao_social") or d.get("nome_fantasia") or d.get("nome") or "",
+        "email": d.get("email") or "",
+        "telefone": d.get("telefone") or "",
+    })

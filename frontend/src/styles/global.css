@@ -410,3 +410,98 @@ select.input {
   from { opacity: 0; transform: scale(.92) translateY(8px); }
   to   { opacity: 1; transform: scale(1)   translateY(0);   }
 }
+
+/* ════════════════════════════════════
+   MOTIONS LEVES — Gravan
+════════════════════════════════════ */
+
+/* ── Entrada de página ── */
+@keyframes gv-page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: gv-page-in .28s cubic-bezier(.2,.8,.4,1) both;
+}
+
+/* ── Fade simples ── */
+@keyframes gv-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up        { animation: gv-fade-up .30s cubic-bezier(.2,.8,.4,1) both; }
+.fade-in-up.delay1 { animation-delay: .06s; }
+.fade-in-up.delay2 { animation-delay: .12s; }
+.fade-in-up.delay3 { animation-delay: .18s; }
+.fade-in-up.delay4 { animation-delay: .24s; }
+.fade-in-up.delay5 { animation-delay: .30s; }
+
+/* Ativação automática para cards e itens de lista */
+.card {
+  animation: gv-fade-up .28s cubic-bezier(.2,.8,.4,1) both;
+}
+
+/* ── Botões — feedback de pressão ── */
+.btn {
+  transition: background var(--transition), border-color var(--transition),
+              color var(--transition), transform .1s ease, box-shadow .15s ease;
+}
+.btn:active:not(:disabled) { transform: scale(.97) !important; }
+
+/* ── Link / nav hover ── */
+a { transition: color .15s, opacity .15s; }
+
+/* ── Inputs — focus suave ── */
+.input, input:not([type="file"]), textarea, select {
+  transition: border-color .18s, box-shadow .18s;
+}
+
+/* ── Card hover (já existia hover-lift, deixamos compatível) ── */
+.card:hover {
+  box-shadow: 0 4px 16px rgba(9,9,11,.07);
+}
+
+/* ── Pulse para badges de notificação ── */
+@keyframes gv-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.18); opacity: .85; }
+}
+.pulse { animation: gv-pulse 2s ease-in-out infinite; }
+
+/* ── Shimmer para skeleton loading ── */
+@keyframes gv-shimmer {
+  from { background-position: -400px 0; }
+  to   { background-position:  400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--surface-2) 25%,
+    var(--border) 50%,
+    var(--surface-2) 75%);
+  background-size: 800px 100%;
+  animation: gv-shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+/* ── Spin suave para loaders ── */
+@keyframes gv-spin {
+  to { transform: rotate(360deg); }
+}
+.spin { animation: gv-spin .7s linear infinite; display: inline-block; }
+
+/* ── Entrada de itens em listas (stagger via nth-child) ── */
+.stagger-list > *:nth-child(1)  { animation-delay: .04s; }
+.stagger-list > *:nth-child(2)  { animation-delay: .08s; }
+.stagger-list > *:nth-child(3)  { animation-delay: .12s; }
+.stagger-list > *:nth-child(4)  { animation-delay: .16s; }
+.stagger-list > *:nth-child(5)  { animation-delay: .20s; }
+.stagger-list > *:nth-child(6)  { animation-delay: .24s; }
+.stagger-list > * { animation: gv-fade-up .28s cubic-bezier(.2,.8,.4,1) both; }
+
+/* Respeita preferência do sistema por movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+}
