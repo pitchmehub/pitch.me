@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 
 export default function TermosModal({ onClose }) {
@@ -21,31 +22,51 @@ export default function TermosModal({ onClose }) {
     load()
   }, [])
 
-  return (
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
+
+  const node = (
     <div
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
       style={{
         position: 'fixed', inset: 0,
-        background: 'rgba(0,0,0,.65)', backdropFilter: 'blur(4px)',
+        background: 'rgba(20,25,40,.35)',
+        backdropFilter: 'blur(28px) saturate(140%)',
+        WebkitBackdropFilter: 'blur(28px) saturate(140%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: 700, padding: 24,
+        zIndex: 1000, padding: 24,
+        animation: 'gv-fade-in .22s ease',
       }}
     >
       <div style={{
-        background: '#fff', borderRadius: 16, width: '100%', maxWidth: 680,
+        background: 'rgba(255,255,255,.78)',
+        backdropFilter: 'blur(40px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+        border: '1px solid rgba(255,255,255,.5)',
+        borderRadius: 28,
+        boxShadow: '0 30px 80px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.6)',
+        width: '100%', maxWidth: 680,
         maxHeight: '85vh', display: 'flex', flexDirection: 'column',
+        overflow: 'hidden',
+        animation: 'gv-pop-in .32s cubic-bezier(.18,1.2,.4,1)',
       }}>
         <div style={{
-          padding: '20px 24px', borderBottom: '1px solid var(--border)',
+          padding: '20px 24px',
+          borderBottom: '1px solid rgba(0,0,0,.06)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <div>
             <h2 style={{ fontSize: 18, fontWeight: 700 }}>{conteudo.titulo}</h2>
             <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Versão {conteudo.versao}</p>
           </div>
-          <button onClick={onClose} style={{
-            background: 'none', border: 'none', fontSize: 24, cursor: 'pointer',
-            color: 'var(--text-muted)', padding: 0, width: 32, height: 32,
+          <button onClick={onClose} aria-label="Fechar" style={{
+            background: 'rgba(0,0,0,.04)', border: 'none', fontSize: 20,
+            cursor: 'pointer', color: 'var(--text-muted)',
+            width: 36, height: 36, borderRadius: 999,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           }}>×</button>
         </div>
 
@@ -58,7 +79,8 @@ export default function TermosModal({ onClose }) {
         </div>
 
         <div style={{
-          padding: '14px 24px', borderTop: '1px solid var(--border)',
+          padding: '14px 24px',
+          borderTop: '1px solid rgba(0,0,0,.06)',
           display: 'flex', justifyContent: 'flex-end',
         }}>
           <button className="btn btn-primary" onClick={onClose}>Fechar</button>
@@ -66,4 +88,6 @@ export default function TermosModal({ onClose }) {
       </div>
     </div>
   )
+
+  return createPortal(node, document.body)
 }

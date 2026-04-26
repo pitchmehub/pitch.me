@@ -34,7 +34,7 @@ from middleware.auth import require_auth
 from db.supabase_client import get_supabase
 from utils.audit import log_event
 from utils.crypto import encrypt_pii, decrypt_pii
-from utils.termo_agregado import gerar_termo_html, gerar_termo_text, VERSAO_ATUAL
+from utils.termo_agregado import gerar_termo_html, gerar_termo_text, VERSAO_ATUAL, _mask_cpf
 from services.notificacoes import notify
 from services.email_service import send_email, _wrap_html
 
@@ -113,10 +113,16 @@ def cadastrar_agregado():
       4. Manda e-mail ao artista com link de definir senha + ler/aceitar termo
     """
     data = request.get_json(silent=True) or {}
-    obrigatorios = ["nome_completo", "nome_artistico", "rg", "cpf", "email", "responsavel_aceite"]
+    obrigatorios = ["nome_completo", "nome_artistico", "rg", "cpf", "email",
+                    "responsavel_aceite", "responsavel_cpf"]
     faltam = [c for c in obrigatorios if not (data.get(c) or "").strip()]
     if faltam:
         abort(400, description=f"Campos obrigatórios faltando: {', '.join(faltam)}")
+
+    import re as _re
+    resp_cpf_digits = _re.sub(r"\D", "", data.get("responsavel_cpf") or "")
+    if len(resp_cpf_digits) != 11:
+        abort(422, description="CPF do solicitante inválido (11 dígitos).")
 
     sb = get_supabase()
     editora = _ensure_publisher(sb)
@@ -186,8 +192,9 @@ def cadastrar_agregado():
         "status":       "pendente",
         "termo_html":   termo_html,
         "termo_versao": VERSAO_ATUAL,
-        "responsavel_editora_nome": data["responsavel_aceite"].strip(),
-        "editora_aceito_ip":        _client_ip(),
+        "responsavel_editora_nome":     data["responsavel_aceite"].strip(),
+        "responsavel_editora_cpf_mask": _mask_cpf(resp_cpf_digits),
+        "editora_aceito_ip":            _client_ip(),
     }
     convite = sb.table("agregado_convites").insert(convite_payload).execute()
     cid = (convite.data or [{}])[0].get("id")
@@ -254,6 +261,11 @@ def adicionar_agregado():
     if not email or not responsavel:
         abort(400, description="E-mail e nome do responsável que aceita o termo são obrigatórios.")
 
+    import re as _re
+    resp_cpf_digits = _re.sub(r"\D", "", data.get("responsavel_cpf") or "")
+    if len(resp_cpf_digits) != 11:
+        abort(422, description="CPF do solicitante inválido (11 dígitos).")
+
     sb = get_supabase()
     editora = _ensure_publisher(sb)
     if not editora:
@@ -294,8 +306,9 @@ def adicionar_agregado():
         "status":       "pendente",
         "termo_html":   termo_html,
         "termo_versao": VERSAO_ATUAL,
-        "responsavel_editora_nome": responsavel,
-        "editora_aceito_ip":        _client_ip(),
+        "responsavel_editora_nome":     responsavel,
+        "responsavel_editora_cpf_mask": _mask_cpf(resp_cpf_digits),
+        "editora_aceito_ip":            _client_ip(),
     }
     res = sb.table("agregado_convites").insert(convite_payload).execute()
     cid = (res.data or [{}])[0].get("id")

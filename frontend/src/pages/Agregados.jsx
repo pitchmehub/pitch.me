@@ -23,9 +23,9 @@ const EMPTY_CADASTRAR = {
  nome_completo: '', nome_artistico: '', rg: '', cpf: '', email: '',
  endereco_rua: '', endereco_numero: '', endereco_compl: '',
  endereco_bairro: '', endereco_cidade: '', endereco_uf: '', endereco_cep: '',
- responsavel_aceite: '', aceitou_termo: false,
+ responsavel_aceite: '', responsavel_cpf: '', aceitou_termo: false,
 }
-const EMPTY_ADICIONAR = { email: '', responsavel_aceite: '', aceitou_termo: false }
+const EMPTY_ADICIONAR = { email: '', responsavel_aceite: '', responsavel_cpf: '', aceitou_termo: false }
 
 export default function Agregados() {
  const [aba, setAba]           = useState('lista')   // 'lista' | 'cadastrar' | 'adicionar' | 'convites'
@@ -243,6 +243,8 @@ export default function Agregados() {
  <BlocoTermoEditora
    responsavel={formC.responsavel_aceite}
    onResponsavel={v => setC('responsavel_aceite', v)}
+   responsavelCpf={formC.responsavel_cpf}
+   onResponsavelCpf={v => setC('responsavel_cpf', fmtCPF(v))}
    aceitou={formC.aceitou_termo}
    onAceitou={v => setC('aceitou_termo', v)}
    showTermo={showTermo}
@@ -276,6 +278,8 @@ export default function Agregados() {
  <BlocoTermoEditora
    responsavel={formA.responsavel_aceite}
    onResponsavel={v => setA('responsavel_aceite', v)}
+   responsavelCpf={formA.responsavel_cpf}
+   onResponsavelCpf={v => setA('responsavel_cpf', fmtCPF(v))}
    aceitou={formA.aceitou_termo}
    onAceitou={v => setA('aceitou_termo', v)}
    showTermo={showTermo}
@@ -296,7 +300,7 @@ export default function Agregados() {
 }
 
 // ── Bloco do termo jurídico ──────────────────────────────
-function BlocoTermoEditora({ responsavel, onResponsavel, aceitou, onAceitou, showTermo, setShowTermo, modo }) {
+function BlocoTermoEditora({ responsavel, onResponsavel, responsavelCpf, onResponsavelCpf, aceitou, onAceitou, showTermo, setShowTermo, modo }) {
  const inputStyle = { width: '100%', padding: '8px 10px', border: '1px solid var(--border)', borderRadius: 6, fontSize: 13 }
  const lbl = { fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 3, display: 'block' }
  return (
@@ -321,8 +325,18 @@ function BlocoTermoEditora({ responsavel, onResponsavel, aceitou, onAceitou, sho
        </div>
      )}
 
-     <div><label style={lbl}>Nome do responsável legal que está aceitando o termo *</label>
-       <input style={inputStyle} value={responsavel} onChange={e => onResponsavel(e.target.value)} placeholder="Ex: Maria da Silva" required />
+     <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '4px 0 8px' }}>
+       Identifique a pessoa física que está fazendo esta solicitação em nome da editora:
+     </p>
+     <div style={{ display: 'grid', gridTemplateColumns: '1fr 180px', gap: 10 }}>
+       <div><label style={lbl}>Nome de quem está solicitando *</label>
+         <input style={inputStyle} value={responsavel} onChange={e => onResponsavel(e.target.value)}
+                placeholder="Ex: Maria da Silva" required minLength={5} />
+       </div>
+       <div><label style={lbl}>CPF de quem está solicitando *</label>
+         <input style={inputStyle} value={responsavelCpf} onChange={e => onResponsavelCpf(e.target.value)}
+                placeholder="000.000.000-00" required maxLength={14} />
+       </div>
      </div>
 
      <label style={{ display: 'flex', gap: 8, marginTop: 10, cursor: 'pointer', fontSize: 13 }}>

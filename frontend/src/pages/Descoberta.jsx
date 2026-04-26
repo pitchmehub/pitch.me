@@ -318,22 +318,22 @@ export default function Descoberta() {
  {cadastroIncompleto && (
  <div style={{
  padding: '14px 28px',
- background: 'linear-gradient(90deg,#083257,#09090B)',
- color: '#fff', display: 'flex', alignItems: 'center', gap: 14,
+ background: '#FAFAFA',
+ borderBottom: '1px solid #E4E4E7',
+ color: '#09090B', display: 'flex', alignItems: 'center', gap: 14,
  flexWrap: 'wrap',
  }}>
- <span style={{ fontSize: 20 }}></span>
  <div style={{ flex: 1 }}>
  <div style={{ fontSize: 13, fontWeight: 700 }}>Complete seu cadastro</div>
- <div style={{ fontSize: 12, opacity: .9 }}>
+ <div style={{ fontSize: 12, color: '#71717A' }}>
  Preencha CPF, RG e endereço para liberar a publicação de obras e realizar compras.
  </div>
  </div>
  <button
  onClick={() => navigate('/perfil/completar')}
  style={{
- background: 'rgba(255,255,255,.2)', color: '#fff',
- border: '1px solid rgba(255,255,255,.3)', padding: '8px 16px', borderRadius: 99,
+ background: '#09090B', color: '#fff',
+ border: '1px solid #09090B', padding: '8px 16px', borderRadius: 99,
  fontSize: 13, fontWeight: 700, cursor: 'pointer',
  }}
  >

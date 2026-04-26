@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -17,7 +18,6 @@ function renderTemplate(tpl, perfil) {
     .replace(/{{endereco_completo}}/g, endereco || 'Não informado')
     .replace(/{{email}}/g,          perfil.email || '')
     .replace(/{{data_assinatura}}/g, agora)
-    // Placeholders preenchidos em runtime pelo backend ao salvar a obra
     .replace(/{{obra_nome}}/g,              '[título da obra]')
     .replace(/{{share_autor_pct}}/g,        '[seu percentual]')
     .replace(/{{coautores_lista}}/g,        '[definido conforme os coautores cadastrados]')
@@ -40,24 +40,42 @@ export default function ContratoEdicaoModal({ onClose }) {
     load()
   }, [])
 
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
+
   const conteudo = renderTemplate(tpl, perfil)
 
-  return (
+  const node = (
     <div
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
       style={{
         position: 'fixed', inset: 0,
-        background: 'rgba(0,0,0,.7)', backdropFilter: 'blur(4px)',
+        background: 'rgba(20,25,40,.35)',
+        backdropFilter: 'blur(28px) saturate(140%)',
+        WebkitBackdropFilter: 'blur(28px) saturate(140%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: 700, padding: 24,
+        zIndex: 1000, padding: 24,
+        animation: 'gv-fade-in .22s ease',
       }}
     >
       <div style={{
-        background: '#fff', borderRadius: 16, width: '100%', maxWidth: 720,
+        background: 'rgba(255,255,255,.78)',
+        backdropFilter: 'blur(40px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+        border: '1px solid rgba(255,255,255,.5)',
+        borderRadius: 28,
+        boxShadow: '0 30px 80px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.6)',
+        width: '100%', maxWidth: 720,
         maxHeight: '85vh', display: 'flex', flexDirection: 'column',
+        overflow: 'hidden',
+        animation: 'gv-pop-in .32s cubic-bezier(.18,1.2,.4,1)',
       }}>
         <div style={{
-          padding: '20px 24px', borderBottom: '1px solid var(--border)',
+          padding: '20px 24px',
+          borderBottom: '1px solid rgba(0,0,0,.06)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <div>
@@ -66,9 +84,11 @@ export default function ContratoEdicaoModal({ onClose }) {
               Versão 1.0 · {new Date().toLocaleDateString('pt-BR')}
             </p>
           </div>
-          <button onClick={onClose} style={{
-            background: 'none', border: 'none', fontSize: 24,
+          <button onClick={onClose} aria-label="Fechar" style={{
+            background: 'rgba(0,0,0,.04)', border: 'none', fontSize: 20,
             cursor: 'pointer', color: 'var(--text-muted)',
+            width: 36, height: 36, borderRadius: 999,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           }}>×</button>
         </div>
 
@@ -81,7 +101,8 @@ export default function ContratoEdicaoModal({ onClose }) {
         </div>
 
         <div style={{
-          padding: '14px 24px', borderTop: '1px solid var(--border)',
+          padding: '14px 24px',
+          borderTop: '1px solid rgba(0,0,0,.06)',
           display: 'flex', justifyContent: 'flex-end',
         }}>
           <button className="btn btn-primary" onClick={onClose}>Fechar</button>
@@ -89,4 +110,6 @@ export default function ContratoEdicaoModal({ onClose }) {
       </div>
     </div>
   )
+
+  return createPortal(node, document.body)
 }

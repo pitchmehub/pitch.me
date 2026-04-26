@@ -32,7 +32,7 @@ export default function CadastroEditora() {
  const [error, setError] = useState('')
  const [form, setForm] = useState({
  razao_social: '', nome_fantasia: '', cnpj: '',
- telefone: '', responsavel_nome: '', responsavel_cpf: '',
+ telefone: '',
  endereco_rua: '', endereco_numero: '', endereco_compl: '',
  endereco_bairro: '', endereco_cidade: '', endereco_uf: '', endereco_cep: '',
  })
@@ -89,17 +89,7 @@ export default function CadastroEditora() {
  </fieldset>
 
  <fieldset style={{ border: '1px solid var(--border)', borderRadius: 12, padding: 16 }}>
- <legend style={{ fontSize: 13, fontWeight: 700, padding: '0 8px' }}>Responsável legal</legend>
- <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
- <div><label style={labelStyle}>Nome completo *</label>
- <input style={inputStyle} value={form.responsavel_nome} onChange={e => set('responsavel_nome', e.target.value)} required /></div>
- <div><label style={labelStyle}>CPF *</label>
- <input style={inputStyle} value={form.responsavel_cpf} onChange={e => set('responsavel_cpf', fmtCPF(e.target.value))} required /></div>
- </div>
- </fieldset>
-
- <fieldset style={{ border: '1px solid var(--border)', borderRadius: 12, padding: 16 }}>
- <legend style={{ fontSize: 13, fontWeight: 700, padding: '0 8px' }}>Endereço</legend>
+ <legend style={{ fontSize: 13, fontWeight: 700, padding: '0 8px' }}>Endereço da empresa</legend>
  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }}>
  <div><label style={labelStyle}>Rua *</label>
  <input style={inputStyle} value={form.endereco_rua} onChange={e => set('endereco_rua', e.target.value)} required /></div>

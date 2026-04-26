@@ -400,3 +400,13 @@ select.input {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
+
+/* ─── Animações de modais com efeito vidro fosco ─── */
+@keyframes gv-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes gv-pop-in {
+  from { opacity: 0; transform: scale(.92) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0);   }
+}

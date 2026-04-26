@@ -60,9 +60,12 @@ def lookup_by_email():
 @require_auth
 def criar_publisher():
     """Promove o usuário logado a EDITORA. Espera os campos PJ no body."""
+    # Editora é PJ: não exigimos dados pessoais (nome/CPF do responsável)
+    # no cadastro inicial. Esses dados serão coletados quando a editora
+    # cadastrar ou convidar um artista.
     REQUIRED_PJ = [
         "razao_social", "nome_fantasia", "cnpj",
-        "telefone", "responsavel_nome", "responsavel_cpf",
+        "telefone",
         "endereco_rua", "endereco_numero", "endereco_bairro",
         "endereco_cidade", "endereco_uf", "endereco_cep",
     ]
@@ -78,8 +81,6 @@ def criar_publisher():
         "nome_fantasia":     data["nome_fantasia"].strip(),
         "cnpj":              encrypt_pii(data["cnpj"].strip()),
         "telefone":          data["telefone"].strip(),
-        "responsavel_nome":  data["responsavel_nome"].strip(),
-        "responsavel_cpf":   encrypt_pii(data["responsavel_cpf"].strip()),
         "endereco_rua":      data["endereco_rua"].strip(),
         "endereco_numero":   data["endereco_numero"].strip(),
         "endereco_bairro":   data["endereco_bairro"].strip(),
@@ -88,6 +89,11 @@ def criar_publisher():
         "endereco_cep":      data["endereco_cep"].strip(),
         "endereco_compl":    (data.get("endereco_compl") or "").strip(),
     }
+    # Campos opcionais (mantidos para compat / preenchimento posterior)
+    if (data.get("responsavel_nome") or "").strip():
+        payload["responsavel_nome"] = data["responsavel_nome"].strip()
+    if (data.get("responsavel_cpf") or "").strip():
+        payload["responsavel_cpf"] = encrypt_pii(data["responsavel_cpf"].strip())
     r = sb.table("perfis").update(payload).eq("id", g.user.id).execute()
     if not r.data:
         abort(404, description="Perfil não encontrado.")
