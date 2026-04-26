@@ -59,9 +59,9 @@ export default function Compras() {
  const isPlaying = obraAtual?.id === c.obra_id && playing
  const badge = STATUS[c.status] ?? STATUS.pendente
  return (
- <div key={c.id} style={{
+ <div key={c.id} className="hover-lift" style={{
  padding: 16, background: 'var(--surface)',
- border: '1px solid var(--border)', borderRadius: 12,
+ border: '1px solid var(--border)', borderRadius: 14,
  display: 'flex', alignItems: 'center', gap: 14,
  }}>
  {c.audio_path && c.status === 'confirmada' && (

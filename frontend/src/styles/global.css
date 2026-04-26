@@ -212,15 +212,27 @@ select.input {
 }
 
 /* ════════════════════════════════════
-   CARDS (bordas finas, sem arredondamento)
+   CARDS (bordas finas, cantos suavemente arredondados)
 ════════════════════════════════════ */
 .card {
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 0;
+  border-radius: 14px;
   padding: 24px;
+  transition: border-color .15s, box-shadow .2s, transform .2s;
 }
-.card-sm { padding: 16px; }
+.card-sm { padding: 16px; border-radius: 12px; }
+
+/* Utility: aplica o mesmo "lift" no hover usado nos cards da Descoberta.
+   Use em qualquer item de lista pra ficar consistente. */
+.hover-lift {
+  transition: border-color .15s, box-shadow .2s, transform .2s;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-border);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .06);
+}
 
 /* ════════════════════════════════════
    BADGES

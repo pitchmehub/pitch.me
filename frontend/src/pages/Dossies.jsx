@@ -201,11 +201,11 @@ export default function Dossies() {
 
  {/* ── Lista ─────────────────────────────────────────────── */}
  {filtered.map(d => (
- <div key={d.id} style={{
+ <div key={d.id} className="hover-lift" style={{
  border: selected?.id === d.id
  ? '1px solid var(--brand)'
  : '1px solid var(--border)',
- borderRadius: 10,
+ borderRadius: 14,
  marginBottom: 10,
  padding: '1rem 1.2rem',
  background: 'var(--surface)',
@@ -213,7 +213,6 @@ export default function Dossies() {
  alignItems: 'center',
  gap: '1rem',
  flexWrap: 'wrap',
- transition: 'border-color .15s',
  }}>
  <div style={{ flex: 1, minWidth: 240 }}>
  <div style={{

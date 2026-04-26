@@ -53,9 +53,9 @@ export default function Biblioteca() {
  {items.map((it, i) => {
  const o = it.obras || {}
  return (
- <div key={it.id || i} data-testid={`biblio-item-${i}`} style={{
+ <div key={it.id || i} data-testid={`biblio-item-${i}`} className="hover-lift" style={{
  display: 'flex', alignItems: 'center', gap: 16, padding: 14,
- border: '1px solid var(--border)', borderRadius: 12, background: '#fff',
+ border: '1px solid var(--border)', borderRadius: 14, background: '#fff',
  }}>
  <div style={{ flex: 1, minWidth: 0 }}>
  <div style={{ fontWeight: 600, fontSize: 15 }}>{o.nome || 'Obra removida'}</div>
