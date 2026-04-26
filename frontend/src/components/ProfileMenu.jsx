@@ -4,8 +4,6 @@ import { useAuth } from '../contexts/AuthContext'
 import { IconUser, IconWallet, IconPlus, IconLogout, IconChevronUp, IconChevronDown } from './Icons'
 import './ProfileMenu.css'
 
-const NIVEL_LABEL = { prata: 'Prata', ouro: 'Ouro', diamante: 'Diamante' }
-
 export default function ProfileMenu() {
  const { perfil, signOut } = useAuth()
  const [open, setOpen] = useState(false)
@@ -25,7 +23,7 @@ export default function ProfileMenu() {
  const iniciais = perfil.nome
  ?.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() ?? '?'
 
- const nivel = perfil.nivel ?? 'prata'
+ const planoLabel = (perfil.plano || 'STARTER') === 'PRO' ? 'PRO' : 'Free'
 
  return (
  <div className="pm-wrap" ref={ref}>
@@ -55,8 +53,8 @@ export default function ProfileMenu() {
  <div className="pm-dd-artistico">"{perfil.nome_artistico}"</div>
  )}
  <div className="pm-dd-email">{perfil.email}</div>
- <span className={`pm-nivel pm-nivel-${nivel}`}>
- {NIVEL_LABEL[nivel] || (nivel.charAt(0).toUpperCase() + nivel.slice(1))}
+ <span className={`pm-nivel pm-plano-${planoLabel.toLowerCase()}`}>
+ {planoLabel}
  </span>
  </div>
  </div>

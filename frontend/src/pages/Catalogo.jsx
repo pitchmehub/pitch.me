@@ -10,7 +10,6 @@ function fmt(cents) {
  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((cents ?? 0) / 100)
 }
 
-const NIVEL_LABEL = { prata: 'Prata', ouro: 'Ouro', diamante: 'Diamante' }
 
 export default function Catalogo() {
  const { perfil } = useAuth()
@@ -134,7 +133,7 @@ export default function Catalogo() {
 
  <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 2 }}>{obra.nome}</div>
  <div style={{ color: 'var(--text-muted)', fontSize: 12, marginBottom: 8 }}>
- {NIVEL_LABEL[obra.titular_nivel]} {obra.titular_nome}
+ {obra.titular_nome}
  {obra.genero && ` · ${obra.genero}`}
  </div>
 
@@ -180,7 +179,7 @@ export default function Catalogo() {
  </div>
 
  <div style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 12 }}>
- {NIVEL_LABEL[selected.titular_nivel]} {selected.titular_nome}
+ {selected.titular_nome}
  {selected.genero && ` · ${selected.genero}`}
  </div>
 
@@ -300,9 +299,6 @@ function ComentariosSection({ obraId, perfilAtual }) {
  {comentarios.map(c => (
  <div key={c.id} style={{ fontSize: 13, lineHeight: 1.5 }}>
  <span style={{ fontWeight: 600 }}>{c.perfis?.nome}</span>
- <span className={`badge badge-${c.perfis?.nivel ?? 'silver'}`} style={{ marginLeft: 6, fontSize: 11 }}>
- {c.perfis?.nivel}
- </span>
  <p style={{ color: 'var(--text-secondary)', margin: '2px 0 0' }}>{c.conteudo}</p>
  </div>
  ))}

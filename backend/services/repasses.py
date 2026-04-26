@@ -16,7 +16,7 @@ from typing import Optional
 import stripe
 
 from db.supabase_client import get_supabase
-from services.finance import fee_rate_for_plano
+from services.finance import fee_rate_for_plano, EDITORA_RATE
 
 logger = logging.getLogger("gravan.repasses")
 
@@ -50,19 +50,37 @@ def _net_cents_do_charge(payment_intent_id: str) -> Optional[int]:
         return None
 
 
-def _calcular_split_sobre_net(net_cents: int, plano_titular: str, coautorias: list) -> dict:
+def _calcular_split_sobre_net(
+    net_cents: int,
+    plano_titular: str,
+    coautorias: list,
+    publisher_id: str | None = None,
+) -> dict:
     """
     Calcula:
       - plataforma_cents (taxa da Gravan sobre o NET)
-      - distribuicao por coautor (com share_pct)
+      - editora_payout (10% para editora vinculada, se aplicável)
+      - distribuição por coautor (com share_pct), sobre o que sobrar
     """
     if net_cents <= 0:
-        return {"plataforma_cents": 0, "payouts": []}
+        return {"plataforma_cents": 0, "editora_payout": None, "payouts": []}
 
     rate = fee_rate_for_plano(plano_titular)
     net = Decimal(str(net_cents))
     plataforma = (net * rate).to_integral_value(ROUND_DOWN)
-    liquido_autores = net - plataforma
+
+    # Editora (10%) — calculada sobre o NET bruto.
+    editora_cents = Decimal("0")
+    editora_payout = None
+    if publisher_id:
+        editora_cents = (net * EDITORA_RATE).to_integral_value(ROUND_DOWN)
+        editora_payout = {
+            "perfil_id":   publisher_id,
+            "valor_cents": int(editora_cents),
+            "share_pct":   float(EDITORA_RATE * Decimal("100")),
+        }
+
+    liquido_autores = net - plataforma - editora_cents
 
     payouts = []
     distribuido = Decimal("0")
@@ -80,9 +98,11 @@ def _calcular_split_sobre_net(net_cents: int, plano_titular: str, coautorias: li
         })
 
     return {
-        "plataforma_cents": int(plataforma),
+        "plataforma_cents":      int(plataforma),
+        "editora_cents":         int(editora_cents),
+        "editora_payout":        editora_payout,
         "liquido_autores_cents": int(liquido_autores),
-        "payouts": payouts,
+        "payouts":               payouts,
     }
 
 
@@ -122,19 +142,55 @@ def creditar_wallets_por_transacao(transacao_id: str) -> dict:
         net = t["valor_cents"]
 
     titular = sb.table("perfis").select(
-        "plano, status_assinatura"
+        "plano, status_assinatura, publisher_id"
     ).eq("id", titular_id).single().execute().data or {}
     plano = titular.get("plano", "STARTER")
     status_ass = titular.get("status_assinatura", "inativa")
     if plano == "PRO" and status_ass not in ("ativa", "cancelada", "past_due"):
         plano = "STARTER"
+    publisher_id = titular.get("publisher_id")
 
     coaut = sb.table("coautorias").select("perfil_id, share_pct").eq(
         "obra_id", t["obra_id"]
     ).execute()
     coautorias = coaut.data or [{"perfil_id": titular_id, "share_pct": 100}]
 
-    split = _calcular_split_sobre_net(net, plano, coautorias)
+    split = _calcular_split_sobre_net(net, plano, coautorias, publisher_id=publisher_id)
+
+    # Crédito automático da editora vinculada (10%), se aplicável.
+    creditados_editora = 0
+    edp = split.get("editora_payout")
+    if edp and edp["valor_cents"] > 0:
+        try:
+            sb.rpc("creditar_wallet", {
+                "p_perfil_id":    edp["perfil_id"],
+                "p_valor_cents":  edp["valor_cents"],
+                "p_transacao_id": transacao_id,
+            }).execute()
+        except Exception as e:
+            logger.warning("RPC creditar_wallet (editora) falhou: %s — fallback direto.", e)
+            try:
+                w = sb.table("wallets").select("saldo_cents").eq(
+                    "perfil_id", edp["perfil_id"]
+                ).maybe_single().execute()
+                saldo_atual = ((w.data if w else None) or {}).get("saldo_cents", 0) or 0
+                novo = saldo_atual + edp["valor_cents"]
+                sb.table("wallets").upsert({
+                    "perfil_id": edp["perfil_id"], "saldo_cents": novo,
+                }).execute()
+            except Exception as e2:
+                logger.error("Fallback wallet (editora) falhou para %s: %s",
+                             edp["perfil_id"], e2)
+        try:
+            sb.table("pagamentos_compositores").insert({
+                "perfil_id":    edp["perfil_id"],
+                "transacao_id": transacao_id,
+                "valor_cents":  edp["valor_cents"],
+                "share_pct":    edp["share_pct"],
+            }).execute()
+            creditados_editora = 1
+        except Exception as e:
+            logger.warning("Falha ao gravar pagamento da editora: %s", e)
 
     creditados = 0
     for p in split["payouts"]:
@@ -175,10 +231,12 @@ def creditar_wallets_por_transacao(transacao_id: str) -> dict:
         creditados += 1
 
     return {
-        "status": "ok",
-        "net_cents": net,
-        "plataforma_cents": split["plataforma_cents"],
-        "creditados": creditados,
+        "status":            "ok",
+        "net_cents":         net,
+        "plataforma_cents":  split["plataforma_cents"],
+        "editora_cents":     split.get("editora_cents", 0),
+        "creditados":        creditados,
+        "creditados_editora": creditados_editora,
     }
 
 
@@ -299,21 +357,73 @@ def gerar_repasses_para_transacao(transacao_id: str) -> dict:
 
     # Plano efetivo do titular
     titular = sb.table("perfis").select(
-        "plano, status_assinatura"
+        "plano, status_assinatura, publisher_id"
     ).eq("id", titular_id).single().execute().data or {}
     plano = titular.get("plano", "STARTER")
     status_ass = titular.get("status_assinatura", "inativa")
     if plano == "PRO" and status_ass not in ("ativa", "cancelada", "past_due"):
         plano = "STARTER"
+    publisher_id = titular.get("publisher_id")
 
     # Coautorias (com fallback 100% titular)
     coaut = sb.table("coautorias").select("perfil_id, share_pct").eq("obra_id", t["obra_id"]).execute()
     coautorias = coaut.data or [{"perfil_id": titular_id, "share_pct": 100}]
 
-    split = _calcular_split_sobre_net(net, plano, coautorias)
+    split = _calcular_split_sobre_net(net, plano, coautorias, publisher_id=publisher_id)
 
-    # Cria registros + dispara transfers
+    # Editora: mesma lógica de "retido/enviado" dos coautores.
     enviados, retidos, falhas = 0, 0, 0
+    edp = split.get("editora_payout")
+    if edp and edp["valor_cents"] > 0:
+        ed_dest = sb.table("perfis").select(
+            "stripe_account_id, stripe_charges_enabled"
+        ).eq("id", edp["perfil_id"]).single().execute().data or {}
+        ed_acc = ed_dest.get("stripe_account_id")
+        ed_pode = ed_acc and ed_dest.get("stripe_charges_enabled")
+        ed_row = {
+            "transacao_id":      transacao_id,
+            "perfil_id":         edp["perfil_id"],
+            "valor_cents":       edp["valor_cents"],
+            "share_pct":         edp["share_pct"],
+            "stripe_account_id": ed_acc,
+            "status":            "retido" if not ed_pode else "pendente",
+            "metadata":          {
+                "net_cents_base": net,
+                "plano_titular":  plano,
+                "papel":          "editora",
+            },
+        }
+        if not ed_pode:
+            sb.table("repasses").insert(ed_row).execute()
+            retidos += 1
+        else:
+            try:
+                tr = stripe.Transfer.create(
+                    amount=edp["valor_cents"],
+                    currency="brl",
+                    destination=ed_acc,
+                    transfer_group=f"OBRA_{t['obra_id']}_TRANS_{transacao_id}",
+                    metadata={
+                        "transacao_id": transacao_id,
+                        "perfil_id":    edp["perfil_id"],
+                        "obra_id":      t["obra_id"],
+                        "papel":        "editora",
+                    },
+                    idempotency_key=f"transfer_editora_{transacao_id}_{edp['perfil_id']}",
+                )
+                ed_row["stripe_transfer_id"] = tr.id
+                ed_row["status"] = "enviado"
+                ed_row["enviado_at"] = "now()"
+                sb.table("repasses").insert(ed_row).execute()
+                enviados += 1
+            except stripe.StripeError as e:
+                ed_row["status"]   = "falhou"
+                ed_row["erro_msg"] = (e.user_message or str(e))[:500]
+                sb.table("repasses").insert(ed_row).execute()
+                falhas += 1
+                logger.error("Falha no Transfer EDITORA para %s: %s", edp["perfil_id"], e)
+
+    # Cria registros + dispara transfers para coautores
     for p in split["payouts"]:
         if p["valor_cents"] <= 0:
             continue
@@ -334,6 +444,7 @@ def gerar_repasses_para_transacao(transacao_id: str) -> dict:
             "metadata":          {
                 "net_cents_base": net,
                 "plano_titular":  plano,
+                "papel":          "compositor",
             },
         }
 

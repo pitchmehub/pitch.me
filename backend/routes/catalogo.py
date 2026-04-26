@@ -114,7 +114,7 @@ def listar_comentarios(obra_id):
     sb = get_supabase()
     resp = (
         sb.table("comentarios")
-        .select("*, perfis(nome, avatar_url, nivel)")
+        .select("*, perfis(nome, avatar_url)")
         .eq("obra_id", obra_id)
         .order("created_at", desc=True)
         .execute()

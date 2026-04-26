@@ -37,7 +37,7 @@
     "compositoresSteps": [
       { "title": "Cadastre-se em 2 minutos", "text": "Crie sua conta, configure seu perfil e dados bancários." },
       { "title": "Faça upload do seu MP3", "text": "Arquivos até 10MB. Metadados, coautoria e licenças claras." },
-      { "title": "Receba a cada venda", "text": "Split automático, relatórios e pagamentos via Stripe/PayPal." }
+      { "title": "Receba a cada venda", "text": "Split automático, relatórios e pagamentos via Stripe." }
     ],
     "compradoresLabel": "PARA COMPRADORES",
     "compradoresTitle": "Descubra obras exclusivas e licencie sem fricção.",
@@ -51,7 +51,7 @@
     "title": "Recursos construídos para escalar.",
     "items": [
       { "label": "01 / UPLOAD",     "title": "MP3 até 10MB",        "text": "Upload rápido, validação de metadata e preview instantâneo no player." },
-      { "label": "02 / PAGAMENTOS", "title": "Stripe & PayPal",     "text": "Checkout em BRL e USD. Repasse automático e relatórios fiscais." },
+      { "label": "02 / PAGAMENTOS", "title": "Stripe",              "text": "Checkout em BRL e USD. Repasse automático e relatórios fiscais." },
       { "label": "03 / SEGURANÇA",  "title": "Criptografia de ponta","text": "CPF/RG criptografados, RLS no banco e logs de auditoria em tempo real." },
       { "label": "04 / COAUTORIA",  "title": "Split automático",    "text": "Divida receitas com coautores direto no cadastro da obra." },
       { "label": "05 / ANALYTICS",  "title": "Dashboard completo",  "text": "Vendas, plays, origem do tráfego e performance por obra." },

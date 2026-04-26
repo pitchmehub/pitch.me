@@ -296,8 +296,8 @@ export default function EditarPerfil() {
  <div style={{ fontWeight: 500, textTransform: 'capitalize' }}>{perfil?.role}</div>
  </div>
  <div>
- <div style={{ color: 'var(--text-muted)', marginBottom: 2 }}>Nível</div>
- <div style={{ fontWeight: 500, textTransform: 'capitalize' }}>{perfil?.nivel}</div>
+ <div style={{ color: 'var(--text-muted)', marginBottom: 2 }}>Plano</div>
+ <div style={{ fontWeight: 500 }}>{(perfil?.plano || 'STARTER') === 'PRO' ? 'PRO' : 'Free'}</div>
  </div>
  <div>
  <div style={{ color: 'var(--text-muted)', marginBottom: 2 }}>Membro desde</div>

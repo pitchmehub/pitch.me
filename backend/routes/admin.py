@@ -269,7 +269,7 @@ def publisher_dashboard_admin(publisher_id):
     agregados = []
     try:
         agregados = sb.table("perfis") \
-            .select("id, nome, nome_artistico, email, avatar_url, nivel, created_at") \
+            .select("id, nome, nome_artistico, email, avatar_url, created_at") \
             .eq("publisher_id", publisher_id) \
             .order("created_at", desc=True).execute().data or []
     except Exception:

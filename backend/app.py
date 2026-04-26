@@ -120,13 +120,13 @@ def create_app() -> Flask:
 
         csp_directives = [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.paypal.com https://*.paypalobjects.com",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
             "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net",
             "img-src 'self' data: blob: https:",
             "media-src 'self' blob: https://*.supabase.co",
-            "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.paypal.com https://*.paypalobjects.com",
-            "frame-src 'self' https://js.stripe.com https://*.paypal.com",
+            "connect-src 'self' https://*.supabase.co https://api.stripe.com",
+            "frame-src 'self' https://js.stripe.com",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",
@@ -149,7 +149,6 @@ def create_app() -> Flask:
     import routes.catalogo as catalogo_module
     import routes.admin as admin_module
     import routes.stripe_routes as stripe_module
-    import routes.paypal_routes as paypal_module
     import routes.contato as contato_module
     import routes.download as download_module
     import routes.landing as landing_module
@@ -166,7 +165,6 @@ def create_app() -> Flask:
     catalogo_bp = catalogo_module.catalogo_bp
     admin_bp = admin_module.admin_bp
     stripe_bp = stripe_module.stripe_bp
-    paypal_bp = paypal_module.paypal_bp
     contato_bp = contato_module.contato_bp
     download_bp = download_module.download_bp
     landing_bp = landing_module.landing_bp
@@ -184,7 +182,6 @@ def create_app() -> Flask:
     app.register_blueprint(stripe_bp, url_prefix="/api/stripe")
     from routes.stripe_connect import connect_bp
     app.register_blueprint(connect_bp, url_prefix="/api/connect")
-    app.register_blueprint(paypal_bp, url_prefix="/api/paypal")
     app.register_blueprint(contato_bp, url_prefix="/api/contato")
     app.register_blueprint(download_bp, url_prefix="/api")
     from routes.dossie import dossie_bp

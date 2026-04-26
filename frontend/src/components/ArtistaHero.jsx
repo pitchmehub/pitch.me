@@ -125,7 +125,6 @@ export default function ArtistaHero({
             fontSize: 12, color: '#3F3F46', marginTop: 6,
             display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
           }}>
-            {perfil.nivel && <><span style={{ fontWeight: 600 }}>{perfil.nivel}</span><span>·</span></>}
             <span>{totalObras} obra{totalObras !== 1 ? 's' : ''}</span>
           </div>
           {perfil.bio && (

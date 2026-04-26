@@ -80,7 +80,7 @@ export default function PerfilPublico() {
     try {
       const { data: p, error: ePerfil } = await supabase
         .from('perfis')
-        .select('id, nome, nome_artistico, avatar_url, capa_url, nivel, role, bio, plano, status_assinatura')
+        .select('id, nome, nome_artistico, avatar_url, capa_url, role, bio, plano, status_assinatura')
         .eq('id', perfilId)
         .maybeSingle()
       if (ePerfil) throw new Error(ePerfil.message)
@@ -88,7 +88,7 @@ export default function PerfilPublico() {
 
       const { data: coa } = await supabase
         .from('coautorias')
-        .select('obra_id, is_titular, share_pct, obras(id, nome, genero, preco_cents, audio_path, status, titular_id, cover_url, perfis!titular_id(nome, nome_artistico, nivel))')
+        .select('obra_id, is_titular, share_pct, obras(id, nome, genero, preco_cents, audio_path, status, titular_id, cover_url, perfis!titular_id(nome, nome_artistico))')
         .eq('perfil_id', perfilId)
         .limit(60)
 
@@ -97,7 +97,6 @@ export default function PerfilPublico() {
         .map(c => ({
           ...c.obras,
           titular_nome: c.obras?.perfis?.nome_artistico || c.obras?.perfis?.nome,
-          titular_nivel: c.obras?.perfis?.nivel,
         }))
 
       setPerfil(p)

@@ -99,7 +99,6 @@ function CompositorCard({ compositor, onSelect, isAdmin, navigate }) {
  {compositor.avatar_url ? <img src={compositor.avatar_url} alt={compositor.nome} /> : iniciais}
  </div>
  <div className="dc-comp-nome">{compositor.nome_artistico || compositor.nome}</div>
- <div className="dc-comp-nivel">{compositor.nivel}</div>
  {isAdmin && (
  <button
  onClick={e => { e.stopPropagation(); navigate(`/perfil/${compositor.id}`) }}
@@ -214,14 +213,13 @@ export default function Descoberta() {
  try {
  const { data } = await supabase
  .from('historico_escuta')
- .select('obra_id, ouvido_em, obras(id, nome, genero, preco_cents, audio_path, status, titular_id, cover_url, perfis!titular_id(nome, nome_artistico, nivel))')
+ .select('obra_id, ouvido_em, obras(id, nome, genero, preco_cents, audio_path, status, titular_id, cover_url, perfis!titular_id(nome, nome_artistico))')
  .eq('perfil_id', perfil.id)
  .order('ouvido_em', { ascending: false })
  .limit(40)
  setBiblioteca((data ?? []).filter(h => h.obras).map(h => ({
  ...h.obras,
  titular_nome: h.obras?.perfis?.nome_artistico || h.obras?.perfis?.nome,
- titular_nivel: h.obras?.perfis?.nivel,
  })))
  } finally { setLoadBib(false) }
  }
@@ -247,7 +245,7 @@ export default function Descoberta() {
  const [obras, comps, eds] = await Promise.all([
  api.get(`/catalogo/?q=${encodeURIComponent(q)}&per_page=12`).catch(() => []),
  supabase.from('perfis')
- .select('id, nome, nome_artistico, avatar_url, capa_url, nivel, role, bio')
+ .select('id, nome, nome_artistico, avatar_url, capa_url, role, bio')
  .eq('role', 'compositor')
  .or(`nome.ilike.%${q}%,nome_artistico.ilike.%${q}%`)
  .limit(8).then(r => r.data ?? []).catch(() => []),

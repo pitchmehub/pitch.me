@@ -94,7 +94,6 @@ export default function AdminEditoraDetalhe() {
  <Row key={a.id} onClick={() => navigate(`/perfil/${a.id}`)}>
  <strong>{a.nome_artistico || a.nome}</strong>
  <span style={{ color: '#71717A' }}>{a.email || '—'}</span>
- <span style={{ color: '#71717A', fontSize: 11 }}>{a.nivel || ''}</span>
  </Row>
  ))}
  </Section>

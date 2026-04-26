@@ -165,7 +165,7 @@ class ObraService:
     def catalogo_publico(self, genero: str | None = None, page: int = 1, per_page: int = 20) -> list[dict]:
         query = (
             self.sb.table("obras")
-            .select("id, nome, genero, preco_cents, titular_id, cover_url, perfis(nome, nivel)")
+            .select("id, nome, genero, preco_cents, titular_id, cover_url, perfis(nome)")
             .eq("status", "publicada")
             .order("created_at", desc=True)
             .range((page - 1) * per_page, page * per_page - 1)

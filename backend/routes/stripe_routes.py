@@ -105,17 +105,20 @@ def criar_checkout():
     # Se houver oferta, usa o valor pactuado (sobrescreve preco_cents)
     valor_unit = oferta["valor_cents"] if oferta else obra["preco_cents"]
 
-    # Nome e plano do compositor titular (fee depende do plano)
+    # Nome, plano e editora do compositor titular (fee depende do plano;
+    # 10% adicional vai para a editora vinculada, se existir)
     try:
-        titular = sb.table("perfis").select("nome, plano, status_assinatura").eq("id", obra["titular_id"]).single().execute()
+        titular = sb.table("perfis").select(
+            "nome, plano, status_assinatura, publisher_id"
+        ).eq("id", obra["titular_id"]).single().execute()
         t_data = titular.data or {}
     except Exception:
-        # Coluna `plano` pode não existir ainda (migração pendente). Usa defaults.
         titular = sb.table("perfis").select("nome").eq("id", obra["titular_id"]).single().execute()
-        t_data = {**(titular.data or {}), "plano": "STARTER", "status_assinatura": "inativa"}
+        t_data = {**(titular.data or {}), "plano": "STARTER", "status_assinatura": "inativa", "publisher_id": None}
     titular_nome  = t_data.get("nome", "Gravan")
     plano_titular = t_data.get("plano", "STARTER")
     status_ass    = t_data.get("status_assinatura", "inativa")
+    publisher_id  = t_data.get("publisher_id")
     # PRO efetivo apenas com assinatura em dia
     if plano_titular == "PRO" and status_ass not in ("ativa", "cancelada", "past_due"):
         plano_titular = "STARTER"
@@ -128,7 +131,12 @@ def criar_checkout():
         coautorias = [{"perfil_id": obra["titular_id"], "share_pct": 100}]
 
     try:
-        split = calcular_split(valor_unit, coautorias, plano_titular=plano_titular)
+        split = calcular_split(
+            valor_unit,
+            coautorias,
+            plano_titular=plano_titular,
+            publisher_id=publisher_id,
+        )
     except ValueError as e:
         abort(422, description=str(e))
 

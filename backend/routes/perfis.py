@@ -165,8 +165,13 @@ def dashboard_compositor():
     """Estatisticas agregadas do compositor para a dashboard."""
     sb = get_supabase()
 
-    perfil = sb.table("perfis").select("id, nome, nivel").eq("id", g.user.id).maybe_single().execute()
-    nivel = ((perfil.data if perfil else None) or {}).get("nivel") or "ouro"
+    perfil = sb.table("perfis").select(
+        "id, nome, plano, status_assinatura"
+    ).eq("id", g.user.id).maybe_single().execute()
+    p_data = (perfil.data if perfil else None) or {}
+    plano_efetivo = p_data.get("plano", "STARTER")
+    if plano_efetivo == "PRO" and p_data.get("status_assinatura") not in ("ativa", "cancelada", "past_due"):
+        plano_efetivo = "STARTER"
 
     # Todas as obras em que o usuario eh titular ou coautor
     coaut = sb.table("coautorias").select("obra_id, is_titular, obras(id, nome, status, preco_cents, created_at, genero, audio_path)").eq("perfil_id", g.user.id).execute()
@@ -204,15 +209,15 @@ def dashboard_compositor():
     saques = sb.table("saques").select("valor_cents, status").eq("perfil_id", g.user.id).execute()
     total_sacado = sum(s["valor_cents"] for s in (saques.data or []) if s.get("status") == "pago")
 
-    # Limites de preco por nivel
-    preco_min = 50000
-    preco_max = 1000000 if nivel == "diamante" else 300000
+    # Limites de preço por plano (Free vs PRO)
+    preco_min = 100
+    preco_max = 1000000 if plano_efetivo == "PRO" else 100000
 
     # Ordena obras por data (mais recente primeiro)
     obras_sorted = sorted(obras, key=lambda x: x.get("created_at") or "", reverse=True)
 
     return jsonify({
-        "nivel":            nivel,
+        "plano":            plano_efetivo,
         "preco_min_cents":  preco_min,
         "preco_max_cents":  preco_max,
         "total_obras":      total_obras,

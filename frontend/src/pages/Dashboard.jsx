@@ -9,24 +9,6 @@ function fmt(cents) {
  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((cents ?? 0) / 100)
 }
 
-/* ── Configuração dos níveis ─────────────────────────────── */
-const NIVEL_INFO = {
- ouro: {
- label: ' Ouro',
- bg: 'linear-gradient(135deg, #b8860b 0%, #f5c842 100%)',
- glow: 'rgba(245,200,66,.25)',
- texto: 'Licenciamento de R$ 500 a R$ 3.000',
- proximoNivel: 'Venda 6 obras para desbloquear o nível Diamante (licenciamento até R$ 10.000).',
- },
- diamante: {
- label: ' Diamante',
- bg: 'linear-gradient(135deg, #083257 0%, #09090B 100%)',
- glow: 'rgba(12,68,124,.25)',
- texto: 'Licenciamento de R$ 500 a R$ 10.000',
- proximoNivel: 'Você está no nível máximo! Continue publicando composições de alta qualidade.',
- },
-}
-
 /* ── Status das obras ────────────────────────────────────── */
 const STATUS_STYLE = {
  publicada: { bg: 'rgba(34,197,94,.12)', cor: '#22c55e', label: '✓ Publicada' },
@@ -138,7 +120,6 @@ export default function Dashboard() {
  )
  }
 
- const nivelInfo = NIVEL_INFO[data.nivel] ?? NIVEL_INFO.ouro
  const segundosDesde = Math.floor((Date.now() - lastUpdate) / 1000)
 
  return (
@@ -176,52 +157,6 @@ export default function Dashboard() {
  <button className="btn btn-primary" onClick={() => navigate('/obras/nova')}>
  + Nova obra
  </button>
- </div>
-
- {/* ── Card de nível ──────────────────── */}
- <div style={{
- padding: '22px 24px', marginBottom: 24,
- background: nivelInfo.bg, color: '#fff',
- borderRadius: 16,
- boxShadow: `0 8px 40px ${nivelInfo.glow}`,
- position: 'relative', overflow: 'hidden',
- }}>
- {/* Ruído de fundo */}
- <div style={{
- position: 'absolute', inset: 0, opacity: .04,
- backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
- pointerEvents: 'none',
- }} />
-
- <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', position: 'relative' }}>
- <div style={{ fontSize: 36 }}>{nivelInfo.label.split(' ')[0]}</div>
- <div style={{ flex: 1, minWidth: 200 }}>
- <div style={{ fontSize: 11, fontWeight: 700, opacity: .7, textTransform: 'uppercase', letterSpacing: '.1em' }}>
- Seu nível de compositor
- </div>
- <div style={{ fontSize: 22, fontWeight: 900, marginTop: 2, letterSpacing: '-.5px' }}>
- {nivelInfo.label.split(' ').slice(1).join(' ')}
- </div>
- <div style={{ fontSize: 13, opacity: .85, marginTop: 4 }}>{nivelInfo.texto}</div>
- </div>
- <div style={{
- padding: '8px 16px',
- background: 'rgba(0,0,0,.25)',
- borderRadius: 99, fontSize: 13, fontWeight: 600,
- backdropFilter: 'blur(8px)',
- border: '1px solid rgba(9,9,11,.1)',
- }}>
- {data.total_vendas} venda{data.total_vendas !== 1 ? 's' : ''} confirmada{data.total_vendas !== 1 ? 's' : ''}
- </div>
- </div>
-
- <div style={{
- marginTop: 14, fontSize: 13, padding: '10px 14px',
- background: 'rgba(0,0,0,.2)', borderRadius: 10,
- backdropFilter: 'blur(8px)', position: 'relative',
- }}>
- {nivelInfo.proximoNivel}
- </div>
  </div>
 
  {/* ── Stats grid ─────────────────────── */}

@@ -18,7 +18,7 @@ def listar():
     sb = get_supabase()
     r = (
         sb.table("favoritos")
-          .select("id, created_at, obras(id, nome, genero, preco_cents, titular_id, status, perfis(nome, nivel))")
+          .select("id, created_at, obras(id, nome, genero, preco_cents, titular_id, status, perfis(nome))")
           .eq("perfil_id", g.user.id)
           .order("created_at", desc=True)
           .execute()

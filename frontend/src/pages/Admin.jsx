@@ -308,10 +308,6 @@ export default function Admin() {
  </span>
  </div>
 
- <div style={{ padding: 10, background: 'var(--surface)', borderRadius: 8, marginBottom: 10, fontSize: 13 }}>
- <strong>PayPal:</strong> <code>{s.paypal_email}</code>
- </div>
-
  {s.motivo_rejeicao && (
  <div style={{ padding: 10, background: 'var(--error-bg)', borderRadius: 8, marginBottom: 10, fontSize: 12, color: 'var(--error)' }}>
  <strong>Motivo da rejeição:</strong> {s.motivo_rejeicao}

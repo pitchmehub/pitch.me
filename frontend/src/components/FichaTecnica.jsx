@@ -50,7 +50,7 @@ export default function FichaTecnica({ obra, onClose }) {
     async function load() {
       const { data } = await supabase
         .from('coautorias')
-        .select('share_pct, perfis(id, nome, nome_artistico, avatar_url, nivel, plano, status_assinatura)')
+        .select('share_pct, perfis(id, nome, nome_artistico, avatar_url, plano, status_assinatura)')
         .eq('obra_id', obra.id)
       setCoautores(data ?? [])
     }
@@ -137,7 +137,6 @@ export default function FichaTecnica({ obra, onClose }) {
                       {c.perfis?.nome_artistico || c.perfis?.nome}
                       <SeloPro ativo={isPerfilPro(c.perfis)} size="sm" />
                     </div>
-                    <div className="dc-modal-comp-nivel">{c.perfis?.nivel}</div>
                   </div>
                 </div>
               )

@@ -343,7 +343,7 @@ def gerar_contrato_trilateral_agregado(
     ip_remote: str | None = None,
 ) -> dict | None:
     """
-    Gera o contrato TRILATERAL para uma transação direta (Stripe/PayPal) quando
+    Gera o contrato TRILATERAL para uma transação direta (Stripe) quando
     o titular da obra é AGREGADO de uma editora cadastrada na plataforma
     (perfis.publisher_id preenchido).
 
@@ -397,6 +397,18 @@ def gerar_contrato_trilateral_agregado(
         editora.get("endereco_cidade"), editora.get("endereco_uf"),
     ])) or "Não informado"
 
+    # Cláusula adicional para o caso AGREGADO: 10% creditado automaticamente
+    # à editora-mãe diretamente pela GRAVAN.
+    clausula_split_editora = (
+        "\n\nNos termos do contrato de agregação vigente entre AUTOR(ES) e EDITORA, "
+        "a GRAVAN, na qualidade de plataforma intermediária, fica autorizada e "
+        "obrigada a creditar automaticamente, em cada licenciamento desta obra, "
+        "o percentual de 10% (dez por cento) do valor pago pelo LICENCIADO "
+        "diretamente à EDITORA, sendo o saldo remanescente, deduzida a taxa de "
+        "intermediação da GRAVAN, distribuído ao(s) AUTOR(ES) conforme o split "
+        "declarado na Cláusula 7."
+    )
+
     conteudo = (TEMPLATE_TRILATERAL
         .replace("{{autores_bloco}}",          "\n".join(autores_bloco).strip())
         .replace("{{editora_razao}}",          editora.get("razao_social") or editora.get("nome_completo") or editora.get("nome") or "—")
@@ -412,6 +424,7 @@ def gerar_contrato_trilateral_agregado(
         .replace("{{obra_letra}}",             (obra.get("letra") or "").strip() or "—")
         .replace("{{valor_buyout_extenso}}",   _moeda(tx["valor_cents"]))
         .replace("{{split_lista}}",            "\n".join(split_lista))
+        .replace("{{clausula_split_editora}}", clausula_split_editora)
         .replace("{{data_emissao}}",           datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
     )
     content_hash = hashlib.sha256(conteudo.encode("utf-8")).hexdigest()
@@ -565,7 +578,7 @@ CLÁUSULA 3 — VALOR E ESCROW
 O LICENCIADO pagará pelo licenciamento o valor de {{valor_buyout_extenso}},
 retido em escrow pela GRAVAN até a assinatura eletrônica de todas as partes.
 A liberação do valor ocorre após a assinatura final, sendo distribuído conforme
-contratos prévios entre AUTOR(ES) e EDITORA TERCEIRA.
+contratos prévios entre AUTOR(ES) e EDITORA.{{clausula_split_editora}}
 
 CLÁUSULA 4 — DECLARAÇÃO DA EDITORA TERCEIRA
 
@@ -678,6 +691,7 @@ def gerar_contrato_trilateral(oferta_id: str) -> dict | None:
         .replace("{{obra_letra}}",             (obra.get("letra") or "").strip() or "—")
         .replace("{{valor_buyout_extenso}}",   _moeda(of["valor_cents"]))
         .replace("{{split_lista}}",            "\n".join(split_lista))
+        .replace("{{clausula_split_editora}}", "")
         .replace("{{data_emissao}}",           datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
     )
     content_hash = hashlib.sha256(conteudo.encode("utf-8")).hexdigest()

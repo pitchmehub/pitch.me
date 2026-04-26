@@ -114,9 +114,8 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-.pm-nivel-prata   { background: var(--surface-2); color: var(--text-secondary); }
-.pm-nivel-ouro    { background: #FEF3C7; color: #92400E; border-color: #FCD34D; }
-.pm-nivel-diamante{ background: var(--brand-light); color: var(--brand); border-color: var(--brand-border); }
+.pm-plano-free { background: var(--surface-2); color: var(--text-secondary); }
+.pm-plano-pro  { background: var(--brand-light); color: var(--brand); border-color: var(--brand-border); }
 
 .pm-divider { height: 1px; background: var(--border); margin: 4px 0; }
 

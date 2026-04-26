@@ -1,7 +1,23 @@
 # Gravan — Marketplace de Obras Musicais
 
 ## Visão Geral
-Plataforma premium que conecta compositores e compradores de obras musicais com suporte a pagamentos via Stripe e PayPal, autenticação via Supabase, e transcrição de áudio com faster-whisper.
+Plataforma premium que conecta compositores e compradores de obras musicais com pagamentos via Stripe (PayPal removido em abr/2026), autenticação via Supabase, e transcrição de áudio com faster-whisper.
+
+### Modelo Comercial (atualizado abr/2026)
+- **Planos de compositor:** apenas duas categorias — **Free (STARTER)** e **PRO**.
+  O sistema antigo de "níveis" (prata / ouro / diamante) foi removido.
+- **Taxa da plataforma sobre cada licenciamento:**
+  - Titular Free → 20% Gravan, 80% para os autores
+  - Titular PRO  → 15% Gravan, 85% para os autores
+- **Editora vinculada (publisher):** quando o titular da obra está agregado a uma
+  editora cadastrada na Gravan (`perfis.publisher_id` preenchido), a editora
+  recebe automaticamente **10% do valor da venda** em cada licenciamento. O
+  saldo remanescente, depois da taxa Gravan e dos 10% da editora, é distribuído
+  entre os coautores conforme o split declarado. Implementado em
+  `backend/services/finance.py::calcular_split` e
+  `backend/services/repasses.py` (cobre tanto o crédito em wallet quanto os
+  Transfers via Stripe Connect). A cláusula correspondente é injetada no
+  contrato trilateral agregado em `backend/services/contrato_licenciamento.py`.
 
 ## Arquitetura
 
@@ -16,7 +32,7 @@ Plataforma premium que conecta compositores e compradores de obras musicais com 
 - Entrada: `backend/app.py` → `create_app()`
 - Autenticação: Supabase Auth (JWT verificado no middleware `backend/middleware/auth.py`)
 - Banco de dados: Supabase (PostgreSQL)
-- Pagamentos: Stripe + PayPal
+- Pagamentos: Stripe (PayPal removido — abr/2026)
 - Rate limiting: Flask-Limiter (Redis ou memória)
 - Segurança: Flask-WTF CSRF, CORS configurado, headers de segurança
 
@@ -37,8 +53,6 @@ Plataforma premium que conecta compositores e compradores de obras musicais com 
 - `STRIPE_SECRET_KEY` — Chave secreta do Stripe
 - `STRIPE_WEBHOOK_SECRET` — Secret do webhook Stripe
 - `STRIPE_CONNECT_WEBHOOK_SECRET` — Secret do webhook Stripe Connect
-- `PAYPAL_CLIENT_ID` — Client ID do PayPal
-- `PAYPAL_CLIENT_SECRET` — Client Secret do PayPal
 
 ### Env Vars (configuradas no Replit userenv.shared)
 - `FLASK_SECRET_KEY` — Chave secreta Flask para sessões
@@ -61,7 +75,6 @@ Todos os blueprints registrados com prefixo `/api/*`:
 - `/api/catalogo` — Catálogo público
 - `/api/transacoes` — Transações
 - `/api/stripe` — Webhooks e pagamentos Stripe
-- `/api/paypal` — Webhooks e pagamentos PayPal
 - `/api/admin` — Painel administrativo
 - `/api/analytics` — Métricas
 - `/api/assinatura` — Assinaturas

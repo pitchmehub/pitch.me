@@ -41,7 +41,7 @@
         "title": "Faça upload do seu MP3"
       },
       {
-        "text": "Split automático, relatórios e pagamentos via Stripe/PayPal.",
+        "text": "Split automático, relatórios e pagamentos via Stripe.",
         "title": "Receba a cada venda"
       }
     ],
@@ -75,7 +75,7 @@
       {
         "label": "02 / PAGAMENTOS",
         "text": "Checkout em BRL e USD. Repasse automático e relatórios fiscais.",
-        "title": "Stripe & PayPal"
+        "title": "Stripe"
       },
       {
         "label": "03 / SEGURANÇA",
