@@ -12,6 +12,7 @@ const ABAS = [
  { id: 'receita', label: 'Receita', icon: '' },
  { id: 'obras', label: 'Obras', icon: '' },
  { id: 'generos', label: 'Gêneros mais procurados', icon: '' },
+ { id: 'contratos', label: 'Contratos', icon: '' },
  { id: 'saques', label: 'Autorizar saques', icon: '' },
  { id: 'auditoria', label: 'Auditoria de splits', icon: '' },
  { id: 'seguranca', label: 'Segurança', icon: '' },
@@ -203,6 +204,9 @@ export default function Admin() {
 
  {/* ── OBRAS ── (lista todas as obras + GERAR / BAIXAR DOSSIÊ) */}
  {aba === 'obras' && <ObrasPanel />}
+
+ {/* ── CONTRATOS ── (todos os contratos da plataforma em vigor) */}
+ {aba === 'contratos' && <ContratosPanel />}
 
  {/* ── GÊNEROS ── */}
  {aba === 'generos' && (
@@ -741,5 +745,202 @@ function SecurityPanel() {
  </>
  )}
  </div>
+ )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PAINEL DE CONTRATOS (admin)
+// Lista TODOS os contratos da plataforma (licenciamento + edição) com
+// botão de atualização manual. "Em vigor" = concluído ou assinado.
+// ═══════════════════════════════════════════════════════════════════
+function ContratosPanel() {
+ const [data, setData] = useState(null)
+ const [loading, setLoading] = useState(true)
+ const [erro, setErro] = useState('')
+ const [filtro, setFiltro] = useState('em_vigor')   // em_vigor | pendente | todos
+ const [busca, setBusca] = useState('')
+
+ async function load() {
+  setLoading(true); setErro('')
+  try {
+   const r = await api.get('/admin/contratos')
+   setData(r)
+  } catch (e) { setErro(e.message) }
+  finally { setLoading(false) }
+ }
+ useEffect(() => { load() }, [])
+
+ function statusBadge(tipo, st) {
+  // Mapa de cores por status (compartilhado entre licenciamento e edição)
+  const map = {
+   concluido:        { bg: 'var(--success-bg)', cor: 'var(--success)', label: '✓ Em vigor' },
+   'concluído':      { bg: 'var(--success-bg)', cor: 'var(--success)', label: '✓ Em vigor' },
+   assinado:         { bg: 'var(--success-bg)', cor: 'var(--success)', label: '✓ Em vigor' },
+   assinado_parcial: { bg: '#E8F4FD', cor: '#0C5494',         label: '◐ Parcialmente assinado' },
+   pendente:         { bg: 'var(--warning-bg)', cor: 'var(--warning)', label: '⏱ Pendente' },
+   cancelado:        { bg: 'var(--error-bg)', cor: 'var(--error)',     label: '✕ Cancelado' },
+  }
+  const m = map[st] || { bg: 'var(--surface-2)', cor: 'var(--text-muted)', label: st || '—' }
+  return (
+   <span style={{
+    fontSize: 11, fontWeight: 700, padding: '2px 8px',
+    background: m.bg, color: m.cor, borderRadius: 99,
+   }}>{m.label}</span>
+  )
+ }
+
+ const itens = (data?.itens || [])
+ const filtrados = itens.filter(c => {
+  // Filtro de status
+  if (filtro === 'em_vigor') {
+   const ok = (c.tipo === 'licenciamento' && (c.status === 'concluido' || c.status === 'concluído'))
+           || (c.tipo === 'edicao' && c.status === 'assinado')
+   if (!ok) return false
+  } else if (filtro === 'pendente') {
+   if (!['pendente', 'assinado_parcial', 'assinado'].includes(c.status)) return false
+   // No licenciamento, "assinado" é parcial; no edicao, "assinado" é final.
+   if (c.tipo === 'edicao' && c.status === 'assinado') return false
+  }
+  // Busca textual
+  if (busca.trim()) {
+   const q = busca.trim().toLowerCase()
+   const blob = [
+    c.id, c.obra_nome, c.obra_id,
+    c.vendedor?.nome, c.comprador?.nome,
+    c.autor?.nome, c.editora?.nome,
+   ].filter(Boolean).join(' ').toLowerCase()
+   if (!blob.includes(q)) return false
+  }
+  return true
+ })
+
+ return (
+  <div className="card">
+   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 12 }}>
+    <div>
+     <h2 style={{ fontSize: 15, fontWeight: 700 }}>Contratos da plataforma</h2>
+     <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+      {data
+       ? <>Total: <strong>{data.total}</strong> · em vigor: <strong style={{ color: 'var(--success)' }}>{data.em_vigor}</strong> · pendentes: <strong style={{ color: 'var(--warning)' }}>{data.pendentes}</strong></>
+       : 'Carregando…'}
+     </p>
+    </div>
+    <button onClick={load} disabled={loading}
+     style={{ background: 'none', border: '1px solid var(--border)', padding: '6px 12px', borderRadius: 8, color: 'var(--brand)', fontSize: 13, cursor: loading ? 'wait' : 'pointer' }}>
+     ↻ {loading ? 'atualizando…' : 'atualizar agora'}
+    </button>
+   </div>
+
+   {/* Filtros rápidos */}
+   <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+    {[
+     { id: 'em_vigor', label: 'Em vigor' },
+     { id: 'pendente', label: 'Pendentes' },
+     { id: 'todos',    label: 'Todos' },
+    ].map(b => (
+     <button key={b.id} onClick={() => setFiltro(b.id)}
+      style={{
+       padding: '6px 12px', borderRadius: 99, fontSize: 12, fontWeight: 600,
+       cursor: 'pointer',
+       background: filtro === b.id ? 'var(--brand)' : 'transparent',
+       color:      filtro === b.id ? '#fff' : 'var(--text-secondary)',
+       border:     filtro === b.id ? '1px solid var(--brand)' : '1px solid var(--border)',
+      }}>{b.label}</button>
+    ))}
+    <input
+     type="search" value={busca} onChange={e => setBusca(e.target.value)}
+     placeholder="Buscar por obra, parte, ID…"
+     className="input"
+     style={{ flex: '1 1 240px', minWidth: 200, fontSize: 13, padding: '6px 12px' }}
+    />
+   </div>
+
+   {erro && <p style={{ color: 'var(--error)', fontSize: 13 }}>{erro}</p>}
+   {loading && !data && <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Carregando contratos…</p>}
+
+   {!loading && filtrados.length === 0 && (
+    <div style={{
+     padding: 36, textAlign: 'center', color: 'var(--text-muted)',
+     border: '1px dashed var(--border)', borderRadius: 10, fontSize: 13,
+    }}>
+     {itens.length === 0
+      ? 'Nenhum contrato cadastrado na plataforma ainda.'
+      : 'Nenhum contrato encontrado com esses filtros.'}
+    </div>
+   )}
+
+   {filtrados.length > 0 && (
+    <div style={{ overflowX: 'auto' }}>
+     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+      <thead>
+       <tr style={{ borderBottom: '1px solid var(--border)' }}>
+        {['Tipo', 'Obra', 'Partes', 'Valor / Split', 'Status', 'Data', 'Ações'].map(h => (
+         <th key={h} style={{ padding: '10px', textAlign: 'left', color: 'var(--text-muted)', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, whiteSpace: 'nowrap' }}>{h}</th>
+        ))}
+       </tr>
+      </thead>
+      <tbody>
+       {filtrados.map(c => (
+        <tr key={c.id} style={{ borderBottom: '1px solid var(--border)' }}>
+         <td style={{ padding: '10px' }}>
+          <span style={{
+           fontSize: 10, fontWeight: 700, padding: '2px 8px',
+           background: c.tipo === 'licenciamento' ? 'var(--brand-light)' : '#FEF3C7',
+           color:      c.tipo === 'licenciamento' ? 'var(--brand)'       : '#92400E',
+           borderRadius: 4, textTransform: 'uppercase', letterSpacing: 1,
+          }}>{c.tipo === 'licenciamento' ? 'Licenc.' : 'Edição'}</span>
+          {c.trilateral && (
+           <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>trilateral</div>
+          )}
+         </td>
+         <td style={{ padding: '10px' }}>
+          <div style={{ fontWeight: 600 }}>{c.obra_nome || '(sem nome)'}</div>
+          <code style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+           {(c.id || '').slice(0, 8)}
+          </code>
+         </td>
+         <td style={{ padding: '10px', fontSize: 12, lineHeight: 1.5 }}>
+          {c.tipo === 'licenciamento' ? (
+           <>
+            <div><strong>Vendedor:</strong> {c.vendedor?.nome || '—'}</div>
+            <div><strong>Comprador:</strong> {c.comprador?.nome || '—'}</div>
+           </>
+          ) : (
+           <>
+            <div>
+             <strong>Autor:</strong> {c.autor?.nome || '—'}
+             {c.autor?.assinou && <span style={{ marginLeft: 6, color: 'var(--success)' }}>✓</span>}
+            </div>
+            <div>
+             <strong>Editora:</strong> {c.editora?.nome || '—'}
+             {c.editora?.assinou && <span style={{ marginLeft: 6, color: 'var(--success)' }}>✓</span>}
+            </div>
+           </>
+          )}
+         </td>
+         <td style={{ padding: '10px', whiteSpace: 'nowrap', fontWeight: 700 }}>
+          {c.tipo === 'licenciamento'
+           ? <span style={{ color: 'var(--brand)' }}>{fmt(c.valor_cents)}</span>
+           : <span>{c.share_pct != null ? `${Number(c.share_pct).toFixed(0)}%` : '—'}</span>}
+         </td>
+         <td style={{ padding: '10px' }}>{statusBadge(c.tipo, c.status)}</td>
+         <td style={{ padding: '10px', whiteSpace: 'nowrap', color: 'var(--text-secondary)', fontSize: 12 }}>
+          {c.created_at ? new Date(c.created_at).toLocaleDateString('pt-BR') : '—'}
+         </td>
+         <td style={{ padding: '10px' }}>
+          {c.tipo === 'licenciamento' && (
+           <a href={`/contratos/licenciamento/${c.id}`}
+              style={{ color: 'var(--brand)', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
+            ver →
+           </a>
+          )}
+         </td>
+        </tr>
+       ))}
+      </tbody>
+     </table>
+    </div>
+   )}
+  </div>
  )
 }

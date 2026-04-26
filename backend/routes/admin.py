@@ -609,3 +609,139 @@ def historico_saques():
         ]
 
     return jsonify(saques), 200
+
+
+# ──────────────────────────── CONTRATOS ──────────────────────────────
+@admin_bp.route("/contratos", methods=["GET"])
+@require_auth
+def listar_contratos_admin():
+    """
+    Devolve TODOS os contratos da plataforma (licenciamento + edição) com
+    nomes das partes e da obra, em ordem decrescente de criação. Apenas
+    administradores. Usado pelo painel admin → aba "Contratos" para
+    auditoria. Aceita filtro opcional ?status=concluido|pendente|...
+    """
+    _check_admin()
+    sb = get_supabase()
+
+    status_fil = (request.args.get("status") or "").strip().lower()
+
+    # ── 1. Licenciamento ────────────────────────────────────────────
+    q_lic = (sb.table("contracts")
+               .select("id, obra_id, seller_id, buyer_id, valor_cents, status, "
+                       "created_at, completed_at, versao, trilateral, "
+                       "obras(nome)")
+               .order("created_at", desc=True)
+               .limit(500))
+    if status_fil:
+        q_lic = q_lic.eq("status", status_fil)
+    licenciamento = q_lic.execute().data or []
+
+    # ── 2. Edição ──────────────────────────────────────────────────
+    q_ed = (sb.table("contracts_edicao")
+              .select("id, obra_id, autor_id, publisher_id, share_pct, status, "
+                      "created_at, completed_at, "
+                      "signed_by_publisher_at, signed_by_autor_at, "
+                      "obras(nome)")
+              .order("created_at", desc=True)
+              .limit(500))
+    if status_fil:
+        q_ed = q_ed.eq("status", status_fil)
+    edicao = q_ed.execute().data or []
+
+    # ── 3. Resolve nomes de perfis em lote ─────────────────────────
+    perfil_ids = set()
+    for c in licenciamento:
+        if c.get("seller_id"): perfil_ids.add(c["seller_id"])
+        if c.get("buyer_id"):  perfil_ids.add(c["buyer_id"])
+    for c in edicao:
+        if c.get("autor_id"):     perfil_ids.add(c["autor_id"])
+        if c.get("publisher_id"): perfil_ids.add(c["publisher_id"])
+
+    perfil_map = {}
+    if perfil_ids:
+        try:
+            rows = (sb.table("perfis")
+                      .select("id, nome, nome_artistico, nome_completo, "
+                              "razao_social, nome_fantasia, email, role")
+                      .in_("id", list(perfil_ids))
+                      .execute()).data or []
+            perfil_map = {p["id"]: p for p in rows}
+        except Exception:
+            perfil_map = {}
+
+    def _nome(pid):
+        p = perfil_map.get(pid) or {}
+        return (p.get("nome_artistico")
+                or p.get("razao_social")
+                or p.get("nome_fantasia")
+                or p.get("nome_completo")
+                or p.get("nome")
+                or (p.get("email") or "—"))
+
+    itens = []
+
+    for c in licenciamento:
+        itens.append({
+            "tipo":            "licenciamento",
+            "id":              c["id"],
+            "status":          c.get("status"),
+            "valor_cents":     c.get("valor_cents"),
+            "created_at":      c.get("created_at"),
+            "completed_at":    c.get("completed_at"),
+            "versao":          c.get("versao"),
+            "trilateral":      c.get("trilateral", False),
+            "obra_id":         c.get("obra_id"),
+            "obra_nome":       (c.get("obras") or {}).get("nome"),
+            "vendedor": {
+                "id":   c.get("seller_id"),
+                "nome": _nome(c.get("seller_id")),
+            },
+            "comprador": {
+                "id":   c.get("buyer_id"),
+                "nome": _nome(c.get("buyer_id")),
+            },
+        })
+
+    for c in edicao:
+        itens.append({
+            "tipo":          "edicao",
+            "id":            c["id"],
+            "status":        c.get("status"),
+            "share_pct":     c.get("share_pct"),
+            "created_at":    c.get("created_at"),
+            "completed_at":  c.get("completed_at"),
+            "obra_id":       c.get("obra_id"),
+            "obra_nome":     (c.get("obras") or {}).get("nome"),
+            "autor": {
+                "id":      c.get("autor_id"),
+                "nome":    _nome(c.get("autor_id")),
+                "assinou": bool(c.get("signed_by_autor_at")),
+            },
+            "editora": {
+                "id":      c.get("publisher_id"),
+                "nome":    _nome(c.get("publisher_id")),
+                "assinou": bool(c.get("signed_by_publisher_at")),
+            },
+        })
+
+    # Ordena tudo junto pela data de criação mais recente
+    itens.sort(key=lambda x: x.get("created_at") or "", reverse=True)
+
+    # Estatísticas para o cabeçalho
+    em_vigor = sum(
+        1 for x in itens
+        if (x["tipo"] == "licenciamento" and x["status"] in ("concluido", "concluído"))
+        or (x["tipo"] == "edicao"        and x["status"] == "assinado")
+    )
+    pendentes = sum(
+        1 for x in itens
+        if x["status"] in ("pendente", "assinado_parcial", "assinado")
+    )
+
+    return jsonify({
+        "itens":     itens,
+        "total":     len(itens),
+        "em_vigor":  em_vigor,
+        "pendentes": pendentes,
+    }), 200

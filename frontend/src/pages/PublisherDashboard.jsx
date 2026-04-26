@@ -186,6 +186,168 @@ function OfertasPendentes() {
  )
 }
 
+function ContratosEditora() {
+ const [items, setItems] = useState(null)
+ const [erro, setErro] = useState('')
+ const [loading, setLoading] = useState(false)
+ const [assinando, setAssinando] = useState(null)
+
+ async function load() {
+   setLoading(true); setErro('')
+   try {
+     const d = await api.get('/contratos-edicao')
+     setItems(Array.isArray(d) ? d : [])
+   } catch (e) { setErro(e.message) }
+   finally { setLoading(false) }
+ }
+ useEffect(() => { load() }, [])
+
+ async function assinar(c) {
+   if (!confirm('Confirmar assinatura eletrônica deste contrato? Esta ação é registrada com data, hora e IP.')) return
+   setAssinando(c.id)
+   try {
+     await api.post(`/contratos-edicao/${c.id}/assinar`, {})
+     await load()
+   } catch (e) { alert('Erro ao assinar: ' + e.message) }
+   finally { setAssinando(null) }
+ }
+
+ const itens = items || []
+ // Pendentes para a editora assinar = status pendente OU assinado_parcial sem assinatura da editora
+ const pendentes = itens.filter(c =>
+   c.status === 'pendente' ||
+   (c.status === 'assinado_parcial' && !c.signed_by_publisher_at)
+ )
+ const aguardandoAutor = itens.filter(c =>
+   c.status === 'assinado_parcial' && c.signed_by_publisher_at && !c.signed_by_autor_at
+ )
+ const assinados = itens.filter(c => c.status === 'assinado')
+
+ function statusBadge(c) {
+   const map = {
+     pendente:         { bg: 'rgba(245,158,11,.15)', cor: '#d97706', label: '⏱ Aguardando assinaturas' },
+     assinado_parcial: { bg: 'rgba(8,145,178,.15)',  cor: '#0891b2', label: '◐ Parcialmente assinado' },
+     assinado:         { bg: 'rgba(34,197,94,.15)',  cor: '#16a34a', label: '✓ Assinado' },
+     cancelado:        { bg: 'rgba(107,114,128,.15)', cor: '#6b7280', label: '✕ Cancelado' },
+   }
+   const m = map[c.status] || { bg: 'var(--surface-2)', cor: 'var(--text-muted)', label: c.status }
+   return (
+     <span style={{ fontSize: 11, padding: '3px 9px', background: m.bg, color: m.cor, borderRadius: 99, fontWeight: 700, whiteSpace: 'nowrap' }}>
+       {m.label}
+     </span>
+   )
+ }
+
+ function Linha({ c }) {
+   const podeAssinar = !c.signed_by_publisher_at && c.status !== 'assinado' && c.status !== 'cancelado'
+   return (
+     <tr style={{ borderTop: '1px solid var(--border)' }}>
+       <td style={{ padding: '12px 14px' }}>
+         <div style={{ fontWeight: 600, fontSize: 13 }}>Obra <code style={{
+           fontFamily: 'monospace', fontSize: 11.5,
+           background: 'var(--surface-2)', padding: '1px 6px',
+           borderRadius: 4, border: '1px solid var(--border)',
+         }}>{(c.obra_id || '').slice(0, 8)}</code></div>
+         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+           Criado {fmtData(c.created_at)}
+         </div>
+       </td>
+       <td style={{ padding: '12px 14px' }}>{c.share_pct != null ? `${Number(c.share_pct).toFixed(0)}%` : '—'}</td>
+       <td style={{ padding: '12px 14px' }}>
+         <div style={{ fontSize: 11, color: c.signed_by_publisher_at ? 'var(--success)' : 'var(--text-muted)' }}>
+           {c.signed_by_publisher_at ? '✓ Editora assinou' : '○ Editora pendente'}
+         </div>
+         <div style={{ fontSize: 11, color: c.signed_by_autor_at ? 'var(--success)' : 'var(--text-muted)' }}>
+           {c.signed_by_autor_at ? '✓ Autor assinou' : '○ Autor pendente'}
+         </div>
+       </td>
+       <td style={{ padding: '12px 14px' }}>{statusBadge(c)}</td>
+       <td style={{ padding: '12px 14px', textAlign: 'right' }}>
+         {podeAssinar && (
+           <button
+             className="btn btn-primary"
+             disabled={assinando === c.id}
+             onClick={() => assinar(c)}
+             style={{ fontSize: 12, padding: '6px 12px' }}>
+             {assinando === c.id ? 'Assinando…' : 'Assinar contrato'}
+           </button>
+         )}
+       </td>
+     </tr>
+   )
+ }
+
+ function Tabela({ titulo, lista, vazio, destaque = false }) {
+   return (
+     <div style={{ marginBottom: 18 }}>
+       <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: destaque ? 'var(--warning)' : 'inherit' }}>
+         {titulo} {lista.length > 0 && <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>({lista.length})</span>}
+       </h3>
+       {lista.length === 0 ? (
+         <div style={{ padding: 14, fontSize: 12, color: 'var(--text-muted)', border: '1px dashed var(--border)', borderRadius: 10 }}>
+           {vazio}
+         </div>
+       ) : (
+         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
+           <div style={{ overflowX: 'auto' }}>
+             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+               <thead>
+                 <tr style={{ background: 'rgba(0,0,0,.04)', textAlign: 'left' }}>
+                   <th style={{ padding: '10px 14px', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em' }}>Contrato</th>
+                   <th style={{ padding: '10px 14px', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em' }}>Split</th>
+                   <th style={{ padding: '10px 14px', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em' }}>Assinaturas</th>
+                   <th style={{ padding: '10px 14px', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em' }}>Status</th>
+                   <th style={{ padding: '10px 14px', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.06em', textAlign: 'right' }}>Ação</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 {lista.map(c => <Linha key={c.id} c={c} />)}
+               </tbody>
+             </table>
+           </div>
+         </div>
+       )}
+     </div>
+   )
+ }
+
+ return (
+   <div style={{ marginBottom: 28 }}>
+     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+       <h2 style={{ fontSize: 18, fontWeight: 700 }}>Contratos da editora</h2>
+       <button onClick={load} disabled={loading}
+         style={{ background: 'none', border: '1px solid var(--border)', padding: '6px 12px', borderRadius: 8, color: 'var(--brand)', fontSize: 13, cursor: loading ? 'wait' : 'pointer' }}>
+         ↻ {loading ? 'atualizando…' : 'atualizar'}
+       </button>
+     </div>
+
+     {erro && <p style={{ color: '#c0392b', fontSize: 13 }}>{erro}</p>}
+     {!items && !erro && <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Carregando contratos…</p>}
+
+     {items && (
+       <>
+         <Tabela
+           titulo="Pendentes para a editora assinar"
+           lista={pendentes}
+           vazio="Nenhum contrato aguardando sua assinatura."
+           destaque
+         />
+         <Tabela
+           titulo="Aguardando assinatura do autor"
+           lista={aguardandoAutor}
+           vazio="Nenhum contrato aguardando assinatura do autor."
+         />
+         <Tabela
+           titulo="Contratos assinados"
+           lista={assinados}
+           vazio="Nenhum contrato totalmente assinado ainda."
+         />
+       </>
+     )}
+   </div>
+ )
+}
+
 function CartaoSaque() {
  const [wallet, setWallet] = useState(null)
 
@@ -264,6 +426,8 @@ export default function PublisherDashboard() {
  <StatCard label="Faturamento bruto" value={fmt(data.faturamento_cents)} accent />
  <StatCard label="Fee devido (5%)" value={fmt(data.fee_devido_cents)} sub="Plataforma GRAVAN" />
  </div>
+
+ <ContratosEditora />
 
  <HistoricoLicenciamentos />
 
