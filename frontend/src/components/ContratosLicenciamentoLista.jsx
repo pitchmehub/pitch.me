@@ -7,7 +7,23 @@ export default function ContratosLicenciamento() {
  const [loading, setLoading] = useState(true)
  const [erro, setErro] = useState('')
  const [sincronizando, setSincronizando] = useState(false)
+ const [baixandoDossie, setBaixandoDossie] = useState(null)
  const navigate = useNavigate()
+
+ async function baixarDossie(c) {
+ setBaixandoDossie(c.id)
+ try {
+ const slug = (c?.obras?.nome || 'obra').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)
+ await api.download(
+ `/contratos/licenciamento/${c.id}/dossie-licenca`,
+ `dossie-de-licenca-${slug}.zip`,
+ )
+ } catch (e) {
+ alert('Erro ao baixar Dossiê de Licença: ' + (e?.message || ''))
+ } finally {
+ setBaixandoDossie(null)
+ }
+ }
 
  async function reload() {
  try {
@@ -138,6 +154,23 @@ export default function ContratosLicenciamento() {
  style={{ fontSize: 12, padding: '6px 12px' }}
  onClick={() => navigate(`/contratos/licenciamento/${c.id}`)}
  >Abrir</button>
+ )}
+
+ {/* Dossiê de Licença — apenas para o comprador (intérprete) e contrato concluído */}
+ {concluido && (c.meu_papel === 'interprete' || c.meu_papel === 'intérprete') && (
+ <button
+ data-testid={`licenciamento-dossie-${i}`}
+ onClick={() => baixarDossie(c)}
+ disabled={baixandoDossie === c.id}
+ title="Baixar pacote ZIP com letra (PDF), áudio e contrato"
+ style={{
+ fontSize: 12, padding: '6px 12px', fontWeight: 700, borderRadius: 8,
+ background: 'linear-gradient(135deg,#083257,#0b1220)',
+ color: '#fff', border: 'none',
+ cursor: baixandoDossie === c.id ? 'wait' : 'pointer',
+ opacity: baixandoDossie === c.id ? .7 : 1,
+ }}
+ >{baixandoDossie === c.id ? 'Preparando…' : '↓ Dossiê de Licença'}</button>
  )}
  </div>
  </div>

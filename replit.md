@@ -7,6 +7,11 @@ Plataforma premium que conecta compositores e compradores de obras musicais com 
 
 ### Backend (`backend/`)
 - **Flask** (Python 3.11) rodando na porta **8000** via `python -m gunicorn`
+- Logo da marca em `backend/assets/gravan-logo.png` (usada nos PDFs premium)
+- Dossiê de Licença (cortesia ao comprador): `backend/services/dossie_licenca.py` →
+  ZIP com letra em PDF (logo + tipografia premium), MP3 da composição (bucket `obras-audio`)
+  e cópia do contrato. Rotas: `GET /api/contratos/licenciamento/<id>/dossie-licenca` (apenas
+  o `buyer_id`) e `GET /api/contratos/licenciamento/by-transacao/<id>` (lookup pós-pagamento).
 - Workflow: `cd backend && python -m gunicorn --bind=0.0.0.0:8000 --workers 2 --reuse-port 'app:create_app()'`
 - Entrada: `backend/app.py` → `create_app()`
 - Autenticação: Supabase Auth (JWT verificado no middleware `backend/middleware/auth.py`)

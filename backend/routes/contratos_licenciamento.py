@@ -1,12 +1,16 @@
 """Routes: /api/contratos/licenciamento — contratos de gravação/exploração."""
 import io
+import logging
 from flask import Blueprint, request, jsonify, g, abort, send_file
 from middleware.auth import require_auth
 from db.supabase_client import get_supabase
 from services.contrato_licenciamento import aceitar_contrato
 from services.contrato_pdf import gerar_pdf_contrato
+from services.dossie_licenca import gerar_zip_dossie_licenca
 from utils.crypto import hash_ip
 from app import limiter
+
+logger = logging.getLogger(__name__)
 
 contratos_lic_bp = Blueprint("contratos_lic", __name__)
 
@@ -123,6 +127,81 @@ def pdf(contract_id):
         buf, mimetype="application/pdf", as_attachment=True,
         download_name=f"contrato-licenciamento-{c['id'][:8]}.pdf",
     )
+
+
+@contratos_lic_bp.route("/<contract_id>/dossie-licenca", methods=["GET"])
+@require_auth
+@limiter.limit("10 per hour")
+def dossie_licenca(contract_id):
+    """
+    Faz o download do ZIP "Dossiê de Licença" — apenas o COMPRADOR pode baixar.
+    Inclui: Letra (PDF premium com logo), áudio MP3 e cópia do contrato.
+    """
+    try:
+        zip_bytes, filename = gerar_zip_dossie_licenca(contract_id, g.user.id)
+    except PermissionError as e:
+        abort(403, description=str(e))
+    except ValueError as e:
+        abort(404, description=str(e))
+    except Exception as e:
+        logger.exception("dossie_licenca: erro inesperado para contrato %s", contract_id)
+        abort(500, description=f"Falha ao gerar Dossiê de Licença: {e}")
+
+    return send_file(
+        io.BytesIO(zip_bytes),
+        mimetype="application/zip",
+        as_attachment=True,
+        download_name=filename,
+    )
+
+
+@contratos_lic_bp.route("/by-transacao/<transacao_id>", methods=["GET"])
+@require_auth
+def por_transacao(transacao_id):
+    """
+    Devolve o contrato associado a uma transação. Se o contrato ainda não tiver
+    sido criado (webhook atrasado), tenta gerá-lo on-demand. Apenas o comprador
+    ou o vendedor da transação podem consultar.
+    """
+    sb = get_supabase()
+    tx = sb.table("transacoes").select(
+        "id, status, comprador_id, obra_id, obras(titular_id)"
+    ).eq("id", transacao_id).limit(1).execute()
+    if not tx.data:
+        abort(404, description="Transação não encontrada.")
+    t = tx.data[0]
+    titular_id = (t.get("obras") or {}).get("titular_id")
+    if g.user.id not in {t.get("comprador_id"), titular_id}:
+        abort(403, description="Sem acesso a esta transação.")
+
+    # Já existe contrato?
+    c = sb.table("contracts").select(
+        "id, status, buyer_id, seller_id, trilateral"
+    ).eq("transacao_id", transacao_id).limit(1).execute()
+
+    if not c.data and t.get("status") == "confirmada":
+        # Tenta gerar o contrato agora (caso o webhook não tenha rodado)
+        try:
+            from services.contrato_licenciamento import gerar_contrato_licenciamento
+            gerar_contrato_licenciamento(transacao_id)
+            c = sb.table("contracts").select(
+                "id, status, buyer_id, seller_id, trilateral"
+            ).eq("transacao_id", transacao_id).limit(1).execute()
+        except Exception as e:
+            logger.warning("por_transacao: falha ao gerar contrato on-demand %s: %s", transacao_id, e)
+
+    if not c.data:
+        return jsonify({"contract_id": None, "disponivel": False}), 200
+
+    contract = c.data[0]
+    sou_comprador = contract.get("buyer_id") == g.user.id
+    return jsonify({
+        "contract_id":   contract["id"],
+        "status":        contract.get("status"),
+        "trilateral":    contract.get("trilateral", False),
+        "sou_comprador": sou_comprador,
+        "disponivel":    True,
+    }), 200
 
 
 @contratos_lic_bp.route("/sincronizar", methods=["POST"])

@@ -14,6 +14,8 @@ export default function PagamentoSucesso() {
  const [status, setStatus] = useState('verificando') // verificando | sucesso | erro
  const [dados, setDados] = useState(null)
  const [erro, setErro] = useState('')
+ const [contratoId, setContratoId] = useState(null)
+ const [baixandoDossie, setBaixandoDossie] = useState(false)
 
  useEffect(() => {
  if (!sessionId) { setStatus('erro'); setErro('Sessão inválida.'); return }
@@ -22,8 +24,16 @@ export default function PagamentoSucesso() {
  try {
  const resp = await api.get(`/stripe/sucesso/${sessionId}`)
  setDados(resp)
- if (resp.stripe_status === 'paid' || resp.transacao?.status === 'confirmada') {
+ const confirmado = resp.stripe_status === 'paid' || resp.transacao?.status === 'confirmada'
+ if (confirmado) {
  setStatus('sucesso')
+ const tid = resp?.transacao?.id
+ if (tid) {
+ try {
+ const c = await api.get(`/contratos/licenciamento/by-transacao/${tid}`)
+ if (c?.contract_id && c?.sou_comprador) setContratoId(c.contract_id)
+ } catch (_) { /* silencioso — botão fica oculto */ }
+ }
  } else {
  setStatus('aguardando')
  }
@@ -34,6 +44,22 @@ export default function PagamentoSucesso() {
  }
  verify()
  }, [sessionId])
+
+ async function baixarDossie() {
+ if (!contratoId) return
+ setBaixandoDossie(true)
+ try {
+ const slug = (dados?.obra_nome || 'obra').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)
+ await api.download(
+ `/contratos/licenciamento/${contratoId}/dossie-licenca`,
+ `dossie-de-licenca-${slug}.zip`,
+ )
+ } catch (e) {
+ alert('Erro ao baixar Dossiê de Licença: ' + (e?.message || ''))
+ } finally {
+ setBaixandoDossie(false)
+ }
+ }
 
  return (
  <div style={{ padding: 32, maxWidth: 520, margin: '40px auto', textAlign: 'center' }}>
@@ -89,6 +115,33 @@ export default function PagamentoSucesso() {
  ✓ Confirmado
  </span>
  </div>
+ </div>
+ )}
+
+ {contratoId && (
+ <div style={{
+ marginBottom: 16, padding: 16, textAlign: 'left',
+ background: 'linear-gradient(135deg, #083257 0%, #0b1220 100%)',
+ borderRadius: 14, color: '#fff',
+ boxShadow: '0 6px 24px rgba(8, 50, 87, 0.25)',
+ }}>
+ <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, opacity: .8, textTransform: 'uppercase', marginBottom: 6 }}>
+ Cortesia exclusiva
+ </div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>Dossiê de Licença</div>
+ <div style={{ fontSize: 12, opacity: .85, lineHeight: 1.5, marginBottom: 12 }}>
+ Pacote ZIP com a letra em PDF premium, o áudio MP3 da composição e a cópia do contrato assinado.
+ </div>
+ <button
+ data-testid="btn-baixar-dossie-licenca"
+ onClick={baixarDossie}
+ disabled={baixandoDossie}
+ style={{
+ background: '#fff', color: '#083257', border: 'none',
+ padding: '10px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700,
+ cursor: baixandoDossie ? 'wait' : 'pointer', opacity: baixandoDossie ? .7 : 1,
+ }}
+ >{baixandoDossie ? 'Preparando ZIP…' : '↓ Baixar Dossiê de Licença'}</button>
  </div>
  )}
 
