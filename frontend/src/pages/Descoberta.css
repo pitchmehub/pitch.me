@@ -202,7 +202,7 @@
 .dc-comp-card {
   display: flex; flex-direction: column; align-items: center;
   gap: 8px; cursor: pointer; padding: 12px 8px;
-  border-radius: 0; transition: background .15s; text-align: center;
+  border-radius: 14px; transition: background .15s; text-align: center;
 }
 .dc-comp-card:hover { background: var(--surface-2); }
 .dc-comp-avatar {
@@ -221,7 +221,7 @@
   margin-bottom: 24px; padding: 20px;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 0;
+  border-radius: 16px;
 }
 .dc-compositor-avatar {
   width: 80px; height: 80px; border-radius: 50%;
@@ -235,7 +235,7 @@
   margin-left: auto;
   background: var(--surface); border: 1px solid var(--border);
   color: var(--text-secondary);
-  padding: 8px 16px; border-radius: 0;
+  padding: 8px 16px; border-radius: 999px;
   font-size: 13px; cursor: pointer;
   transition: all .15s; font-family: inherit;
 }
@@ -251,7 +251,7 @@
 .dc-empty-btn {
   margin-top: 8px;
   background: var(--brand); color: #fff;
-  border: none; padding: 10px 24px; border-radius: 0;
+  border: none; padding: 10px 24px; border-radius: 999px;
   font-size: 14px; font-weight: 700; cursor: pointer;
   transition: background .15s, box-shadow .15s; font-family: inherit;
   box-shadow: none;
@@ -281,18 +281,18 @@
 @keyframes dcFadeIn { from{opacity:0} to{opacity:1} }
 
 .dc-modal {
-  background: rgba(255, 255, 255, .78);
+  background: rgba(255, 255, 255, .82);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, .5);
-  border-radius: 28px;
-  width: 100%; max-width: 440px;
-  max-height: 88vh;
+  border-radius: 24px;
+  width: 100%; max-width: 360px;
+  max-height: 86vh;
   overflow: hidden;
   overflow-y: auto;
   position: relative;
   box-shadow:
-    0 30px 80px rgba(0, 0, 0, .35),
+    0 24px 60px rgba(0, 0, 0, .30),
     inset 0 1px 0 rgba(255, 255, 255, .6);
   animation: dcSlideUp .22s cubic-bezier(.2,.9,.3,1.2);
 }
@@ -318,10 +318,10 @@
   border-bottom: 1px solid var(--border);
 }
 .dc-modal-cover {
-  width: 56px; height: 56px; border-radius: 0;
+  width: 52px; height: 52px; border-radius: 12px;
   background: var(--brand-light);
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px; font-weight: 700; color: var(--brand); flex-shrink: 0;
+  font-size: 20px; font-weight: 700; color: var(--brand); flex-shrink: 0;
 }
 .dc-modal-genre { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 2px; }
 .dc-modal-nome  { font-size: 18px; font-weight: 800; color: var(--text-primary); line-height: 1.15; margin-bottom: 3px; letter-spacing: -.3px; }
@@ -357,7 +357,7 @@
   padding: 7px 10px;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 0;
+  border-radius: 12px;
 }
 .dc-modal-comp-avatar {
   width: 30px; height: 30px; border-radius: 50%;
@@ -375,7 +375,7 @@
   margin: 6px 18px 18px; padding: 12px;
   background: var(--brand-light);
   border: 1px solid var(--brand-border);
-  border-radius: 0;
+  border-radius: 14px;
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
 }
 .dc-modal-buy-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
@@ -383,7 +383,7 @@
 .dc-modal-buy-btn {
   background: var(--brand); color: #fff;
   border: none; cursor: pointer;
-  padding: 10px 20px; border-radius: 0;
+  padding: 10px 20px; border-radius: 999px;
   font-size: 13px; font-weight: 700; white-space: nowrap;
   transition: background .15s, box-shadow .15s; font-family: inherit;
   box-shadow: none;
@@ -395,7 +395,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-height: 320px;
+  max-height: 220px;
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   background: var(--brand-light);

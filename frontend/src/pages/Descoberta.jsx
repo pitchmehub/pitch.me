@@ -311,7 +311,7 @@ export default function Descoberta() {
 
  return (
  <div
- className="dc-root"
+ className="dc-root page-slide-up"
  onTouchStart={handleRootTouchStart}
  onTouchEnd={handleRootTouchEnd}
  >

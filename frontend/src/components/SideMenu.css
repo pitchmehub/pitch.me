@@ -60,8 +60,8 @@
   cursor: pointer;
   font-size: 14px;
   color: var(--text-muted);
-  padding: 4px 8px;
-  border-radius: 0;
+  padding: 4px 10px;
+  border-radius: 8px;
   transition: all .15s;
   line-height: 1;
   flex-shrink: 0;
@@ -88,7 +88,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  border-radius: 0;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
@@ -101,17 +101,15 @@
   white-space: nowrap;
   overflow: hidden;
   font-family: inherit;
-  border-left: 2px solid transparent;
 }
 .sidebar-link:hover {
   background: var(--surface-2);
   color: var(--text-primary);
 }
 .sidebar-link.active {
-  background: var(--surface-2);
-  color: var(--text-primary);
-  font-weight: 600;
-  border-left-color: var(--brand);
+  background: var(--brand-light);
+  color: var(--brand);
+  font-weight: 700;
 }
 .sidebar-link.active .sidebar-icon { color: var(--brand); }
 
@@ -145,7 +143,7 @@
   padding: 10px;
   border: none;
   background: transparent;
-  border-radius: 0;
+  border-radius: 12px;
   cursor: pointer;
   transition: background .15s;
   text-align: left;
@@ -155,7 +153,7 @@
 
 .sidebar-avatar {
   width: 34px; height: 34px;
-  border-radius: 0;
+  border-radius: 50%;
   background: var(--ink);
   border: 1px solid var(--ink);
   color: #fff;
@@ -190,7 +188,7 @@
   left: 8px; right: 8px;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 0;
+  border-radius: 14px;
   box-shadow: var(--shadow-lg);
   overflow: hidden;
   z-index: 300;
@@ -237,9 +235,11 @@
   .sidebar.mobile-drawer {
     width: 280px !important;
     transform: translateX(-100%);
-    transition: transform .25s ease;
+    /* Easing mais marcante: sai da esquerda, freia suavemente. */
+    transition: transform .38s cubic-bezier(.22,.85,.30,1.05);
     z-index: 160;
-    box-shadow: 4px 0 40px rgba(9,9,11,.15);
+    box-shadow: 4px 0 40px rgba(9,9,11,.18);
+    border-radius: 0 22px 22px 0;
   }
   .sidebar.mobile-drawer-open { transform: translateX(0); }
 
@@ -259,13 +259,16 @@
 @media (max-width: 767px) {
   .mobile-bottom-nav {
     display: flex;
+    align-items: stretch;
     position: fixed;
     bottom: 0; left: 0; right: 0;
     z-index: 200;
     background: var(--surface);
     border-top: 1px solid var(--border);
-    box-shadow: 0 -2px 16px rgba(9,9,11,.08);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -2px 18px rgba(9,9,11,.08);
+    padding: 8px 8px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    gap: 6px;
   }
 
   .mobile-bottom-item {
@@ -274,89 +277,104 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
-    padding: 10px 4px;
+    gap: 5px;
+    padding: 10px 8px;
     text-decoration: none;
     color: var(--text-muted);
-    font-size: 11px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 600;
     font-family: inherit;
-    background: none;
+    background: transparent;
     border: none;
+    border-radius: 14px;
     cursor: pointer;
-    transition: color .15s;
+    transition: color .18s, background .18s, transform .12s;
     letter-spacing: 0.01em;
+    min-height: 56px;
   }
-  .mobile-bottom-item:hover,
+  .mobile-bottom-item:hover {
+    background: var(--surface-2);
+    color: var(--text-primary);
+  }
+  .mobile-bottom-item:active { transform: scale(.96); }
   .mobile-bottom-item.active {
     color: var(--brand);
+    background: var(--brand-light);
   }
   .mobile-bottom-item.active .mobile-bottom-icon {
     color: var(--brand);
   }
 
   .mobile-bottom-icon {
-    font-size: 18px;
+    font-size: 22px;
     line-height: 1;
     color: inherit;
+    display: inline-flex;
   }
 
   .mobile-bottom-label {
-    font-size: 10px;
+    font-size: 11px;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 56px;
+    max-width: 90px;
     text-align: center;
   }
 
-  /* Botão central destacado: Descoberta (mantém destaque sem ultrapassar os outros) */
+  /* Botão central destacado: Descoberta (preenche junto com os outros) */
   .mobile-bottom-center {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
-    padding: 8px 4px;
+    gap: 4px;
+    padding: 6px 8px;
     text-decoration: none;
     color: var(--text-muted);
     font-family: inherit;
     cursor: pointer;
     position: relative;
+    border-radius: 14px;
+    transition: background .18s, transform .12s;
+    min-height: 56px;
   }
+  .mobile-bottom-center:active { transform: scale(.96); }
   .mobile-bottom-center-circle {
-    width: 32px;
-    height: 32px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     background: var(--brand);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 3px 10px rgba(225,29,72,.30);
+    box-shadow: 0 6px 18px rgba(12,68,124,.35);
     transition: transform .15s, box-shadow .15s;
   }
   .mobile-bottom-center:active .mobile-bottom-center-circle {
-    transform: scale(.94);
+    transform: scale(.92);
   }
   .mobile-bottom-center.active .mobile-bottom-center-circle {
-    box-shadow: 0 4px 14px rgba(225,29,72,.45);
+    box-shadow: 0 8px 22px rgba(12,68,124,.50);
+    transform: translateY(-1px);
   }
   .mobile-bottom-center-icon {
-    font-size: 16px;
+    font-size: 22px;
     line-height: 1;
     color: #fff;
+    display: inline-flex;
   }
   .mobile-bottom-center-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.02em;
     color: var(--text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 56px;
+    max-width: 90px;
     text-align: center;
   }
   .mobile-bottom-center.active .mobile-bottom-center-label {

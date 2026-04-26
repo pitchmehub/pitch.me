@@ -82,7 +82,7 @@ export default function MinhasObras() {
  if (loading) return <div style={{ padding: 32 }}><p style={{ color: 'var(--text-muted)' }}>Carregando…</p></div>
 
  return (
- <div style={{ padding: 32, maxWidth: 920 }}>
+ <div className="page-slide-up" style={{ padding: 32, maxWidth: 920 }}>
  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
  <div>
  <h1 style={{ fontSize: 24, fontWeight: 800 }}>Minhas obras</h1>

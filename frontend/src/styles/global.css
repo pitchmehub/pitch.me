@@ -43,11 +43,11 @@
   --warning:      #D97706;
   --warning-bg:   rgba(217, 119, 6, .10);
 
-  /* ── Radii (tudo reto — Swiss style) ── */
-  --radius-sm:    0px;
-  --radius-md:    0px;
-  --radius-lg:    0px;
-  --radius-xl:    0px;
+  /* ── Radii (cantos suavemente arredondados) ── */
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-lg:    14px;
+  --radius-xl:    20px;
 
   /* ── Sombras (leves) ── */
   --shadow-sm:    0 1px 2px rgba(9,9,11,.04);
@@ -127,7 +127,7 @@ a:hover { text-decoration: underline; }
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  border-radius: 0;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -188,7 +188,7 @@ a:hover { text-decoration: underline; }
   width: 100%;
   padding: 11px 14px;
   border: 1px solid var(--border);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   color: var(--text-primary);
   background: var(--bg);
@@ -242,7 +242,7 @@ select.input {
   align-items: center;
   gap: 4px;
   padding: 3px 10px;
-  border-radius: 0;
+  border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -316,7 +316,7 @@ select.input {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
   background: var(--border-2);
-  border-radius: 0;
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
@@ -347,7 +347,7 @@ select.input {
 
   .mobile-menu-btn {
     position: fixed; top: 12px; left: 12px; z-index: 110;
-    width: 42px; height: 42px; border-radius: 0;
+    width: 42px; height: 42px; border-radius: 12px;
     background: var(--bg);
     border: 1px solid var(--border);
     cursor: pointer; font-size: 18px; color: var(--text-primary);
@@ -447,6 +447,29 @@ select.input {
               color var(--transition), transform .1s ease, box-shadow .15s ease;
 }
 .btn:active:not(:disabled) { transform: scale(.97) !important; }
+
+/* ── Fallback global: garante que QUALQUER botão sem classe específica
+       fique levemente arredondado (10px). Botões com border-radius próprio
+       prevalecem porque têm seletor mais específico ou estão depois.   ── */
+button {
+  border-radius: 10px;
+}
+button[data-shape="circle"],
+.gv-modal-close,
+.dc-modal-close,
+.mobile-bottom-center-circle {
+  border-radius: 50%;
+}
+
+/* ── Page transition: slide up (subida) ao trocar de página ── */
+@keyframes gv-page-slide-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-slide-up {
+  animation: gv-page-slide-up .34s cubic-bezier(.2,.85,.35,1) both;
+  will-change: transform, opacity;
+}
 
 /* ── Link / nav hover ── */
 a { transition: color .15s, opacity .15s; }
