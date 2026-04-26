@@ -407,21 +407,6 @@ function AnalyticsDashboard() {
                 accent="#10b981"
                 testid="kpi-economia-total"
               />
-              <KPI
-                label="ROI da assinatura (mês)"
-                value={data.roi_mes_pct == null ? '—' : `${data.roi_mes_pct > 0 ? '+' : ''}${data.roi_mes_pct}%`}
-                accent={data.roi_mes_pct > 0 ? '#10b981' : '#6b7280'}
-                testid="kpi-roi"
-              />
-            </div>
-            <div style={contextBox}>
-              Sua assinatura PRO custa <b>{fmtBRL(data.assinatura_pro_cents)}/mês</b>.
-              Você já economizou <b>{fmtBRL(data.economia_mes_cents)}</b> este mês.
-              {data.roi_mes_pct != null && (
-                <> ROI: <b style={{ color: data.roi_mes_pct > 0 ? '#10b981' : '#c0392b' }}>
-                  {data.roi_mes_pct > 0 ? '+' : ''}{data.roi_mes_pct}%
-                </b></>
-              )}
             </div>
           </Section>
 
