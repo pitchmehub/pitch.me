@@ -190,7 +190,7 @@ def on_payment_authorized(session_id: str, payment_intent_id: str) -> Optional[d
         "pago_em":                  datetime.now(timezone.utc).isoformat(),
     }).eq("id", of["id"]).execute()
 
-    obra = sb.table("obras").select("nome").eq("id", of["obra_id"]).single().execute().data or {}
+    obra = sb.table("obras").select("nome, titular_id").eq("id", of["obra_id"]).single().execute().data or {}
     comprador = sb.table("perfis").select("nome, email").eq("id", of["comprador_id"]).single().execute().data or {}
 
     deadline_brt = datetime.fromisoformat(of["deadline_at"].replace("Z","+00:00")).astimezone(BRT)
@@ -235,6 +235,30 @@ def on_payment_authorized(session_id: str, payment_intent_id: str) -> Optional[d
     send_email(of["editora_terceira_email"],
                f"Gravan — Pedido de licenciamento de \"{obra.get('nome','obra musical')}\"",
                html, text)
+
+    # Notifica o compositor titular da obra sobre a oferta de licenciamento
+    if obra.get("titular_id"):
+        try:
+            from services.notificacoes import notify
+            notify(
+                perfil_id=obra["titular_id"],
+                tipo="oferta",
+                titulo=f"Nova oferta de licença: \"{obra.get('nome','sua obra')}\"",
+                mensagem=(
+                    f"{comprador.get('nome') or 'Um intérprete'} fez uma oferta de licença de "
+                    f"{_moeda(of['valor_cents'])} para \"{obra.get('nome','—')}\". "
+                    f"Aguardando aprovação da editora até {deadline_str}."
+                ),
+                link="/dashboard",
+                payload={
+                    "oferta_id":   of["id"],
+                    "obra_id":     of["obra_id"],
+                    "valor_cents": of["valor_cents"],
+                    "deadline_at": of["deadline_at"],
+                },
+            )
+        except Exception as e:
+            log.warning("Falha ao notificar compositor da oferta de licenciamento %s: %s", of.get("id"), e)
 
     return sb.table("ofertas_licenciamento").select("*").eq("id", of["id"]).single().execute().data
 

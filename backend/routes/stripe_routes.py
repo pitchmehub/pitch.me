@@ -348,6 +348,37 @@ def webhook():
             except Exception as _e:
                 logger.error("Falha ao creditar wallets: %s", _e)
 
+            # Push/notificação para o compositor: obra licenciada
+            try:
+                from services.notificacoes import notify as _notify
+                obra_info = sb.table("obras").select("nome, titular_id").eq(
+                    "id", trans["obra_id"]
+                ).single().execute().data or {}
+                comprador_info = sb.table("perfis").select("nome").eq(
+                    "id", trans["comprador_id"]
+                ).single().execute().data or {}
+                titular_id = obra_info.get("titular_id")
+                if titular_id and titular_id != trans.get("comprador_id"):
+                    valor_reais = f"R$ {trans['valor_cents'] / 100:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+                    _notify(
+                        perfil_id=titular_id,
+                        tipo="compra",
+                        titulo=f"Sua obra foi licenciada: \"{obra_info.get('nome','—')}\"",
+                        mensagem=(
+                            f"{comprador_info.get('nome') or 'Um intérprete'} licenciou "
+                            f"\"{obra_info.get('nome','—')}\" por {valor_reais}. "
+                            f"O valor já foi creditado na sua carteira."
+                        ),
+                        link="/dashboard",
+                        payload={
+                            "transacao_id": trans["id"],
+                            "obra_id":      trans["obra_id"],
+                            "valor_cents":  trans["valor_cents"],
+                        },
+                    )
+            except Exception as _e:
+                logger.warning("Falha ao notificar compositor da compra: %s", _e)
+
     elif event_type == "payment_intent.succeeded":
         # Backup: se checkout.session.completed não disparou, garante crédito
         pi_id = obj.get("id") if isinstance(obj, dict) else obj.id
