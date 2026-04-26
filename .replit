@@ -21,7 +21,7 @@ args = "Backend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Frontend"
+args = "Start application"
 
 [[workflows.workflow]]
 name = "Backend"
@@ -36,16 +36,16 @@ args = "cd backend && python -m gunicorn --bind=0.0.0.0:8000 --workers 2 --reuse
 waitForPort = 8000
 
 [[workflows.workflow]]
-name = "Frontend"
+name = "Start application"
 author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd frontend && npm run dev"
 waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[ports]]
 localPort = 5000
