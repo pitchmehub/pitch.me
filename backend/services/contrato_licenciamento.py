@@ -807,14 +807,26 @@ def aceitar_contrato(contract_id: str, user_id: str, ip_hash: str | None = None)
         except Exception:
             pass
 
-        # Notifica todas as partes que o contrato foi concluído (licenciamento efetivado)
+        # Notifica TODAS as partes que o contrato foi concluído (licenciamento efetivado).
+        # Inclui: comprador, vendedor, coautores e — em contratos trilaterais —
+        # a editora terceira ou a editora-mãe (agregadora).
         try:
             from services.notificacoes import notify as _notify
             ctr = sb.table("contracts").select("obra_id, buyer_id, seller_id, valor_cents").eq("id", contract_id).single().execute().data or {}
             obra2 = sb.table("obras").select("nome").eq("id", ctr.get("obra_id")).single().execute().data or {}
             obra_nome2 = obra2.get("nome") or "obra"
-            partes = list(filter(None, {ctr.get("buyer_id"), ctr.get("seller_id")}))
-            for pid in partes:
+
+            # Reúne IDs únicos: buyer, seller + todos os signers
+            partes_ids = set(filter(None, [ctr.get("buyer_id"), ctr.get("seller_id")]))
+            try:
+                signers_rows = sb.table("contract_signers").select("user_id").eq("contract_id", contract_id).execute().data or []
+                for r in signers_rows:
+                    if r.get("user_id"):
+                        partes_ids.add(r["user_id"])
+            except Exception:
+                pass
+
+            for pid in partes_ids:
                 _notify(
                     pid,
                     tipo="licenciamento",
