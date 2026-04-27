@@ -16,8 +16,8 @@
 .dc-topbar {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 0 28px 8px;
+  gap: 10px;
+  padding: 14px 28px 12px;
   background: var(--surface-translucent);
   position: sticky;
   top: calc(var(--gtb-h, 68px) + env(safe-area-inset-top, 0px));
@@ -64,11 +64,99 @@
 }
 .dc-tab-icon { font-size: 14px; }
 
+/* Linha da busca + filtro */
+.dc-search-row {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+}
+
 /* Busca */
 .dc-search-wrap {
   flex: 1; max-width: 440px;
   position: relative;
   display: flex; align-items: center;
+}
+
+/* Botão de filtro ao lado da busca */
+.dc-filtro-wrap { position: relative; flex-shrink: 0; }
+.dc-filtro-btn {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 99px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+}
+.dc-filtro-btn:hover {
+  background: var(--surface-2);
+  color: var(--brand);
+  border-color: var(--brand-border);
+}
+.dc-filtro-btn-active {
+  background: var(--brand) !important;
+  color: #fff !important;
+  border-color: var(--brand) !important;
+}
+.dc-filtro-badge {
+  position: absolute;
+  top: -2px; right: -2px;
+  min-width: 16px; height: 16px;
+  padding: 0 4px;
+  background: #DC2626;
+  color: #fff;
+  border-radius: 99px;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--surface);
+}
+.dc-filtro-overlay {
+  position: fixed; inset: 0;
+  background: transparent;
+  z-index: 60;
+}
+.dc-filtro-menu {
+  position: absolute;
+  top: calc(100% + 8px); right: 0;
+  min-width: 200px;
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.10);
+  padding: 6px;
+  z-index: 70;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.dc-filtro-menu-title {
+  padding: 8px 12px 6px;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.dc-filtro-opt {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%;
+  padding: 9px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: background .12s;
+}
+.dc-filtro-opt:hover { background: var(--surface-2); }
+.dc-filtro-opt-active {
+  background: var(--surface-2);
+  color: var(--brand);
+  font-weight: 600;
 }
 .dc-search-icon {
   position: absolute; left: 14px;
@@ -100,29 +188,6 @@
 }
 .dc-search-clear:hover { color: var(--text-primary); }
 
-/* ── FILTRO DE GÊNEROS ───────────────────── */
-.dc-generos {
-  display: flex; gap: 8px;
-  padding: 8px 0 0;
-  flex-wrap: wrap;
-}
-.dc-genero-btn {
-  padding: 6px 16px;
-  border-radius: 99px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-secondary);
-  font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: all .15s;
-  white-space: nowrap; font-family: inherit;
-}
-.dc-genero-btn:hover { background: var(--surface-2); color: var(--brand); border-color: var(--brand-border); }
-.dc-genero-active {
-  background: var(--brand) !important;
-  border-color: var(--brand) !important;
-  color: #fff !important;
-  box-shadow: 0 4px 12px rgba(12,68,124,.25);
-}
 
 /* ── SEÇÕES ──────────────────────────────── */
 .dc-section { padding: 20px 28px; }
@@ -462,7 +527,7 @@
 /* ── RESPONSIVO ──────────────────────────── */
 @media (max-width: 767px) {
   /* Topbar compacta */
-  .dc-topbar      { padding: 0 12px 6px; gap: 6px; }
+  .dc-topbar      { padding: 10px 12px 10px; gap: 8px; }
   .dc-topbar-row1 { gap: 8px; }
   .dc-tabs        { flex: 1; justify-content: flex-start; gap: 6px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 0; }
   .dc-tab         { font-size: 12px; padding: 0 12px; height: 36px; flex-shrink: 0; display: flex; align-items: center; }
@@ -473,10 +538,9 @@
   .dc-search-wrap { max-width: 100%; }
   .dc-search-icon { left: 10px; font-size: 13px; }
 
-  /* Filtros de gênero — scroll horizontal */
-  .dc-generos     { padding: 6px 0 0; gap: 5px; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
-  .dc-generos::-webkit-scrollbar { display: none; }
-  .dc-genero-btn  { font-size: 11px; padding: 4px 10px; flex-shrink: 0; }
+  /* Botão de filtro mobile */
+  .dc-filtro-btn  { width: 36px; height: 36px; }
+  .dc-filtro-menu { min-width: 180px; }
 
   /* Seções */
   .dc-section        { padding: 0 12px 12px; }

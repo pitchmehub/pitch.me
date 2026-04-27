@@ -192,6 +192,7 @@ export default function Descoberta() {
  const buscaLogTimer = useRef(null)
  const [buscaFocada, setBuscaFocada] = useState(false)
  const [buscasRecentes, setBuscasRecentes] = useState([])
+ const [mostraFiltro, setMostraFiltro] = useState(false)
 
  useEffect(() => {
  async function load() {
@@ -366,8 +367,6 @@ export default function Descoberta() {
  setMinimized(true)
  }
 
- const cadastroIncompleto = perfil && !perfil.cadastro_completo
-
  function handleExpand(obra) {
  if (!obra.audio_path) return
  if (obraAtual?.id !== obra.id) {
@@ -385,14 +384,6 @@ export default function Descoberta() {
  onTouchEnd={handleRootTouchEnd}
  >
  <div className="dc-topbar">
- {aba === 'catalogo' && !busca && !compositor && (
- <div className="dc-generos">
- {GENEROS.map(g => (
- <button key={g} className={`dc-genero-btn ${generoFiltro === g ? 'dc-genero-active' : ''}`}
- onClick={() => setGeneroFiltro(g)}>{g}</button>
- ))}
- </div>
- )}
  <div className="dc-topbar-row1">
  <div className="dc-tabs">
  <button className={`dc-tab ${aba === 'catalogo' ? 'dc-tab-active' : ''}`}
@@ -405,6 +396,7 @@ export default function Descoberta() {
  </button>
  </div>
  </div>
+ <div className="dc-search-row">
  <div className="dc-search-wrap" style={{ position: 'relative' }}>
  <span className="dc-search-icon">⌕</span>
  <input className="dc-search" placeholder="Buscar obras, compositores ou editoras…"
@@ -444,34 +436,44 @@ export default function Descoberta() {
  </div>
  )}
  </div>
- </div>
-
- {cadastroIncompleto && (
- <div style={{
- padding: '14px 28px',
- background: '#FAFAFA',
- borderBottom: '1px solid #E4E4E7',
- color: '#09090B', display: 'flex', alignItems: 'center', gap: 14,
- flexWrap: 'wrap',
- }}>
- <div style={{ flex: 1 }}>
- <div style={{ fontSize: 13, fontWeight: 700 }}>Complete seu cadastro</div>
- <div style={{ fontSize: 12, color: '#71717A' }}>
- Preencha CPF, RG e endereço para liberar a publicação de obras e realizar compras.
- </div>
- </div>
+ {aba === 'catalogo' && !compositor && (
+ <div className="dc-filtro-wrap">
  <button
- onClick={() => navigate('/perfil/completar')}
- style={{
- background: '#09090B', color: '#fff',
- border: '1px solid #09090B', padding: '8px 16px', borderRadius: 99,
- fontSize: 13, fontWeight: 700, cursor: 'pointer',
- }}
+ className={`dc-filtro-btn ${generoFiltro !== 'Todos' ? 'dc-filtro-btn-active' : ''}`}
+ onClick={() => setMostraFiltro(v => !v)}
+ aria-label="Filtrar por gênero"
  >
- Completar agora →
+ <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+ <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+ </svg>
+ {generoFiltro !== 'Todos' && <span className="dc-filtro-badge">1</span>}
  </button>
+ {mostraFiltro && (
+ <>
+ <div className="dc-filtro-overlay" onClick={() => setMostraFiltro(false)} />
+ <div className="dc-filtro-menu">
+ <div className="dc-filtro-menu-title">Gênero</div>
+ {GENEROS.map(g => (
+ <button
+ key={g}
+ className={`dc-filtro-opt ${generoFiltro === g ? 'dc-filtro-opt-active' : ''}`}
+ onClick={() => { setGeneroFiltro(g); setMostraFiltro(false) }}
+ >
+ {g}
+ {generoFiltro === g && (
+ <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+ <polyline points="20 6 9 17 4 12"/>
+ </svg>
+ )}
+ </button>
+ ))}
+ </div>
+ </>
+ )}
  </div>
  )}
+ </div>
+ </div>
 
  {busca && (
  <div className="dc-search-results">
