@@ -8,7 +8,7 @@
   color: var(--text-primary, #09090B);
   padding-bottom: 100px;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100vw;
 }
 
