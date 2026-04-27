@@ -411,6 +411,14 @@ export default function Descoberta() {
  </div>
  )}
  <div className="dc-topbar">
+ {aba === 'catalogo' && !busca && !compositor && (
+ <div className="dc-generos">
+ {GENEROS.map(g => (
+ <button key={g} className={`dc-genero-btn ${generoFiltro === g ? 'dc-genero-active' : ''}`}
+ onClick={() => setGeneroFiltro(g)}>{g}</button>
+ ))}
+ </div>
+ )}
  <div className="dc-topbar-row1">
  <div className="dc-tabs">
  <button className={`dc-tab ${aba === 'catalogo' ? 'dc-tab-active' : ''}`}
@@ -536,15 +544,6 @@ export default function Descoberta() {
 
  {!busca && !compositor && (
  <>
- {aba === 'catalogo' && (
- <div className="dc-generos">
- {GENEROS.map(g => (
- <button key={g} className={`dc-genero-btn ${generoFiltro === g ? 'dc-genero-active' : ''}`}
- onClick={() => setGeneroFiltro(g)}>{g}</button>
- ))}
- </div>
- )}
-
  {aba === 'catalogo' && (
  <div className="dc-section">
  <h2 className="dc-section-title">{generoFiltro === 'Todos' ? 'Descobrir composições' : generoFiltro}</h2>
