@@ -2,11 +2,11 @@
 Geração de capas de obra via Pollinations.ai (gratuito, sem chave).
 
 Estratégia MVP:
-  • Constrói um prompt em inglês baseado no nome + gênero + um conceito
-    contemporâneo de arte (sorteado entre vários movimentos) e uma paleta
-    de cores variada — mantendo neo-minimalismo + minimalismo como base
-    sempre presente, e mesclando UM conceito contemporâneo extra para
-    dar variedade real entre as capas.
+  • Constrói um prompt em inglês baseado no nome + gênero + um estilo
+    de arte contemporânea sorteado entre dezenas de movimentos
+    (expressivos, abstratos, figurativos, gestuais, pop, etc.) e uma
+    paleta de cores variada — para dar variedade artística real entre
+    as capas, sem amarrar o visual a um único estilo.
   • Gera URL determinística do Pollinations.ai
   • Baixa a imagem e PERSISTE no Supabase Storage (bucket "capas")
   • Salva a URL pública do Supabase em obras.cover_url
@@ -29,40 +29,62 @@ POLLINATIONS_TIMEOUT_S = 60
 POLLINATIONS_RETRIES = 3
 
 # =====================================================================
-# BASE: neo-minimalismo + minimalismo (sempre presente)
+# ESTILOS DE ARTE CONTEMPORÂNEA — UM é OBRIGATÓRIO em cada capa.
+# Sorteado deterministicamente por obra para dar variedade artística
+# real, do gestual ao geométrico, do figurativo ao expressivo, sem
+# amarrar tudo num único visual.
 # =====================================================================
-BASE_AESTHETIC = (
-    "neo-minimalism fused with classic minimalism, clean composition, "
-    "generous negative space, single focal subject, geometric clarity, "
-    "subtle paper-like or matte texture, soft directional light, "
-    "calm contemplative mood, contemporary editorial art print quality"
-)
-
-# =====================================================================
-# CONCEITOS CONTEMPORÂNEOS — sorteados por capa para dar variedade.
-# Cada item descreve a "tempera" extra que vai junto da base neo-min.
-# =====================================================================
-CONTEMPORARY_CONCEPTS = [
-    "Bauhaus design influence with primary geometric shapes (circles, squares, triangles)",
-    "Suprematist composition with floating geometric planes and dynamic tension",
-    "Color Field abstraction with large flat planes of pure saturated color",
-    "Hard Edge abstraction with crisp boundaries between flat color zones",
-    "Op Art subtle linework, precise repetition, gentle visual rhythm",
-    "Memphis Group inspired playful pattern accents and bold geometric motifs",
-    "Brutalist concrete texture mood, raw and architectural",
-    "Constructivist diagonal composition, strong asymmetry, modernist energy",
-    "Mid-century modern Scandinavian print aesthetic, organic restraint",
-    "Geometric abstraction with overlapping translucent planes",
+CONTEMPORARY_ART_STYLES = [
+    "Abstract Expressionism with bold gestural brushstrokes, dripped paint and raw emotional energy",
+    "Neo-Expressionism with thick impasto, distorted figures and intense saturated color",
+    "Action painting with splashes, drips and dynamic spontaneous marks",
+    "Color Field painting with vast flat planes of pure saturated color and atmospheric softness",
+    "Hard Edge abstraction with crisp boundaries between flat geometric color zones",
+    "Lyrical Abstraction with soft fluid washes, organic shapes and poetic atmosphere",
+    "Pop Art aesthetic with bold flat colors, halftone dots and screenprint texture",
+    "Neo-Pop with playful iconography, vivid contrast and contemporary irony",
+    "Surrealism with dreamlike imagery, impossible composition and mysterious atmosphere",
+    "Cubist fragmented planes with multiple perspectives and angular geometry",
+    "Futurist composition with dynamic motion lines, speed and modernist energy",
+    "Constructivist diagonal composition with strong asymmetry and bold geometry",
+    "Suprematist floating geometric planes with dynamic tension on neutral ground",
+    "De Stijl inspired pure rectangles with primary color accents",
+    "Bauhaus design with primary geometric shapes, circles, squares and triangles",
+    "Op Art with precise repetition, optical illusion and rhythmic linework",
+    "Kinetic art suggestion with shapes that imply movement and visual vibration",
+    "Memphis Group postmodernism with playful patterns, bold motifs and squiggle accents",
+    "Brutalist concrete texture mood, raw architectural surfaces and heavy materiality",
     "Risograph print look with grainy duotone overlay and slight misregistration",
-    "Modernist poster style inspired by Swiss design, clean grid structure",
-    "Postmodern playful collage of one or two simple shapes",
-    "Cubist fragmented planes interpreted in flat minimalist palette",
-    "Concrete art (Arte Concreta) with mathematical proportions and pure forms",
-    "Abstract expressionist single calm gesture in vast empty space",
-    "Japanese Mingei influence, handmade simplicity, wabi-sabi imperfection",
-    "Ukiyo-e inspired flat composition with negative-space horizon",
-    "Op-Pop fusion with one bold optical motif on neutral ground",
-    "De Stijl inspired pure rectangles with restrained primary accent",
+    "Silkscreen poster aesthetic with layered flat color and rough edges",
+    "Collage and mixed-media composition with torn paper, layered textures and analog feel",
+    "Photomontage with cut-out fragments arranged in surreal symbolic composition",
+    "Art Brut / Outsider Art with raw naive figuration, childlike marks and unfiltered expression",
+    "Street art and graffiti aesthetic with spray paint texture, stencil shapes and urban energy",
+    "Stencil art with sharp silhouettes, layered spray and political-poster feel",
+    "Glitch art with digital distortion, pixel sorting and analog artifacts",
+    "Vaporwave aesthetic with pastel gradients, classical motifs and retro-digital feel",
+    "Cyberpunk neon aesthetic with electric color and high-tech atmosphere",
+    "Lowbrow / pop surrealism with stylized characters and storybook strangeness",
+    "Magical realism with figurative scene infused with dreamlike symbolism",
+    "Contemporary figurative painting with stylized human or natural forms and atmospheric color",
+    "Botanical contemporary illustration with stylized plants, organic curves and natural palette",
+    "Contemporary woodcut and linocut style with carved bold lines and hand-printed texture",
+    "Japanese Sumi-e ink wash with expressive black brushwork and breathing negative space",
+    "Ukiyo-e inspired flat composition with stylized waves, mountains or natural motifs",
+    "Mingei wabi-sabi aesthetic with handmade simplicity and quiet imperfection",
+    "Fauvism with wildly non-naturalistic vivid color and bold expressive brushwork",
+    "Symbolism with rich allegorical imagery and mystical atmospheric color",
+    "Land art aesthetic with raw natural materials, earth pigments and organic geometry",
+    "Process art with visible material gestures, drips, folds and traces of making",
+    "Arte Povera with humble organic materials, raw textures and quiet poetry",
+    "Tropicália visual aesthetic with lush tropical motifs, vivid Brazilian color and modernist edge",
+    "Neoconcretism with sensual geometric forms, soft color and Brazilian modernist heritage",
+    "Contemporary editorial illustration with stylized figures and bold flat color",
+    "Painterly abstraction with visible brushwork, layered color and atmospheric depth",
+    "Maximalist composition with rich layered patterns, ornament and saturated color",
+    "Photorealist-inspired stylization with crisp detail isolated on flat field",
+    "Dada-inspired absurd assemblage with unexpected juxtapositions",
+    "Mid-century modern poster aesthetic with stylized figures and warm retro palette",
 ]
 
 # =====================================================================
@@ -125,28 +147,29 @@ def _rng_index(seed_str: str, n: int) -> int:
 
 def _build_prompt(nome: str, genero: str, seed: int | None) -> str:
     """
-    Prompt em inglês para Pollinations: base neo-min + minimalismo SEMPRE,
-    combinada com UM movimento contemporâneo + UMA paleta sorteada
-    deterministicamente a partir da seed/nome — para dar real variedade
-    entre as capas mantendo a identidade Gravan.
+    Prompt em inglês para Pollinations: UM estilo de arte contemporânea
+    é OBRIGATÓRIO (sorteado entre dezenas de movimentos) e combinado
+    com uma paleta sorteada e um motivo inspirado no gênero — tudo
+    determinístico a partir da seed/nome para variar entre obras mas
+    ser estável para a mesma obra.
     """
     seed_str = f"{seed or 0}-{nome}-{genero}"
-    concept = CONTEMPORARY_CONCEPTS[_rng_index(seed_str + "-c", len(CONTEMPORARY_CONCEPTS))]
-    palette = COLOR_PALETTES[_rng_index(seed_str + "-p", len(COLOR_PALETTES))]
-    focal   = GENERO_FOCAL.get(genero, GENERO_FOCAL["OUTROS"])
+    art_style = CONTEMPORARY_ART_STYLES[_rng_index(seed_str + "-s", len(CONTEMPORARY_ART_STYLES))]
+    palette   = COLOR_PALETTES[_rng_index(seed_str + "-p", len(COLOR_PALETTES))]
+    focal     = GENERO_FOCAL.get(genero, GENERO_FOCAL["OUTROS"])
 
     return (
         f"Album cover for the song titled '{nome}'. "
-        f"MANDATORY BASE STYLE: {BASE_AESTHETIC}. "
-        f"Combine the base with this contemporary art concept: {concept}. "
-        f"Focal motif inspired by genre: {focal}. "
-        f"Color palette (strict, only these colors): {palette}. "
-        f"Square 1:1 format, art print quality, flat or very subtle gradient "
-        f"background, no clutter, no busy details, no realism, no photography, "
-        f"no people faces, no crowded scenes. "
-        f"Strict negative rules: no text, no letters, no words, no numbers, "
-        f"no logo, no watermark, no signature, no caption, no typography "
-        f"of any kind anywhere in the image."
+        f"MANDATORY ART STYLE (must dominate the entire image): {art_style}. "
+        f"Visual motif inspired by the genre (interpret freely in the chosen "
+        f"art style, do not depict literally): {focal}. "
+        f"Color palette (use mainly these colors): {palette}. "
+        f"Be artistic, expressive and creative — push the chosen contemporary "
+        f"art style strongly. Square 1:1 format, gallery-quality contemporary "
+        f"art print, no photography, no realistic human faces, no crowded "
+        f"scenes. Strict negative rules: no text, no letters, no words, no "
+        f"numbers, no logo, no watermark, no signature, no caption, no "
+        f"typography of any kind anywhere in the image."
     )
 
 
