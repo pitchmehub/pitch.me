@@ -976,6 +976,8 @@ function ContratosPanel() {
  const [erro, setErro] = useState('')
  const [filtro, setFiltro] = useState('em_vigor')   // em_vigor | pendente | todos
  const [busca, setBusca] = useState('')
+ const [reconciliando, setReconciliando] = useState(false)
+ const [resultadoReconc, setResultadoReconc] = useState(null)
 
  async function load() {
   setLoading(true); setErro('')
@@ -986,6 +988,22 @@ function ContratosPanel() {
   finally { setLoading(false) }
  }
  useEffect(() => { load() }, [])
+
+ async function reconciliar() {
+  const ok = window.confirm(
+   'Isto vai varrer todas as obras vinculadas a uma editora e gerar o ' +
+   'contrato de edição para as que ainda não têm. As editoras serão ' +
+   'notificadas. Deseja continuar?'
+  )
+  if (!ok) return
+  setReconciliando(true); setResultadoReconc(null); setErro('')
+  try {
+   const r = await api.post('/admin/contratos-edicao/reconciliar', { notificar: true })
+   setResultadoReconc(r)
+   await load()
+  } catch (e) { setErro(e.message) }
+  finally { setReconciliando(false) }
+ }
 
  function statusBadge(tipo, st) {
   // Mapa de cores por status (compartilhado entre licenciamento e edição)
@@ -1042,11 +1060,36 @@ function ContratosPanel() {
        : 'Carregando…'}
      </p>
     </div>
-    <button onClick={load} disabled={loading}
-     style={{ background: 'none', border: '1px solid var(--border)', padding: '6px 12px', borderRadius: 8, color: 'var(--brand)', fontSize: 13, cursor: loading ? 'wait' : 'pointer' }}>
-     ↻ {loading ? 'atualizando…' : 'atualizar agora'}
-    </button>
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+     <button onClick={reconciliar} disabled={reconciliando}
+      title="Gera contratos de edição faltantes para obras que estão vinculadas a uma editora mas ficaram sem contrato (por exemplo, por falha temporária no cadastro)."
+      style={{ background: 'var(--brand)', border: '1px solid var(--brand)', padding: '6px 12px', borderRadius: 8, color: '#fff', fontSize: 13, cursor: reconciliando ? 'wait' : 'pointer', fontWeight: 600 }}>
+      {reconciliando ? 'reconciliando…' : 'Reconciliar contratos pendentes'}
+     </button>
+     <button onClick={load} disabled={loading}
+      style={{ background: 'none', border: '1px solid var(--border)', padding: '6px 12px', borderRadius: 8, color: 'var(--brand)', fontSize: 13, cursor: loading ? 'wait' : 'pointer' }}>
+      ↻ {loading ? 'atualizando…' : 'atualizar agora'}
+     </button>
+    </div>
    </div>
+
+   {resultadoReconc && (
+    <div style={{
+     marginBottom: 12, padding: '10px 14px',
+     background: resultadoReconc.contratos_criados > 0 ? 'var(--success-bg)' : 'var(--surface-2)',
+     border: '1px solid ' + (resultadoReconc.contratos_criados > 0 ? 'var(--success)' : 'var(--border)'),
+     color: 'var(--text-primary)',
+     borderRadius: 10, fontSize: 13,
+    }}>
+     <strong>Reconciliação concluída.</strong>{' '}
+     Obras analisadas: <strong>{resultadoReconc.obras_analisadas}</strong> ·
+     Já tinham contrato: <strong>{resultadoReconc.ja_tinham_contrato}</strong> ·
+     Contratos criados agora: <strong style={{ color: 'var(--success)' }}>{resultadoReconc.contratos_criados}</strong>
+     {resultadoReconc.erros?.length > 0 && (
+      <> · <span style={{ color: 'var(--error)' }}>Erros: {resultadoReconc.erros.length}</span></>
+     )}
+    </div>
+   )}
 
    {/* Filtros rápidos */}
    <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>

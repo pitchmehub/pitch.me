@@ -288,6 +288,25 @@ def auditoria_splits():
     offset   = (page - 1) * per_page
     return jsonify(sb.table("bi_auditoria_splits").select("*").range(offset, offset + per_page - 1).execute().data or []), 200
 
+@admin_bp.route("/contratos-edicao/reconciliar", methods=["POST"])
+@require_auth
+def reconciliar_contratos_edicao():
+    """
+    Varre todas as obras com publisher_id setado e gera contratos de edição
+    para as que ainda não têm. Útil quando algum cadastro falhou silenciosamente
+    (por exemplo, durante uma indisponibilidade do Supabase).
+
+    Body opcional: { "notificar": true }  (default true) — se enviado false,
+    NÃO dispara notificação para as editoras.
+    """
+    _check_admin()
+    data = request.get_json(silent=True) or {}
+    notificar = bool(data.get("notificar", True))
+    from services.reconciliar_contratos import reconciliar
+    resultado = reconciliar(notificar=notificar)
+    return jsonify(resultado), 200
+
+
 @admin_bp.route("/saques", methods=["GET"])
 @require_auth
 def listar_saques():
