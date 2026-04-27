@@ -1474,7 +1474,7 @@ create table if not exists public.contract_signers (
   ip_hash       text,
   created_at    timestamptz not null default now(),
   unique (contract_id, user_id),
-  constraint signers_role_check check (role in ('autor','coautor','intérprete','interprete'))
+  constraint signers_role_check check (role in ('autor','coautor','intérprete','interprete','editora_agregadora','editora_terceira'))
 );
 
 create index if not exists idx_signers_contract on public.contract_signers (contract_id);

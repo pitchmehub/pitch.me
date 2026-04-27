@@ -147,13 +147,13 @@ def _rng_index(seed_str: str, n: int) -> int:
 
 def _build_prompt(nome: str, genero: str, seed: int | None) -> str:
     """
-    Prompt simples e direto: pede arte em Brutalism + anti-IA + Memphis design,
+    Prompt simples e direto: pede arte anti-IA + Memphis design,
     nada de visual genérico. O nome da obra entra apenas como referência para
     a seed manter variação entre obras (sem renderizar texto na imagem).
     """
     return (
         f"Album cover for the song '{nome}'. "
-        f"Create art in Brutalism, anti-AI, Memphis design — nothing generic. "
+        f"Create art in anti-AI, Memphis design — nothing generic. "
         f"Square 1:1 format. "
         f"No text, no letters, no words, no numbers, no logo, no watermark, "
         f"no signature, no typography of any kind."

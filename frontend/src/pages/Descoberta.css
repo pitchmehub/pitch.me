@@ -659,9 +659,9 @@
   .dc-tab-icon    { font-size: 11px; }
 
   /* Busca compacta */
-  .dc-search      { font-size: 13px; padding: 7px 10px 7px 32px; }
+  .dc-search      { font-size: 13px; padding: 7px 10px 7px 38px; }
   .dc-search-wrap { max-width: 100%; }
-  .dc-search-icon { left: 10px; font-size: 13px; }
+  .dc-search-icon { left: 12px; font-size: 14px; }
 
   /* Botão de filtro mobile */
   .dc-filtro-btn  { width: 36px; height: 36px; }
