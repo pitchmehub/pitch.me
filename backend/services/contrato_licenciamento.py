@@ -82,7 +82,7 @@ O LICENCIADO pagará o valor bruto de {{valor_buyout_extenso}} referente à aqui
 
 Sobre o valor bruto pago pelo LICENCIADO incidirá uma taxa de intermediação devida à plataforma GRAVAN, no percentual de {{plataforma_pct}}% ({{plataforma_pct_extenso}}), correspondente ao plano de assinatura vigente do AUTOR PRINCIPAL na data deste licenciamento ({{plano_titular_label}}). O saldo remanescente, equivalente a {{liquido_autores_pct}}% do valor bruto, será distribuído entre o(s) AUTOR(ES) na proporção declarada na CLÁUSULA 10 (SPLIT).
 
-Parágrafo Único: Os percentuais aplicados pela plataforma são: 20% (vinte por cento) para titular no plano GRÁTIS e 15% (quinze por cento) para titular no plano PRO ativo na data da venda.
+Parágrafo Único: Os percentuais aplicados pela plataforma são: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda.
 
 5.3 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
 
@@ -632,7 +632,7 @@ Sobre o valor bruto pago pelo LICENCIADO incidirá:
 - {{editora_pct}}% ({{editora_pct_extenso}}) destinados à EDITORA TERCEIRA, na qualidade de detentora dos direitos editoriais sobre a composição;
 - {{liquido_autores_pct_trilateral}}% remanescentes, distribuídos entre o(s) AUTOR(ES) na proporção declarada na CLÁUSULA 7 (SPLIT).
 
-Parágrafo Primeiro: A taxa da plataforma GRAVAN segue a tabela: 20% (vinte por cento) para titular no plano GRÁTIS e 15% (quinze por cento) para titular no plano PRO ativo na data da venda.
+Parágrafo Primeiro: A taxa da plataforma GRAVAN segue a tabela: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda.
 
 Parágrafo Segundo: O percentual de 10% (dez por cento) destinado à EDITORA é fixo e independe do plano de assinatura do AUTOR PRINCIPAL.{{clausula_split_editora}}
 

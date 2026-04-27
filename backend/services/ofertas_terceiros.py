@@ -323,7 +323,7 @@ def on_contrato_concluido(contract_id: str) -> Optional[dict]:
     Chamado quando o contrato trilateral é totalmente assinado.
     Captura o PaymentIntent (libera o valor), cria registro em `transacoes`
     e CREDITA AUTOMATICAMENTE as wallets do split:
-      - 15% (PRO) ou 20% (STARTER) → plataforma
+      - 20% (PRO) ou 25% (STARTER) → plataforma
       - 10% → editora terceira (que aceitou a oferta)
       - resto → autor titular + coautores conforme `share_pct`
     Idempotente: só credita uma vez (proteção via `pagamentos_compositores`).

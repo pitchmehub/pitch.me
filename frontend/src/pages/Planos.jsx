@@ -108,7 +108,7 @@ export default function Planos() {
  <li>Upload ilimitado de obras</li>
  <li>Curtir &amp; salvar na biblioteca</li>
  <li>Licenciamento de obras</li>
- <li><b>Taxa de 20%</b> por transação</li>
+ <li><b>Taxa de 25%</b> por transação</li>
  </ul>
  <button
  data-testid="btn-starter"
@@ -129,7 +129,7 @@ export default function Planos() {
  <p style={priceStyle}>R$ 49,90<span style={priceSuffix}>/mês</span></p>
  <ul style={listStyle}>
  <li>Tudo do Starter</li>
- <li><b style={{ color: 'var(--brand)' }}>Taxa reduzida de 15%</b> (economize 5%)</li>
+ <li><b style={{ color: 'var(--brand)' }}>Taxa reduzida de 20%</b> (economize 5%)</li>
  <li>Painel de analytics (plays, curtidas)</li>
  <li>Destaque na plataforma</li>
  <li>Selo PRO no seu perfil</li>

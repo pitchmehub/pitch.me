@@ -617,7 +617,7 @@ export default function NovaObra() {
    open={showUpgrade}
    onClose={() => setShowUpgrade(false)}
    titulo="Para precificar acima de R$ 1.000, assine o PRO"
-   mensagem="O plano Grátis permite obras de R$ 500 a R$ 1.000. Com o PRO, você precifica até R$ 10.000 e ainda paga só 15% de comissão."
+   mensagem="O plano Grátis permite obras de R$ 500 a R$ 1.000. Com o PRO, você precifica até R$ 10.000 e ainda paga só 20% de comissão."
    contexto={{
      obra: {
        nome,

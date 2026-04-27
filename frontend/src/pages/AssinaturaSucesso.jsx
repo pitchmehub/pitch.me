@@ -55,7 +55,7 @@ export default function AssinaturaSucesso() {
  <div style={{ fontSize: 52, marginBottom: 16 }}></div>
  <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 10 }}>Bem-vindo ao PRO!</h1>
  <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
- Sua assinatura foi ativada. Taxa de transação agora é <b>15%</b> e você já tem acesso
+ Sua assinatura foi ativada. Taxa de transação agora é <b>20%</b> e você já tem acesso
  ao painel de analytics.
  </p>
  <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 16 }}>

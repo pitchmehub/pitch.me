@@ -30,7 +30,7 @@ function AnalyticsPaywall() {
       icone: '%',
       titulo: 'COMISSÃO',
       itens: [
-        'Fee reduzido de 20% para 15%',
+        'Fee reduzido de 25% para 20%',
         'Mais lucro em cada venda',
       ],
     },
@@ -392,7 +392,7 @@ function AnalyticsDashboard() {
           {/* ── 2. ECONOMIA PRO ────────────────────────── */}
           <Section
             title="Sua economia PRO"
-            subtitle="A diferença entre 20% (Grátis) e 15% (PRO) sobre cada venda volta para o seu bolso."
+            subtitle="A diferença entre 25% (Grátis) e 20% (PRO) sobre cada venda volta para o seu bolso."
           >
             <div style={kpiGrid}>
               <KPI

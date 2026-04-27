@@ -18,7 +18,7 @@ from app import limiter
 analytics_bp = Blueprint("analytics", __name__)
 
 
-# Diferença entre fee STARTER (20%) e fee PRO (15%) = 5%.
+# Diferença entre fee STARTER (25%) e fee PRO (20%) = 5%.
 ECONOMIA_PRO_FRACTION = 0.05
 
 
@@ -149,7 +149,7 @@ def resumo():
     )
 
     # Receita líquida (após comissão da plataforma)
-    fee_rate = 0.15 if is_pro_user else 0.20
+    fee_rate = 0.20 if is_pro_user else 0.25
     receita_liquida_total_cents = int(round(receita_total_cents * (1 - fee_rate)))
     receita_liquida_mes_cents = int(round(receita_mes_cents * (1 - fee_rate)))
 

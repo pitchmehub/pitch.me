@@ -4,8 +4,8 @@ Motor Financeiro do Gravan.
 Todos os cálculos são realizados EXCLUSIVAMENTE aqui, no servidor.
 
 Estrutura de receita (fee varia com o plano do TITULAR da obra):
-  Titular Grátis (STARTER): 20% plataforma | 80% compositores
-  Titular PRO:              15% plataforma | 85% compositores
+  Titular Grátis (STARTER): 25% plataforma | 75% compositores
+  Titular PRO:              20% plataforma | 80% compositores
 
 Quando a obra possui editora vinculada (titular agregado a uma editora,
 ou seja, perfis.publisher_id preenchido), 10% do valor é destinado à
@@ -17,8 +17,8 @@ percentuais (share_pct).
 from decimal import Decimal, ROUND_DOWN
 from dataclasses import dataclass, field
 
-PLATFORM_RATE_STARTER = Decimal("0.20")  # 20%
-PLATFORM_RATE_PRO     = Decimal("0.15")  # 15%
+PLATFORM_RATE_STARTER = Decimal("0.25")  # 25%
+PLATFORM_RATE_PRO     = Decimal("0.20")  # 20%
 EDITORA_RATE          = Decimal("0.10")  # 10% para editora vinculada
 
 

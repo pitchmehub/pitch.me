@@ -17,7 +17,7 @@ export default function UpgradeProModal({
   open,
   onClose,
   titulo = 'Esta funcionalidade é exclusiva do plano PRO',
-  mensagem = 'Assine o plano PRO e tenha acesso a compradores de alto valor, comissão menor (15%) e analytics completo.',
+  mensagem = 'Assine o plano PRO e tenha acesso a compradores de alto valor, comissão menor (20%) e analytics completo.',
   ctaLabel = 'Assinar PRO agora',
   contexto,
 }) {

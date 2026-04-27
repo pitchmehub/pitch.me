@@ -105,9 +105,9 @@ def bi_extras():
     starter_total  = sum(1 for p in perfis if p.get("plano") != "PRO")
 
     # ── 2. Transações + economia gerada pela assinatura PRO ───────
-    # PRO paga 15% de fee; STARTER paga 20%. Para cada transação confirmada
-    # de um titular PRO, a economia = (20% - 15%) × valor = 5% × valor.
-    # Calculamos comparando o que seria cobrado a 20% vs o que foi cobrado.
+    # PRO paga 20% de fee; STARTER paga 25%. Para cada transação confirmada
+    # de um titular PRO, a economia = (25% - 20%) × valor = 5% × valor.
+    # Calculamos comparando o que seria cobrado a 25% vs o que foi cobrado.
     trans = (sb.table("transacoes")
                .select("id, valor_cents, plataforma_cents, liquido_cents, "
                        "status, created_at")
@@ -117,7 +117,7 @@ def bi_extras():
     receita_total      = sum(int(t.get("valor_cents") or 0) for t in trans)
     plataforma_total   = sum(int(t.get("plataforma_cents") or 0) for t in trans)
     economia_assinatura_total = sum(
-        max(0, int(round((t.get("valor_cents") or 0) * 0.20)) - int(t.get("plataforma_cents") or 0))
+        max(0, int(round((t.get("valor_cents") or 0) * 0.25)) - int(t.get("plataforma_cents") or 0))
         for t in trans
     )
 
@@ -126,7 +126,7 @@ def bi_extras():
     receita_30d = sum(int(t.get("valor_cents") or 0)
                       for t in trans if (t.get("created_at") or "") >= iso_30d)
     economia_30d = sum(
-        max(0, int(round((t.get("valor_cents") or 0) * 0.20)) - int(t.get("plataforma_cents") or 0))
+        max(0, int(round((t.get("valor_cents") or 0) * 0.25)) - int(t.get("plataforma_cents") or 0))
         for t in trans if (t.get("created_at") or "") >= iso_30d
     )
 
@@ -236,8 +236,8 @@ def bi_extras():
             "receita_mensal_cents":   receita_assinatura_mensal,
             "economia_total_cents":   economia_assinatura_total,
             "economia_30d_cents":     economia_30d,
-            "fee_starter_pct":        20,
-            "fee_pro_pct":            15,
+            "fee_starter_pct":        25,
+            "fee_pro_pct":            20,
         },
         "ofertas": {
             "total":               len(ofertas_catalogo),

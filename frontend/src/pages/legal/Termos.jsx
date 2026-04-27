@@ -50,8 +50,8 @@ export default function Termos() {
       <Section n="5" title="Planos e taxas de serviço">
         A GRAVAN oferece dois planos:
         <ul style={{ marginTop: 10 }}>
-          <Bullet><b>STARTER</b> — gratuito, com taxa de <b>20%</b> sobre cada transação realizada na plataforma.</Bullet>
-          <Bullet><b>PRO</b> — assinatura mensal de <b>R$ 49,90</b>, com taxa reduzida para <b>15%</b>, painel de analytics e benefícios adicionais descritos na página de Planos.</Bullet>
+          <Bullet><b>STARTER</b> — gratuito, com taxa de <b>25%</b> sobre cada transação realizada na plataforma.</Bullet>
+          <Bullet><b>PRO</b> — assinatura mensal de <b>R$ 49,90</b>, com taxa reduzida para <b>20%</b>, painel de analytics e benefícios adicionais descritos na página de Planos.</Bullet>
         </ul>
         <p style={{ marginTop: 14 }}>
           O plano PRO é renovado automaticamente pelo Stripe a cada ciclo mensal. O
