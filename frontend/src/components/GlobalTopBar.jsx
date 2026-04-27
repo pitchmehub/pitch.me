@@ -41,7 +41,7 @@ export default function GlobalTopBar({ leftOffset = 0, isMobile = false }) {
             onClick={() => navigate('/descoberta')}
             aria-label="Início"
           >
-            <GravanLogo height={26} color={logoColor} textColor={logoText} />
+            <GravanLogo height={34} color={logoColor} textColor={logoText} />
           </button>
         )}
       </div>
