@@ -31,6 +31,7 @@ MAX_FAILURES      = int(os.getenv("WATCHDOG_MAX_FAILURES", "3"))# falhas antes d
 STARTUP_WAIT      = int(os.getenv("WATCHDOG_STARTUP_WAIT", "20"))# segundos para o gunicorn subir
 BACKEND_PORT      = int(os.getenv("WATCHDOG_PORT", "8000"))
 DUNNING_INTERVAL  = int(os.getenv("WATCHDOG_DUNNING_INTERVAL", "3600"))  # segundos entre rodadas de dunning
+RECONC_INTERVAL   = int(os.getenv("WATCHDOG_RECONC_INTERVAL", "1800"))   # segundos entre rodadas de reconciliação de contratos (default: 30min)
 BACKEND_DIR       = os.path.dirname(os.path.abspath(__file__))
 GUNICORN_CMD      = [
     sys.executable, "-m", "gunicorn",
@@ -143,6 +144,45 @@ def _run_dunning() -> None:
         logger.warning("Dunning erro inesperado: %s", e)
 
 
+def _run_reconciliacao_contratos() -> None:
+    """
+    Dispara em subprocesso a reconciliação de contratos de edição faltantes.
+    Idempotente: a função `gerar_contrato_edicao` já evita duplicação.
+    Isolado para não derrubar o watchdog se algo falhar.
+    """
+    logger.info("Rodando reconciliação de contratos de edição...")
+    try:
+        result = subprocess.run(
+            [
+                sys.executable, "-c",
+                "from services.reconciliar_contratos import reconciliar;"
+                "import json, sys;"
+                "r = reconciliar(notificar=True);"
+                "sys.stdout.write(json.dumps({"
+                "  'obras_analisadas': r['obras_analisadas'],"
+                "  'ja_tinham_contrato': r['ja_tinham_contrato'],"
+                "  'contratos_criados': r['contratos_criados'],"
+                "  'erros': len(r['erros']),"
+                "}))",
+            ],
+            cwd=BACKEND_DIR,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        if result.returncode == 0:
+            logger.info("Reconciliação OK: %s", (result.stdout or "").strip())
+        else:
+            logger.warning(
+                "Reconciliação falhou (rc=%s): %s",
+                result.returncode, (result.stderr or "").strip()[:500],
+            )
+    except subprocess.TimeoutExpired:
+        logger.warning("Reconciliação excedeu timeout de 120s — abortado.")
+    except Exception as e:
+        logger.warning("Reconciliação erro inesperado: %s", e)
+
+
 def _restart_backend(reason: str) -> None:
     logger.error("REINICIANDO backend. Motivo: %s", reason)
     _sentry_alert(
@@ -171,11 +211,12 @@ def _restart_backend(reason: str) -> None:
 
 def main() -> None:
     logger.info(
-        "Watchdog iniciado | url=%s intervalo=%ss max_falhas=%s dunning=%ss",
-        HEALTH_URL, CHECK_INTERVAL, MAX_FAILURES, DUNNING_INTERVAL,
+        "Watchdog iniciado | url=%s intervalo=%ss max_falhas=%s dunning=%ss reconc=%ss",
+        HEALTH_URL, CHECK_INTERVAL, MAX_FAILURES, DUNNING_INTERVAL, RECONC_INTERVAL,
     )
     consecutive_failures = 0
     last_dunning_run = 0.0  # epoch da última rodada de dunning
+    last_reconc_run  = 0.0  # epoch da última rodada de reconciliação
 
     # Aguarda o backend subir pela primeira vez
     logger.info("Aguardando backend ficar disponível...")
@@ -196,11 +237,14 @@ def main() -> None:
             consecutive_failures = 0
             logger.debug("Health check OK")
 
-            # Tick de dunning — só roda quando backend está saudável
+            # Ticks periódicos — só rodam quando o backend está saudável
             now = time.time()
             if DUNNING_INTERVAL > 0 and (now - last_dunning_run) >= DUNNING_INTERVAL:
                 last_dunning_run = now
                 _run_dunning()
+            if RECONC_INTERVAL > 0 and (now - last_reconc_run) >= RECONC_INTERVAL:
+                last_reconc_run = now
+                _run_reconciliacao_contratos()
             continue
 
         consecutive_failures += 1
