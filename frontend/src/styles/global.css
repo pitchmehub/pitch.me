@@ -90,12 +90,11 @@ html {
 }
 
 body {
-  font-family: 'Inter', 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text-primary);
   line-height: 1.55;
   font-size: 14px;
-  font-feature-settings: 'ss01', 'cv11';
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
@@ -117,18 +116,11 @@ input, textarea, select {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
-  font-optical-sizing: auto;
-  font-variation-settings: 'opsz' 96, 'SOFT' 50;
+  font-family: 'Space Grotesk', sans-serif;
   letter-spacing: -0.02em;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
-  line-height: 1.1;
 }
-
-h1 { font-weight: 600; letter-spacing: -0.035em; }
-h2 { font-weight: 600; letter-spacing: -0.03em; }
-h3 { font-weight: 600; letter-spacing: -0.025em; }
 
 a { color: var(--brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
