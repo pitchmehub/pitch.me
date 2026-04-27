@@ -430,8 +430,7 @@ export default function Descoberta() {
  </button>
  )}
  <div className="dc-search-wrap" style={{ position: 'relative' }}>
- <span className="dc-search-icon">⌕</span>
- <input className="dc-search" placeholder="Buscar obras, compositores ou editoras…"
+ <input className="dc-search" placeholder="Buscar"
  value={busca}
  onChange={e => setBusca(e.target.value)}
  onFocus={() => { setBuscaFocada(true); carregarBuscasRecentes() }}
