@@ -352,10 +352,19 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
         "role":        "interprete",
         "share_pct":   None,
     })
-    try:
-        sb.table("contract_signers").insert(signers).execute()
-    except Exception:
-        pass
+    # INSERT resiliente: cada signer individual (ver explicação no trilateral).
+    for s in signers:
+        try:
+            sb.table("contract_signers").insert(s).execute()
+        except Exception as e:
+            try:
+                sb.table("contract_events").insert({
+                    "contract_id": contract["id"],
+                    "event_type":  "signers_error",
+                    "payload":     {"erro": str(e), "signer": s},
+                }).execute()
+            except Exception:
+                pass
 
     # Log do evento
     try:
@@ -520,17 +529,22 @@ def gerar_contrato_trilateral_agregado(
         "role":        "interprete",
         "share_pct":   None,
     })
-    try:
-        sb.table("contract_signers").insert(signers).execute()
-    except Exception as e:
+    # INSERT resiliente: cada signer é inserido individualmente para que um
+    # erro em uma linha (ex.: violação de CHECK) não derrube TODOS os signers
+    # do contrato — bug histórico que fazia editoras agregadoras ficarem sem
+    # acesso ao contrato trilateral.
+    for s in signers:
         try:
-            sb.table("contract_events").insert({
-                "contract_id": contract["id"],
-                "event_type":  "signers_error",
-                "payload":     {"erro": str(e)},
-            }).execute()
-        except Exception:
-            pass
+            sb.table("contract_signers").insert(s).execute()
+        except Exception as e:
+            try:
+                sb.table("contract_events").insert({
+                    "contract_id": contract["id"],
+                    "event_type":  "signers_error",
+                    "payload":     {"erro": str(e), "signer": s},
+                }).execute()
+            except Exception:
+                pass
 
     try:
         sb.table("contract_events").insert({
@@ -815,18 +829,19 @@ def gerar_contrato_trilateral(oferta_id: str) -> dict | None:
         "role":        "interprete",
         "share_pct":   None,
     })
-    try:
-        sb.table("contract_signers").insert(signers).execute()
-    except Exception as e:
-        # log mas não falha
+    # INSERT resiliente: cada signer individual (ver explicação no trilateral).
+    for s in signers:
         try:
-            sb.table("contract_events").insert({
-                "contract_id": contract["id"],
-                "event_type":  "signers_error",
-                "payload":     {"erro": str(e)},
-            }).execute()
-        except Exception:
-            pass
+            sb.table("contract_signers").insert(s).execute()
+        except Exception as e:
+            try:
+                sb.table("contract_events").insert({
+                    "contract_id": contract["id"],
+                    "event_type":  "signers_error",
+                    "payload":     {"erro": str(e), "signer": s},
+                }).execute()
+            except Exception:
+                pass
 
     try:
         sb.table("contract_events").insert({
