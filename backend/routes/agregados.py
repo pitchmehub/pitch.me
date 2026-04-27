@@ -587,6 +587,26 @@ def aceitar_convite(cid):
 
     log_event("agregado.convite_aceito", entity_type="agregado_convite", entity_id=cid,
               metadata={"editora_id": cv["editora_id"], "artista_id": g.user.id})
+
+    # Backfill: gera contrato de edição para todas as obras já cadastradas pelo
+    # artista que ainda não têm publisher_id. Sem isso, o dashboard da editora
+    # ficaria vazio até que o agregado cadastrasse uma nova obra.
+    try:
+        from services.contrato_publisher import gerar_contrato_edicao
+        obras_existentes = sb.table("obras").select("id, publisher_id, nome") \
+            .eq("titular_id", g.user.id).execute()
+        for o in (obras_existentes.data or []):
+            if o.get("publisher_id"):
+                continue  # já vinculada a alguma editora — não sobrescreve
+            try:
+                sb.table("obras").update({"publisher_id": cv["editora_id"]}) \
+                    .eq("id", o["id"]).execute()
+                gerar_contrato_edicao(o["id"], g.user.id, cv["editora_id"])
+            except Exception as e:
+                print(f"[agregados.aceitar] backfill obra {o.get('id')} falhou: {e}")
+    except Exception as e:
+        print(f"[agregados.aceitar] backfill geral falhou: {e}")
+
     return jsonify({"ok": True, "status": "aceito"})
 
 

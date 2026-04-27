@@ -366,6 +366,27 @@
 /* ── RESULTADOS DE BUSCA ─────────────────── */
 .dc-search-results { padding: 16px 28px; }
 
+/* No mobile, quando o teclado está aberto e o usuário está focado na busca,
+   os resultados ocupam toda a área visível abaixo da topbar fullscreen e
+   ficam roláveis — assim o teclado não esconde os perfis encontrados. */
+@media (max-width: 767px) {
+  .dc-search-results-fullscreen {
+    position: fixed;
+    top: 64px;     /* abaixo da topbar fullscreen (height ~64px) */
+    left: 0; right: 0; bottom: 0;
+    z-index: 199;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: var(--surface, #fff);
+    padding: 8px 12px 24px;
+    overscroll-behavior: contain;
+  }
+  /* Seções dentro do fullscreen: padding mais compacto */
+  .dc-search-results-fullscreen .dc-section {
+    padding: 12px 0;
+  }
+}
+
 /* ── COMPOSITORES ────────────────────────── */
 .dc-comp-grid {
   display: grid;

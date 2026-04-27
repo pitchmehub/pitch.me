@@ -113,11 +113,11 @@ function CompositorCard({ compositor, onSelect, isAdmin, navigate }) {
  )
 }
 
-function EditoraCard({ editora, isAdmin, navigate }) {
+function EditoraCard({ editora, isAdmin, navigate, onSelect }) {
  const nome = editora.razao_social || editora.nome_artistico || editora.nome || '(sem nome)'
  const iniciais = (nome[0] || '?').toUpperCase()
  return (
- <div className="dc-comp-card" onClick={() => navigate(`/perfil/${editora.id}`)}>
+ <div className="dc-comp-card" onClick={() => { onSelect?.(editora, nome); navigate(`/perfil/${editora.id}`) }}>
  <div className="dc-comp-avatar" style={{ background: ObrgGrad(editora.id) }}>
  {editora.avatar_url ? <img src={editora.avatar_url} alt={nome} /> : iniciais}
  </div>
@@ -179,7 +179,9 @@ export default function Descoberta() {
  const [generoFiltro, setGeneroFiltro] = useState('Todos')
  const [catalogo, setCatalogo] = useState([])
  const [biblioteca, setBiblioteca] = useState([])
- const [busca, setBusca] = useState('')
+ const [busca, setBusca] = useState(() => {
+ try { return localStorage.getItem('gravan_ultima_busca') || '' } catch (_) { return '' }
+ })
  const [resultados, setResultados] = useState({ obras: [], compositores: [], editoras: [] })
  const isAdmin = perfil?.role === 'administrador'
  const [compositor, setCompositor] = useState(null)
@@ -342,7 +344,20 @@ export default function Descoberta() {
 
  async function selecionarCompositor(comp) {
  if (!comp?.id) return
+ const nome = comp.nome_artistico || comp.nome || ''
+ // Mantém o nome do perfil escolhido na barra para que, ao reabrir a busca,
+ // o usuário veja "Baby Boy Records" em vez do que ele havia digitado ("Bab").
+ if (nome) {
+ setBusca(nome)
+ try { localStorage.setItem('gravan_ultima_busca', nome) } catch (_) {}
+ }
  navigate(`/perfil/${comp.id}`)
+ }
+
+ function selecionarEditora(_ed, nome) {
+ if (!nome) return
+ setBusca(nome)
+ try { localStorage.setItem('gravan_ultima_busca', nome) } catch (_) {}
  }
 
  // Monta fila com todas as obras visíveis que têm áudio.
@@ -421,7 +436,7 @@ export default function Descoberta() {
  onChange={e => setBusca(e.target.value)}
  onFocus={() => { setBuscaFocada(true); carregarBuscasRecentes() }}
  onBlur={() => { setTimeout(() => setBuscaFocada(false), 150) }} />
- {busca && <button className="dc-search-clear" onClick={() => { setBusca(''); setResultados({ obras: [], compositores: [], editoras: [] }) }}>×</button>}
+ {busca && <button className="dc-search-clear" onClick={() => { setBusca(''); setResultados({ obras: [], compositores: [], editoras: [] }); try { localStorage.removeItem('gravan_ultima_busca') } catch (_) {} }}>×</button>}
 
  {buscaFocada && !busca && buscasRecentes.length > 0 && (
  <div style={{
@@ -532,7 +547,7 @@ export default function Descoberta() {
  </div>
 
  {busca && (
- <div className="dc-search-results">
+ <div className={`dc-search-results ${buscaFocada ? 'dc-search-results-fullscreen' : ''}`}>
  {buscando && <p className="dc-muted">Buscando…</p>}
  {!buscando && resultados.compositores.length > 0 && (
  <div className="dc-section">
@@ -550,7 +565,7 @@ export default function Descoberta() {
  <h2 className="dc-section-title">Editoras</h2>
  <div className="dc-comp-grid">
  {resultados.editoras.map(e => (
- <EditoraCard key={e.id} editora={e} isAdmin={isAdmin} navigate={navigate} />
+ <EditoraCard key={e.id} editora={e} isAdmin={isAdmin} navigate={navigate} onSelect={selecionarEditora} />
  ))}
  </div>
  </div>

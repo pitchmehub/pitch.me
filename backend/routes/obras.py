@@ -205,6 +205,18 @@ def criar_obra():
             except Exception as e:
                 print(f"[obras] notify cadastro falhou: {e}")
 
+            # Vincula a obra à editora e gera o contrato de edição autor↔editora.
+            # Sem isso, a editora nunca recebia o contrato no dashboard dela.
+            try:
+                sb.table("obras").update({"publisher_id": editora_terceira_id}).eq("id", obra["id"]).execute()
+            except Exception as e:
+                print(f"[obras] falha ao vincular publisher_id: {e}")
+            try:
+                from services.contrato_publisher import gerar_contrato_edicao
+                gerar_contrato_edicao(obra["id"], g.user.id, editora_terceira_id)
+            except Exception as e:
+                print(f"[obras] falha ao gerar contrato de edição (terceiros): {e}")
+
         return jsonify(obra), 201
 
     # Gera e assina o contrato de edição (fluxo padrão da Gravan)
@@ -318,6 +330,36 @@ def criar_obra():
                             "managed_by_publisher": obra.get("managed_by_publisher", False)})
     except Exception:
         pass
+
+    # Se o autor é AGREGADO de uma editora (perfil.publisher_id setado),
+    # vincula a obra à editora e gera o contrato de edição autor↔editora.
+    # Sem isso, o dashboard da editora nunca mostrava as obras dos agregados.
+    publisher_do_autor = perfil.get("publisher_id")
+    if publisher_do_autor:
+        try:
+            sb.table("obras").update({"publisher_id": publisher_do_autor}).eq("id", obra["id"]).execute()
+        except Exception as e:
+            print(f"[obras] falha ao vincular publisher_id (agregado): {e}")
+        try:
+            from services.contrato_publisher import gerar_contrato_edicao
+            gerar_contrato_edicao(obra["id"], g.user.id, publisher_do_autor)
+        except Exception as e:
+            print(f"[obras] falha ao gerar contrato de edição (agregado): {e}")
+        try:
+            from services.notificacoes import notify
+            notify(
+                perfil_id=publisher_do_autor,
+                tipo="obra_cadastrada",
+                titulo="Novo contrato de edição disponível",
+                mensagem=(
+                    f"Seu agregado cadastrou a obra \"{obra.get('nome')}\". "
+                    f"Um contrato de edição foi gerado e está aguardando sua assinatura."
+                ),
+                link="/contratos",
+                payload={"obra_id": obra["id"], "via": "agregado"},
+            )
+        except Exception as e:
+            print(f"[obras] notify agregado falhou: {e}")
 
     return jsonify(obra), 201
 
