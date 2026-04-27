@@ -16,18 +16,22 @@
 .dc-topbar {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px 28px 12px;
+  gap: 8px;
+  padding: 8px 28px 10px;
   background: var(--surface-translucent);
   position: sticky;
-  top: calc(var(--gtb-h, 68px) + env(safe-area-inset-top, 0px));
+  top: var(--gtb-h, 68px);
   z-index: 50;
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(12px) saturate(140%);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
 }
 @media (max-width: 767px) {
-  .dc-topbar { top: calc(var(--gtb-h-mobile, 64px) + env(safe-area-inset-top, 0px)); }
+  .dc-topbar {
+    top: var(--gtb-h-mobile, 64px);
+    padding: 4px 12px 8px;
+    gap: 6px;
+  }
 }
 
 .dc-topbar-row1 {

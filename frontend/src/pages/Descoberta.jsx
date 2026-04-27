@@ -595,7 +595,9 @@ export default function Descoberta() {
  <>
  {aba === 'catalogo' && (
  <div className="dc-section">
- <h2 className="dc-section-title">{generoFiltro === 'Todos' ? 'Descobrir composições' : generoFiltro}</h2>
+ {generoFiltro !== 'Todos' && (
+ <h2 className="dc-section-title">{generoFiltro}</h2>
+ )}
  {loadCat ? <SkeletonGrid /> : (
  <div className="dc-grid">
  {catalogo.map(o => (
