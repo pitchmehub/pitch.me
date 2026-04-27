@@ -18,12 +18,16 @@
   flex-direction: column;
   gap: 10px;
   padding: 12px 28px 12px;
-  background: rgba(255,255,255,0.92);
+  background: var(--surface-translucent);
   position: sticky;
-  top: 0;
+  top: var(--gtb-h, 56px);
   z-index: 50;
   border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+@media (max-width: 767px) {
+  .dc-topbar { top: var(--gtb-h-mobile, 52px); }
 }
 
 .dc-topbar-row1 {

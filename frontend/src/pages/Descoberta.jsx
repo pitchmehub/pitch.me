@@ -7,7 +7,6 @@ import { supabase } from '../lib/supabase'
 import { api } from '../lib/api'
 import { prefetchAudioUrl } from '../lib/audioUrl'
 import './Descoberta.css'
-import NotificationBell from '../components/NotificationBell'
 import ArtistaHero, { ObrasLista } from '../components/ArtistaHero'
 import FichaTecnica from '../components/FichaTecnica'
 import { IconPlay, IconPause } from '../components/Icons'
@@ -422,9 +421,6 @@ export default function Descoberta() {
  onClick={() => { setAba('biblioteca'); setCompositor(null); setBusca('') }}>
  <span className="dc-tab-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg></span> Biblioteca
  </button>
- </div>
- <div className="dc-topbar-bell">
- <NotificationBell />
  </div>
  </div>
  <div className="dc-search-wrap" style={{ position: 'relative' }}>

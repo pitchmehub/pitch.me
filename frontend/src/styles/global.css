@@ -64,7 +64,67 @@
   --sidebar-w:          240px;
   --sidebar-collapsed:  64px;
   --header-h:           60px;
+  --gtb-h:              56px;
+  --gtb-h-mobile:       52px;
   --transition:         .2s ease;
+
+  /* ── Translucent surface (para barras flutuantes com blur) ── */
+  --surface-translucent: rgba(255, 252, 247, 0.85);
+
+  color-scheme: light;
+}
+
+/* ════════════════════════════════════
+   DARK MODE — palette charcoal warm
+════════════════════════════════════ */
+:root[data-theme="dark"] {
+  /* Marca — leve ajuste para contraste no escuro */
+  --brand:        #4F95DB;
+  --brand-light:  rgba(79, 149, 219, .14);
+  --brand-dark:   #3C7AB8;
+  --brand-glow:   rgba(79, 149, 219, .35);
+  --brand-border: rgba(79, 149, 219, .42);
+  --brand-accent: #6FAEE8;
+  --brand-accent-light: rgba(79, 149, 219, .14);
+
+  /* Accent quente */
+  --accent:        #D8704F;
+  --accent-light:  rgba(216, 112, 79, .15);
+  --accent-dark:   #B8543C;
+  --accent-border: rgba(216, 112, 79, .40);
+
+  /* Fundos charcoal warm (umber dark) */
+  --bg:           #14110E;
+  --surface:      #1E1A16;
+  --surface-2:    #28231E;
+  --surface-3:    #332D26;
+
+  /* Texto cream warm */
+  --text-primary:   #F2EDE2;
+  --text-secondary: #BAB1A2;
+  --text-muted:     #7E776B;
+
+  --ink:          #F2EDE2;
+  --ink-invert:   #1E1A16;
+
+  --border:       #2D2823;
+  --border-2:     #3D3631;
+  --border-focus: #6FAEE8;
+
+  --success:      #22C55E;
+  --success-bg:   rgba(34, 197, 94, .15);
+  --error:        #EF4444;
+  --error-bg:     rgba(239, 68, 68, .15);
+  --warning:      #F59E0B;
+  --warning-bg:   rgba(245, 158, 11, .15);
+
+  --shadow-sm:    0 1px 2px rgba(0, 0, 0, .35);
+  --shadow-md:    0 2px 8px rgba(0, 0, 0, .50);
+  --shadow-lg:    0 8px 32px rgba(0, 0, 0, .65);
+
+  --surface-translucent: rgba(20, 17, 14, 0.78);
+
+  color-scheme: dark;
 }
 
 /* ════════════════════════════════════

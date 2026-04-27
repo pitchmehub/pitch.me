@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { PlayerProvider } from './contexts/PlayerContext'
+import { ThemeProvider }  from './contexts/ThemeContext'
 import SideMenu      from './components/SideMenu'
+import GlobalTopBar  from './components/GlobalTopBar'
 import GlobalPlayer  from './components/GlobalPlayer'
 import PWAInstaller  from './components/PWAInstaller'
 import PWAInstall    from './components/PWAInstall'
@@ -121,13 +123,16 @@ function AppShell({ children }) {
   const [collapsed, setCollapsed] = useState(false)
   const isMobile = useIsMobile()
   const sideW = isMobile ? 0 : (collapsed ? 64 : 240)
+  const topbarH = isMobile ? 52 : 56
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#FFFFFF' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
       <SideMenu onCollapse={setCollapsed} />
+      <GlobalTopBar leftOffset={sideW} isMobile={isMobile} />
       <main style={{
         marginLeft: sideW, flex: 1,
         transition: 'margin-left .2s ease',
-        minWidth: 0, background: '#FFFFFF',
+        minWidth: 0, background: 'var(--bg)',
+        paddingTop: topbarH,
         paddingBottom: isMobile ? 'calc(64px + env(safe-area-inset-bottom, 0px))' : 0,
       }}>
         {children}
@@ -205,12 +210,14 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <PlayerProvider>
-          <AppRoutes />
-          <PWAInstaller />
-        </PlayerProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <PlayerProvider>
+            <AppRoutes />
+            <PWAInstaller />
+          </PlayerProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   )
 }
