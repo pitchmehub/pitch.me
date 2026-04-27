@@ -147,29 +147,16 @@ def _rng_index(seed_str: str, n: int) -> int:
 
 def _build_prompt(nome: str, genero: str, seed: int | None) -> str:
     """
-    Prompt em inglês para Pollinations: UM estilo de arte contemporânea
-    é OBRIGATÓRIO (sorteado entre dezenas de movimentos) e combinado
-    com uma paleta sorteada e um motivo inspirado no gênero — tudo
-    determinístico a partir da seed/nome para variar entre obras mas
-    ser estável para a mesma obra.
+    Prompt simples e direto: pede arte em Brutalism + anti-IA + Memphis design,
+    nada de visual genérico. O nome da obra entra apenas como referência para
+    a seed manter variação entre obras (sem renderizar texto na imagem).
     """
-    seed_str = f"{seed or 0}-{nome}-{genero}"
-    art_style = CONTEMPORARY_ART_STYLES[_rng_index(seed_str + "-s", len(CONTEMPORARY_ART_STYLES))]
-    palette   = COLOR_PALETTES[_rng_index(seed_str + "-p", len(COLOR_PALETTES))]
-    focal     = GENERO_FOCAL.get(genero, GENERO_FOCAL["OUTROS"])
-
     return (
-        f"Album cover for the song titled '{nome}'. "
-        f"MANDATORY ART STYLE (must dominate the entire image): {art_style}. "
-        f"Visual motif inspired by the genre (interpret freely in the chosen "
-        f"art style, do not depict literally): {focal}. "
-        f"Color palette (use mainly these colors): {palette}. "
-        f"Be artistic, expressive and creative — push the chosen contemporary "
-        f"art style strongly. Square 1:1 format, gallery-quality contemporary "
-        f"art print, no photography, no realistic human faces, no crowded "
-        f"scenes. Strict negative rules: no text, no letters, no words, no "
-        f"numbers, no logo, no watermark, no signature, no caption, no "
-        f"typography of any kind anywhere in the image."
+        f"Album cover for the song '{nome}'. "
+        f"Create art in Brutalism, anti-AI, Memphis design — nothing generic. "
+        f"Square 1:1 format. "
+        f"No text, no letters, no words, no numbers, no logo, no watermark, "
+        f"no signature, no typography of any kind."
     )
 
 

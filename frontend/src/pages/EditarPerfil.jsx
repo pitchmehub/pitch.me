@@ -158,7 +158,7 @@ export default function EditarPerfil() {
  const iniciais = form.nome?.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() || '?'
 
  return (
- <div style={{ maxWidth: 720 }}>
+ <div style={{ maxWidth: 720, padding: '24px 20px', margin: '0 auto' }}>
  <div style={{ marginBottom: 28 }}>
  <button
  onClick={() => navigate(-1)}
