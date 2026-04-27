@@ -132,7 +132,7 @@ function AppShell({ children }) {
         marginLeft: sideW, flex: 1,
         transition: 'margin-left .2s ease',
         minWidth: 0, background: 'var(--bg)',
-        paddingTop: `calc(${topbarH}px + env(safe-area-inset-top, 0px))`,
+        paddingTop: `${topbarH}px`,
         paddingBottom: isMobile ? 'calc(64px + env(safe-area-inset-bottom, 0px))' : 0,
       }}>
         {children}
