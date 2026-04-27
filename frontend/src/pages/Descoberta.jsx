@@ -384,32 +384,6 @@ export default function Descoberta() {
  onTouchStart={handleRootTouchStart}
  onTouchEnd={handleRootTouchEnd}
  >
- {cadastroIncompleto && (
- <div style={{
- padding: '14px 28px',
- background: '#FAFAFA',
- borderBottom: '1px solid #E4E4E7',
- color: '#09090B', display: 'flex', alignItems: 'center', gap: 14,
- flexWrap: 'wrap',
- }}>
- <div style={{ flex: 1 }}>
- <div style={{ fontSize: 13, fontWeight: 700 }}>Complete seu cadastro</div>
- <div style={{ fontSize: 12, color: '#71717A' }}>
- Preencha CPF, RG e endereço para liberar a publicação de obras e realizar compras.
- </div>
- </div>
- <button
- onClick={() => navigate('/perfil/completar')}
- style={{
- background: '#09090B', color: '#fff',
- border: '1px solid #09090B', padding: '8px 16px', borderRadius: 99,
- fontSize: 13, fontWeight: 700, cursor: 'pointer',
- }}
- >
- Completar agora →
- </button>
- </div>
- )}
  <div className="dc-topbar">
  {aba === 'catalogo' && !busca && !compositor && (
  <div className="dc-generos">
@@ -471,6 +445,33 @@ export default function Descoberta() {
  )}
  </div>
  </div>
+
+ {cadastroIncompleto && (
+ <div style={{
+ padding: '14px 28px',
+ background: '#FAFAFA',
+ borderBottom: '1px solid #E4E4E7',
+ color: '#09090B', display: 'flex', alignItems: 'center', gap: 14,
+ flexWrap: 'wrap',
+ }}>
+ <div style={{ flex: 1 }}>
+ <div style={{ fontSize: 13, fontWeight: 700 }}>Complete seu cadastro</div>
+ <div style={{ fontSize: 12, color: '#71717A' }}>
+ Preencha CPF, RG e endereço para liberar a publicação de obras e realizar compras.
+ </div>
+ </div>
+ <button
+ onClick={() => navigate('/perfil/completar')}
+ style={{
+ background: '#09090B', color: '#fff',
+ border: '1px solid #09090B', padding: '8px 16px', borderRadius: 99,
+ fontSize: 13, fontWeight: 700, cursor: 'pointer',
+ }}
+ >
+ Completar agora →
+ </button>
+ </div>
+ )}
 
  {busca && (
  <div className="dc-search-results">
