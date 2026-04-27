@@ -4,7 +4,7 @@
  * Push notifications (PWA) — exibem notificações vindas do backend.
  */
 
-const VERSION       = 'gravan-v5-design1-push-20260426'
+const VERSION       = 'gravan-v6-design1-push-20260427'
 const STATIC_CACHE  = `static-${VERSION}`
 const IMG_CACHE     = `img-${VERSION}`
 const RUNTIME_CACHE = `runtime-${VERSION}`

@@ -148,6 +148,12 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
   useEffect(() => {
     if (!notif) return
     setDetalheExtra(null); setErro(''); setAcao(null); setFeedback('')
+    // Auto-marca como lida assim que o modal abre (silenciosamente)
+    if (!notif.lida) {
+      api.patch(`/notificacoes/${notif.id}/marcar-lida`)
+        .then(() => onChange?.())
+        .catch(() => {/* falha silenciosa: UI continua */})
+    }
     if (notif.tipo === 'convite_editora' && notif.payload?.convite_id) {
       setLoadingExtra(true)
       api.get(`/agregados/convites/${notif.payload.convite_id}/termo`)
@@ -183,14 +189,6 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
       onChange?.()
     } catch (e) { setErro(e.message) }
     finally { setSalvando(false) }
-  }
-
-  async function marcarLida(lida) {
-    try {
-      if (lida) await api.patch(`/notificacoes/${notif.id}/marcar-lida`)
-      else      await api.patch(`/notificacoes/${notif.id}/marcar-nao-lida`)
-      onChange?.()
-    } catch (e) { setErro(e.message) }
   }
 
   async function excluir() {
@@ -318,9 +316,6 @@ export default function NotificationDetailModal({ notif, onClose, onChange }) {
         {/* ── AÇÕES padrão ── */}
         {!isConvitePendente && !acao && !loadingExtra && (
           <footer className="ndm-actions">
-            {notif.lida
-              ? <button className="btn btn-ghost ndm-btn-ghost" onClick={() => marcarLida(false)}>Marcar como não-lida</button>
-              : <button className="btn btn-ghost ndm-btn-ghost" onClick={() => marcarLida(true)}>Marcar como lida</button>}
             <button className="btn btn-ghost ndm-btn-ghost ndm-danger" onClick={excluir}>Excluir</button>
             <div style={{ flex: 1 }} />
             {padrao.acoes.map((a, i) => (

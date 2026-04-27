@@ -37,6 +37,29 @@ export default function EditarPerfil() {
  const [erro, setErro] = useState('')
  const [sucesso, setSucesso] = useState('')
 
+ // Trocar senha
+ const [senhaEnviando, setSenhaEnviando] = useState(false)
+ const [senhaMsg, setSenhaMsg] = useState('')
+ const [senhaErro, setSenhaErro] = useState('')
+
+ async function enviarLinkTrocaSenha() {
+  if (!perfil?.email) {
+   setSenhaErro('Não foi possível identificar o e-mail da sua conta.')
+   return
+  }
+  if (!confirm(`Enviaremos um link para ${perfil.email} com instruções para alterar sua senha. Continuar?`)) return
+  setSenhaEnviando(true); setSenhaErro(''); setSenhaMsg('')
+  try {
+   const { error } = await supabase.auth.resetPasswordForEmail(perfil.email, {
+    redirectTo: `${window.location.origin}/redefinir-senha`,
+   })
+   if (error) throw error
+   setSenhaMsg(`Link enviado para ${perfil.email}. Verifique sua caixa de entrada (e a pasta de spam).`)
+  } catch (e) {
+   setSenhaErro(e.message || 'Não foi possível enviar o link agora. Tente novamente.')
+  } finally { setSenhaEnviando(false) }
+ }
+
  function handleChange(e) {
  setForm(p => ({ ...p, [e.target.name]: e.target.value }))
  }
@@ -281,6 +304,32 @@ export default function EditarPerfil() {
  <div className="card" style={{ marginBottom: 20 }}>
  <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Notificações</h2>
  <PushToggle />
+ </div>
+
+ {/* Segurança – trocar senha */}
+ <div className="card" style={{ marginBottom: 20 }}>
+ <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 8 }}>Segurança</h2>
+ <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14 }}>
+ Para alterar sua senha, enviaremos um link seguro para o e-mail cadastrado. No link você confirmará seu e-mail e definirá a nova senha.
+ </p>
+ {senhaMsg && (
+ <div style={{ background: 'var(--success-bg)', border: '1px solid var(--success)', color: 'var(--success)', padding: '10px 12px', borderRadius: 8, fontSize: 13, marginBottom: 12 }}>
+ ✓ {senhaMsg}
+ </div>
+ )}
+ {senhaErro && (
+ <div style={{ background: 'var(--error-bg)', border: '1px solid var(--error)', color: 'var(--error)', padding: '10px 12px', borderRadius: 8, fontSize: 13, marginBottom: 12 }}>
+ {senhaErro}
+ </div>
+ )}
+ <button
+ type="button"
+ className="btn btn-secondary"
+ onClick={enviarLinkTrocaSenha}
+ disabled={senhaEnviando}
+ >
+ {senhaEnviando ? 'Enviando link…' : '🔑 Trocar senha por e-mail'}
+ </button>
  </div>
 
  {/* Info de conta (somente leitura) */}

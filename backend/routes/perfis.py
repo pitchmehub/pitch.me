@@ -51,8 +51,14 @@ def completar_cadastro():
     if not validate_cpf(cpf):
         abort(422, description="CPF inválido.")
     
-    if not rg or len(rg) < 5:
-        abort(422, description="RG inválido.")
+    # Validação de RG: 5–14 caracteres, apenas dígitos (X aceito como dígito verificador final)
+    rg_limpo = re.sub(r"[^0-9Xx]", "", rg)
+    if len(rg_limpo) < 5 or len(rg_limpo) > 14:
+        abort(422, description="RG inválido (informe 5 a 14 dígitos).")
+    nucleo = rg_limpo[:-1] if rg_limpo[-1] in ("X", "x") else rg_limpo
+    if not nucleo.isdigit():
+        abort(422, description="RG inválido (apenas dígitos, com X opcional ao final).")
+    rg = rg_limpo.upper()
 
     # CORREÇÃO VULNERABILIDADE #9 (ALTA): Encrypt PII antes de salvar
     cpf_encrypted = encrypt_pii(cpf)

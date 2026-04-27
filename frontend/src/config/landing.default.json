@@ -70,7 +70,7 @@
     "basico": {
       "label": "PLANO BÁSICO",
       "price": "Grátis",
-      "features": ["Upload ilimitado", "Taxa de 12% por venda", "Pagamento em até 7 dias", "Suporte por e-mail"],
+      "features": ["Upload ilimitado", "Taxa de 25% por venda", "Pagamento em até 7 dias", "Suporte por e-mail"],
       "cta": "Começar grátis →"
     },
     "pro": {
@@ -78,7 +78,7 @@
       "label": "PLANO PRO",
       "price": "R$ 49",
       "priceUnit": "/mês",
-      "features": ["Tudo do Básico", "Taxa reduzida de 7% por venda", "Pagamento em 24h", "Analytics avançado", "Suporte prioritário"],
+      "features": ["Tudo do Básico", "Taxa reduzida de 20% por venda", "Pagamento em 24h", "Analytics avançado", "Suporte prioritário"],
       "cta": "Assinar Pro →"
     }
   },

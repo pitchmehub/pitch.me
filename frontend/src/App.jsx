@@ -42,6 +42,7 @@ import Privacidade      from './pages/legal/Privacidade'
 import DireitosAutorais from './pages/legal/DireitosAutorais'
 import EditarPerfil  from './pages/EditarPerfil'
 import CompletarCadastro from './pages/CompletarCadastro'
+import RedefinirSenha from './pages/RedefinirSenha'
 import Dossies                from './pages/Dossies'
 import CancelarSaque          from './pages/CancelarSaque'
 import PagamentoSucesso   from './pages/PagamentoSucesso'
@@ -81,10 +82,6 @@ function RouteTracker() {
 function PrivateRoute({ children, roles }) {
   const { user, perfil, loading } = useAuth()
   const path = typeof window !== 'undefined' ? window.location.pathname : ''
-  const skipCadastro = (() => {
-    try { return typeof window !== 'undefined' && localStorage.getItem('gravan_skip_cadastro') === '1' }
-    catch { return false }
-  })()
 
   if (loading) return <div style={{ padding: 40, color: '#71717A', fontFamily: 'IBM Plex Sans, system-ui, sans-serif' }}>Carregando…</div>
   if (!user)   return <Navigate to="/login" replace />
@@ -92,11 +89,13 @@ function PrivateRoute({ children, roles }) {
   if (perfil && !perfil.role && path !== '/perfil/tipo') {
     return <Navigate to="/perfil/tipo" replace />
   }
-  if (perfil && perfil.role === 'compositor' && !perfil.cadastro_completo && !skipCadastro
+  // CPF/RG e dados pessoais agora são OBRIGATÓRIOS para compositores antes
+  // de acessar qualquer parte da plataforma. Sem bypass.
+  if (perfil && perfil.role === 'compositor' && !perfil.cadastro_completo
       && path !== '/perfil/completar' && path !== '/perfil/tipo') {
     return <Navigate to="/perfil/completar" replace />
   }
-  if (perfil && perfil.role === 'publisher' && !perfil.razao_social && !skipCadastro
+  if (perfil && perfil.role === 'publisher' && !perfil.razao_social
       && path !== '/editora/cadastro' && path !== '/perfil/tipo') {
     return <Navigate to="/editora/cadastro" replace />
   }
@@ -145,6 +144,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/"              element={<Landing />} />
       <Route path="/login"         element={<Login />} />
+      <Route path="/redefinir-senha" element={<RedefinirSenha />} />
 
       <Route path="/descoberta"    element={<PrivateRoute><AppShell><Descoberta /></AppShell></PrivateRoute>} />
       <Route path="/dashboard"     element={<PrivateRoute><AppShell><Dashboard /></AppShell></PrivateRoute>} />
