@@ -289,16 +289,19 @@
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, .5);
-  border-radius: 24px;
-  width: 100%; max-width: 360px;
-  max-height: 86vh;
+  border-radius: 28px;
+  width: 100%; max-width: 320px;
+  max-height: 80vh;
   overflow: hidden;
   overflow-y: auto;
   position: relative;
   box-shadow:
-    0 24px 60px rgba(0, 0, 0, .30),
+    0 30px 80px rgba(0, 0, 0, .30),
     inset 0 1px 0 rgba(255, 255, 255, .6);
   animation: dcSlideUp .22s cubic-bezier(.2,.9,.3,1.2);
+}
+@media (max-width: 480px) {
+  .dc-modal { max-width: 300px; max-height: 78vh; border-radius: 24px; }
 }
 @keyframes dcSlideUp {
   from { opacity:0; transform: scale(.94) translateY(12px); }
@@ -399,11 +402,14 @@
   position: relative;
   width: 100%;
   aspect-ratio: 3 / 4;
-  max-height: 420px;
+  max-height: 340px;
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   background: linear-gradient(180deg, #1A1816 0%, #0A0908 100%);
   isolation: isolate;
+}
+@media (max-width: 480px) {
+  .ft-hero { max-height: 300px; }
 }
 /* Fundo: a própria capa borrada e escurecida, criando "ambiente" */
 .ft-hero-bg {

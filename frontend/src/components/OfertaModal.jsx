@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { api } from '../lib/api'
+import '../styles/modal.css'
 
 function fmt(cents) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -73,28 +74,18 @@ export default function OfertaModal({
 
   return createPortal(
     <div
+      className="gv-modal-bg"
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
-      style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,.55)',
-        backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center',
-        justifyContent: 'center', zIndex: 1000, padding: 16,
-      }}
     >
-      <div style={{
-        background: '#fff', borderRadius: 14, width: '100%', maxWidth: 480,
-        padding: 24, boxShadow: '0 12px 40px rgba(0,0,0,.25)',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700 }}>
-            {modo === 'contraproposta' ? 'Fazer contraproposta' : 'Fazer oferta'}
-          </h2>
-          <button onClick={onClose} style={{
-            background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#666',
-          }}>×</button>
+      <div className="gv-modal-box" style={{ maxWidth: 440 }}>
+        <div className="gv-modal-head">
+          <div className="gv-modal-head-info">
+            <h2>{modo === 'contraproposta' ? 'Fazer contraproposta' : 'Fazer oferta'}</h2>
+            <p>Obra: <b>{obra.nome}</b> · valor de catálogo {fmt(preco)}</p>
+          </div>
+          <button className="gv-modal-close" onClick={onClose} aria-label="Fechar">×</button>
         </div>
-        <p style={{ color: '#666', fontSize: 13, marginBottom: 18 }}>
-          Obra: <b>{obra.nome}</b> · valor de catálogo {fmt(preco)}
-        </p>
+        <div className="gv-modal-body" style={{ padding: '18px 24px 22px' }}>
 
         {/* Tipo: padrão | exclusividade — só na oferta inicial */}
         {modo === 'oferta' && (
@@ -218,9 +209,10 @@ export default function OfertaModal({
                 : `Fazer oferta · ${fmt(valorCents)}`}
           </button>
         </div>
-        <p style={{ fontSize: 11, color: '#888', marginTop: 12, textAlign: 'center' }}>
+        <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 12, textAlign: 'center' }}>
           O compositor tem 48h para responder. Se aceitar, você paga o valor da oferta.
         </p>
+        </div>
       </div>
     </div>,
     document.body

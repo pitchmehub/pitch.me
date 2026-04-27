@@ -5,13 +5,13 @@ import { useTheme } from '../contexts/ThemeContext'
 import NotificationBell from './NotificationBell'
 import GravanLogo from './GravanLogo'
 import {
-  IconSun, IconMoon, IconUser, IconWallet, IconLogout, IconChevronDown,
+  IconUser, IconWallet, IconLogout, IconChevronDown,
 } from './Icons'
 import './GlobalTopBar.css'
 
 export default function GlobalTopBar({ leftOffset = 0, isMobile = false }) {
   const { perfil, signOut } = useAuth()
-  const { theme, toggle } = useTheme()
+  const { theme } = useTheme()
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   const navigate = useNavigate()
@@ -41,21 +41,12 @@ export default function GlobalTopBar({ leftOffset = 0, isMobile = false }) {
             onClick={() => navigate('/descoberta')}
             aria-label="Início"
           >
-            <GravanLogo height={20} color={logoColor} textColor={logoText} />
+            <GravanLogo height={26} color={logoColor} textColor={logoText} />
           </button>
         )}
       </div>
 
       <div className="gtb-right">
-        <button
-          className="gtb-icon-btn gtb-theme-toggle"
-          onClick={toggle}
-          aria-label={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
-          title={theme === 'dark' ? 'Tema claro' : 'Tema escuro'}
-        >
-          {theme === 'dark' ? <IconSun size={17} /> : <IconMoon size={17} />}
-        </button>
-
         <div className="gtb-bell-wrap">
           <NotificationBell />
         </div>

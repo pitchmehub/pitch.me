@@ -64,8 +64,8 @@
   --sidebar-w:          240px;
   --sidebar-collapsed:  64px;
   --header-h:           60px;
-  --gtb-h:              56px;
-  --gtb-h-mobile:       52px;
+  --gtb-h:              68px;
+  --gtb-h-mobile:       64px;
   --transition:         .2s ease;
 
   /* ── Translucent surface (para barras flutuantes com blur) ── */

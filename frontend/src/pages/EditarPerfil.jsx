@@ -1,15 +1,18 @@
 import React, { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useTheme } from '../contexts/ThemeContext'
 import { supabase } from '../lib/supabase'
 import ImageCropper from '../components/ImageCropper'
 import PushToggle from '../components/PushToggle'
+import { IconSun, IconMoon } from '../components/Icons'
 
 const MAX_AVATAR = 2 * 1024 * 1024 // 2 MB
 const MAX_CAPA = 5 * 1024 * 1024 // 5 MB
 
 export default function EditarPerfil() {
  const { perfil, refreshPerfil } = useAuth()
+ const { theme, toggle: toggleTheme } = useTheme()
  const navigate = useNavigate()
  const avatarFileRef = useRef(null)
  const capaFileRef = useRef(null)
@@ -305,6 +308,55 @@ export default function EditarPerfil() {
  <div className="card" style={{ marginBottom: 20 }}>
  <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Notificações</h2>
  <PushToggle />
+
+ <div style={{ height: 1, background: 'var(--border)', margin: '16px 0' }} />
+
+ <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>Aparência</h2>
+ <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14 }}>
+   Escolha entre tema claro e escuro para o app.
+ </p>
+ <button
+   type="button"
+   onClick={toggleTheme}
+   aria-label={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+   style={{
+     display: 'flex', alignItems: 'center', gap: 12,
+     width: '100%', padding: '12px 14px',
+     background: 'var(--surface-2)',
+     border: '1px solid var(--border)',
+     borderRadius: 12,
+     cursor: 'pointer',
+     color: 'var(--text-primary)',
+     fontFamily: 'inherit',
+     textAlign: 'left',
+     transition: 'background .15s, border-color .15s',
+   }}
+ >
+   <span style={{
+     width: 36, height: 36, borderRadius: '50%',
+     display: 'flex', alignItems: 'center', justifyContent: 'center',
+     background: 'var(--surface)', border: '1px solid var(--border)',
+     color: 'var(--brand)',
+   }}>
+     {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
+   </span>
+   <span style={{ flex: 1 }}>
+     <div style={{ fontSize: 14, fontWeight: 600 }}>
+       Modo {theme === 'dark' ? 'escuro' : 'claro'}
+     </div>
+     <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+       Toque para mudar para o modo {theme === 'dark' ? 'claro' : 'escuro'}.
+     </div>
+   </span>
+   <span style={{
+     padding: '4px 10px', borderRadius: 999,
+     background: 'var(--brand-light)', color: 'var(--brand)',
+     fontSize: 11, fontWeight: 700, letterSpacing: .5,
+     textTransform: 'uppercase',
+   }}>
+     {theme === 'dark' ? 'Escuro' : 'Claro'}
+   </span>
+ </button>
  </div>
 
  {/* Segurança – trocar senha */}

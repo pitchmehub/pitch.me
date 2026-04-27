@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import '../styles/modal.css'
 
 /**
  * Modal genérico de upgrade para PRO.
@@ -27,65 +28,64 @@ export default function UpgradeProModal({
   return (
     <div
       data-testid="upgrade-pro-modal"
+      className="gv-modal-bg"
       onClick={onClose}
-      style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: 9999, padding: 16,
-      }}
+      style={{ zIndex: 9999 }}
     >
       <div
+        className="gv-modal-box"
         onClick={e => e.stopPropagation()}
-        style={{
-          background: '#fff', borderRadius: 16, maxWidth: 460, width: '100%',
-          padding: 28, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', textAlign: 'center',
-        }}
+        style={{ maxWidth: 420, textAlign: 'center' }}
       >
-        <div style={{
-          display: 'inline-block', padding: '4px 12px',
-          background: 'linear-gradient(135deg, #1e3a8a, #2563eb)', color: '#fff',
-          fontSize: 11, fontWeight: 800, letterSpacing: 1.2, borderRadius: 4,
-          marginBottom: 16,
-        }}>
-          PLANO PRO
-        </div>
+        <button className="gv-modal-close" onClick={onClose} aria-label="Fechar"
+          style={{ position: 'absolute', top: 14, right: 14 }}>×</button>
+        <div style={{ padding: '28px 24px 24px' }}>
+          <div style={{
+            display: 'inline-block', padding: '4px 12px',
+            background: 'linear-gradient(135deg, var(--brand-dark), var(--brand))', color: '#fff',
+            fontSize: 11, fontWeight: 800, letterSpacing: 1.2, borderRadius: 4,
+            marginBottom: 16,
+          }}>
+            PLANO PRO
+          </div>
 
-        <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10, lineHeight: 1.3 }}>
-          {titulo}
-        </h2>
-        <p style={{ color: 'var(--text-muted, #71717A)', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
-          {mensagem}
-        </p>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10, lineHeight: 1.3, color: 'var(--text-primary)' }}>
+            {titulo}
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 22, lineHeight: 1.5 }}>
+            {mensagem}
+          </p>
 
-        <ul style={{ textAlign: 'left', fontSize: 13, color: '#333', listStyle: 'none', padding: 0, marginBottom: 22 }}>
-          <li style={{ padding: '6px 0' }}>✓ Precificação até R$ 10.000 por obra</li>
-          <li style={{ padding: '6px 0' }}>✓ Comissão de 15% (em vez de 20%)</li>
-          <li style={{ padding: '6px 0' }}>✓ Receba ofertas de exclusividade</li>
-          <li style={{ padding: '6px 0' }}>✓ Selo PRO no seu perfil e obras</li>
-          <li style={{ padding: '6px 0' }}>✓ Analytics completo de receita e ofertas</li>
-        </ul>
+          <ul style={{ textAlign: 'left', fontSize: 13, color: 'var(--text-primary)', listStyle: 'none', padding: 0, marginBottom: 22 }}>
+            <li style={{ padding: '6px 0' }}>✓ Precificação até R$ 10.000 por obra</li>
+            <li style={{ padding: '6px 0' }}>✓ Comissão de 15% (em vez de 20%)</li>
+            <li style={{ padding: '6px 0' }}>✓ Receba ofertas de exclusividade</li>
+            <li style={{ padding: '6px 0' }}>✓ Selo PRO no seu perfil e obras</li>
+            <li style={{ padding: '6px 0' }}>✓ Analytics completo de receita e ofertas</li>
+          </ul>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <button
-            data-testid="btn-assinar-pro"
-            className="btn btn-primary"
-            onClick={() => {
-              navigate('/planos', { state: contexto ? { contexto } : undefined })
-            }}
-            style={{ padding: '12px 18px', fontSize: 14, fontWeight: 600 }}
-          >
-            {ctaLabel}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              background: 'none', border: 'none', color: 'var(--text-muted, #71717A)',
-              fontSize: 13, cursor: 'pointer', padding: 8,
-            }}
-          >
-            Agora não
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <button
+              data-testid="btn-assinar-pro"
+              className="btn btn-primary"
+              onClick={() => {
+                navigate('/planos', { state: contexto ? { contexto } : undefined })
+              }}
+              style={{ padding: '12px 18px', fontSize: 14, fontWeight: 600 }}
+            >
+              {ctaLabel}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                background: 'none', border: 'none', color: 'var(--text-muted)',
+                fontSize: 13, cursor: 'pointer', padding: 8,
+              }}
+            >
+              Agora não
+            </button>
+          </div>
         </div>
       </div>
     </div>
