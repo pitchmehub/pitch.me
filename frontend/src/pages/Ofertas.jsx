@@ -35,10 +35,14 @@ export default function Ofertas() {
   const isCompositor = perfil?.role === 'compositor'
   const isPublisher  = perfil?.role === 'publisher'
 
-  // Aba inicial: compositor → recebidas; editora → editora; demais → enviadas
+  // Aba inicial: compositor → recebidas; editora → editora; demais → enviadas.
+  // Esse default é só um chute — depois que os dados carregam, se a aba
+  // padrão estiver vazia mas outra tiver conteúdo, ajustamos automaticamente
+  // para a aba que tem ofertas (evita o usuário achar que sumiram).
   const [aba, setAba] = useState(
     isCompositor ? 'recebidas' : isPublisher ? 'editora' : 'enviadas'
   )
+  const [abaTocadaPeloUsuario, setAbaTocadaPeloUsuario] = useState(false)
 
   const [recebidas, setRecebidas] = useState([])
   const [enviadas, setEnviadas]   = useState([])
@@ -66,6 +70,20 @@ export default function Ofertas() {
   }
 
   useEffect(() => { carregar() }, [isCompositor, isPublisher])
+
+  // Após carregar, se a aba padrão estiver vazia e existir outra com
+  // conteúdo, troca automaticamente — a menos que o usuário já tenha
+  // clicado em alguma aba manualmente.
+  useEffect(() => {
+    if (loading || abaTocadaPeloUsuario) return
+    const counts = { recebidas: recebidas.length, enviadas: enviadas.length, editora: editora.length }
+    if ((counts[aba] ?? 0) > 0) return
+    // Ordem de preferência: recebidas (decisões pendentes) → editora → enviadas
+    const ordem = ['recebidas', 'editora', 'enviadas']
+      .filter(k => (k === 'recebidas' && isCompositor) || (k === 'editora' && isPublisher) || k === 'enviadas')
+    const proxima = ordem.find(k => (counts[k] ?? 0) > 0)
+    if (proxima && proxima !== aba) setAba(proxima)
+  }, [loading, recebidas.length, enviadas.length, editora.length, abaTocadaPeloUsuario, isCompositor, isPublisher, aba])
 
   async function responder(oferta, status) {
     setRespondendo(oferta.id)
@@ -130,7 +148,7 @@ export default function Ofertas() {
             return (
               <button
                 key={t.key}
-                onClick={() => setAba(t.key)}
+                onClick={() => { setAba(t.key); setAbaTocadaPeloUsuario(true) }}
                 style={{
                   padding: '10px 16px',
                   background: 'transparent',
