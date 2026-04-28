@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import api from '../lib/api'
+import { api } from '../lib/api'
 
 const POLL_INTERVAL = 60_000
 
