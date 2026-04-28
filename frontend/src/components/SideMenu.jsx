@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { usePendencias } from '../hooks/usePendencias'
 import GravanLogo from './GravanLogo'
 import {
   IconCompass, IconGrid, IconMusic, IconPlus, IconChart, IconDocument,
@@ -180,6 +181,41 @@ function AdminBadge({ collapsed }) {
  )
 }
 
+function PendBadge({ count, collapsed }) {
+  if (!count) return null
+  if (collapsed) {
+    return (
+      <span style={{
+        position: 'absolute', top: 6, right: 6,
+        width: 8, height: 8, borderRadius: '50%',
+        background: '#ef4444',
+        border: '1.5px solid var(--bg)',
+        display: 'block',
+        flexShrink: 0,
+      }} />
+    )
+  }
+  return (
+    <span style={{
+      marginLeft: 'auto',
+      minWidth: 18, height: 18,
+      borderRadius: 9,
+      background: '#ef4444',
+      color: '#fff',
+      fontSize: 10.5,
+      fontWeight: 700,
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '0 5px',
+      lineHeight: 1,
+      flexShrink: 0,
+    }}>
+      {count > 99 ? '99+' : count}
+    </span>
+  )
+}
+
 export default function SideMenu({ onCollapse }) {
  const isMobile = useIsMobile()
  const [collapsed, setCollapsed] = useState(false)
@@ -190,6 +226,7 @@ export default function SideMenu({ onCollapse }) {
  const drawerRef = useRef(null)
  const dragStateRef = useRef(null)
  const [dragOffset, setDragOffset] = useState(0)
+ const pendencias = usePendencias()
 
  useEffect(() => { onCollapse?.(isMobile ? true : collapsed) }, [collapsed, isMobile])
  useEffect(() => { setMobileOpen(false) }, [location.pathname])
@@ -287,10 +324,11 @@ export default function SideMenu({ onCollapse }) {
  style={highlight ? { fontWeight: 700 } : undefined}
  onClick={() => setMobileOpen(false)}>
  <span className="sidebar-icon">{Icon ? <Icon size={18} /> : null}</span>
- <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+ <span style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1 }}>
  {label}
  {pro && <span style={proTag}>PRO</span>}
  </span>
+ {to === '/contratos' && <PendBadge count={pendencias} collapsed={false} />}
  </NavLink>
  ))}
  </nav>
@@ -331,8 +369,18 @@ export default function SideMenu({ onCollapse }) {
  <button
  className={`mobile-bottom-item ${mobileOpen ? 'active' : ''}`}
  onClick={() => setMobileOpen(o => !o)}
- aria-label="Mais opções">
- <span className="mobile-bottom-icon"><IconMore size={22} /></span>
+ aria-label="Mais opções"
+ style={{ position: 'relative' }}>
+ <span className="mobile-bottom-icon" style={{ position: 'relative', display: 'inline-flex' }}>
+ <IconMore size={22} />
+ {pendencias > 0 && drawerItems.some(i => i.to === '/contratos') && (
+ <span style={{
+ position: 'absolute', top: -2, right: -3,
+ width: 8, height: 8, borderRadius: '50%',
+ background: '#ef4444', border: '1.5px solid var(--bg)',
+ }} />
+ )}
+ </span>
  <span className="mobile-bottom-label">Mais</span>
  </button>
  </nav>
@@ -361,14 +409,15 @@ export default function SideMenu({ onCollapse }) {
  <NavLink key={to} to={to}
  className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
  title={collapsed ? label : undefined}
- style={highlight ? { fontWeight: 700 } : undefined}>
+ style={{ ...(highlight ? { fontWeight: 700 } : {}), position: 'relative' }}>
  <span className="sidebar-icon">{Icon ? <Icon size={18} /> : null}</span>
  {!collapsed && (
- <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+ <span style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1 }}>
  {label}
  {pro && <span style={proTag}>PRO</span>}
  </span>
  )}
+ {to === '/contratos' && <PendBadge count={pendencias} collapsed={collapsed} />}
  </NavLink>
  ))}
  </nav>

@@ -69,6 +69,77 @@ def templates():
     }), 200
 
 
+@contratos_lic_bp.route("/pendencias", methods=["GET"])
+@require_auth
+def pendencias():
+    """
+    Retorna quantos contratos aguardam assinatura do usuário autenticado.
+    Consulta: contract_signers (licenciamento) + contracts_edicao (edição).
+    """
+    user_id = g.user_id
+    sb = get_supabase()
+
+    # ── 1. Contratos de licenciamento ──────────────────────────
+    lic_count = 0
+    try:
+        # Busca signers do usuário que ainda não assinaram (signed_at IS NULL)
+        rows = (
+            sb.table("contract_signers")
+            .select("contract_id")
+            .eq("user_id", user_id)
+            .is_("signed_at", "null")
+            .execute()
+            .data or []
+        )
+        if rows:
+            contract_ids = [r["contract_id"] for r in rows]
+            # Filtra apenas contratos ativos (não cancelados e não totalmente assinados)
+            ativos = (
+                sb.table("contracts")
+                .select("id")
+                .in_("id", contract_ids)
+                .not_.in_("status", ["cancelado", "assinado"])
+                .execute()
+                .data or []
+            )
+            lic_count = len(ativos)
+    except Exception:
+        pass
+
+    # ── 2. Contratos de edição (autor ↔ editora) ───────────────
+    ed_count = 0
+    try:
+        perfil_r = sb.table("perfis").select("role").eq("id", user_id).single().execute()
+        role = (perfil_r.data or {}).get("role", "")
+
+        if role == "publisher":
+            rows = (
+                sb.table("contracts_edicao")
+                .select("id")
+                .eq("publisher_id", user_id)
+                .is_("signed_by_publisher_at", "null")
+                .not_.in_("status", ["cancelado", "assinado"])
+                .execute()
+                .data or []
+            )
+        else:
+            rows = (
+                sb.table("contracts_edicao")
+                .select("id")
+                .eq("autor_id", user_id)
+                .is_("signed_by_autor_at", "null")
+                .not_.in_("status", ["cancelado", "assinado"])
+                .execute()
+                .data or []
+            )
+        ed_count = len(rows)
+    except Exception:
+        pass
+
+    total = lic_count + ed_count
+    return jsonify({"total": total, "licenciamento": lic_count, "edicao": ed_count}), 200
+
+
 def _build_autores_e_split(sb, obra: dict, titular: dict):
     """Monta autores_bloco, split_lista e nomes artísticos a partir das coautorias."""
     coaut = sb.table("coautorias").select("perfil_id, share_pct").eq("obra_id", obra["id"]).execute().data or []
