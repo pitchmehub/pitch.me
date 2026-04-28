@@ -183,18 +183,24 @@ def creditar_wallets_por_transacao(
                 ).maybe_single().execute()
                 saldo_atual = ((w.data if w else None) or {}).get("saldo_cents", 0) or 0
                 novo = saldo_atual + edp["valor_cents"]
-                sb.table("wallets").upsert({
-                    "perfil_id": edp["perfil_id"], "saldo_cents": novo,
-                }).execute()
+                # IMPORTANTE: on_conflict="perfil_id" para atualizar wallet
+                # existente em vez de tentar inserir e bater na unique.
+                sb.table("wallets").upsert(
+                    {"perfil_id": edp["perfil_id"], "saldo_cents": novo},
+                    on_conflict="perfil_id",
+                ).execute()
             except Exception as e2:
                 logger.error("Fallback wallet (editora) falhou para %s: %s",
                              edp["perfil_id"], e2)
         try:
+            # Editora não é coautora — coautoria_id fica nulo. A coluna
+            # precisa permitir NULL no schema (vide migration aplicada).
             sb.table("pagamentos_compositores").insert({
                 "perfil_id":    edp["perfil_id"],
                 "transacao_id": transacao_id,
                 "valor_cents":  edp["valor_cents"],
                 "share_pct":    edp["share_pct"],
+                "coautoria_id": None,
             }).execute()
             creditados_editora = 1
         except Exception as e:
@@ -219,9 +225,10 @@ def creditar_wallets_por_transacao(
                 ).maybe_single().execute()
                 saldo_atual = ((w.data if w else None) or {}).get("saldo_cents", 0) or 0
                 novo = saldo_atual + p["valor_cents"]
-                sb.table("wallets").upsert({
-                    "perfil_id": p["perfil_id"], "saldo_cents": novo,
-                }).execute()
+                sb.table("wallets").upsert(
+                    {"perfil_id": p["perfil_id"], "saldo_cents": novo},
+                    on_conflict="perfil_id",
+                ).execute()
             except Exception as e2:
                 logger.error("Fallback wallet falhou para %s: %s", p["perfil_id"], e2)
                 continue
