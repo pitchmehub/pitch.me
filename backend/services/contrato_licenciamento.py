@@ -86,9 +86,10 @@ Parágrafo Único: Os percentuais aplicados pela plataforma são: 25% (vinte e c
 
 5.3 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
 
-No presente contrato bilateral, a GRAVAN EDITORA MUSICAL LTDA. (CNPJ 64.342.514/0001-08) é a editora detentora dos direitos de edição da obra, nos termos do contrato de edição vigente com o(s) AUTOR(ES). Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão distribuídos da seguinte forma:
+No presente contrato, a GRAVAN EDITORA MUSICAL LTDA. (CNPJ 64.342.514/0001-08) atua como EDITORA DETENTORA DOS DIREITOS de edição da obra, nos termos do contrato de edição vigente com o(s) AUTOR(ES). Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão distribuídos da seguinte forma:
 - 85% (oitenta e cinco por cento) para os AUTORES da obra, repartidos entre si na proporção pró-rata declarada na CLÁUSULA 10 (SPLIT) deste instrumento;
-- 15% (quinze por cento) para a GRAVAN EDITORA MUSICAL LTDA., sendo 10% (dez por cento) na qualidade de editora detentora dos direitos de edição e 5% (cinco por cento) na qualidade de plataforma intermediária.
+- 10% (dez por cento) para a GRAVAN EDITORA MUSICAL LTDA., na qualidade de EDITORA DETENTORA DOS DIREITOS;
+- 5% (cinco por cento) para a GRAVAN EDITORA MUSICAL LTDA., na qualidade de plataforma intermediária.
 
 CLÁUSULA 6 — CRÉDITOS E IDENTIFICAÇÃO
 
@@ -685,11 +686,10 @@ Parágrafo Quarto — Renovação (licença EXCLUSIVA): Findo o prazo de exclusi
 
 CLÁUSULA 6 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
 
-Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão
-distribuídos da seguinte forma:
+A EDITORA DETENTORA DOS DIREITOS é identificada no cabeçalho deste instrumento. Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão distribuídos da seguinte forma:
 - 85% (oitenta e cinco por cento) para os AUTORES da obra, repartidos entre si na proporção pró-rata declarada na CLÁUSULA 7 (SPLIT) deste instrumento;
 - 10% (dez por cento) para a EDITORA DETENTORA DOS DIREITOS;
-- 5% (cinco por cento) para a EDITORA GRAVAN.
+- 5% (cinco por cento) para a EDITORA GRAVAN, na qualidade de plataforma intermediária.
 
 CLÁUSULA 7 — AUTORIA E DIVISÃO IGUALITÁRIA PRÓ-RATA DE DIREITOS (SPLIT)
 
