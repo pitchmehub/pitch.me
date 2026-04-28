@@ -187,7 +187,7 @@ def _info_plano(titular: dict) -> dict:
         "editora_pct": editora_pct,
         "editora_pct_extenso": editora_extenso,
         "liquido_autores_pct": 100 - plataforma_pct,
-        "liquido_autores_pct_trilateral": 100 - plataforma_pct,
+        "liquido_autores_pct_trilateral": 100 - plataforma_pct - editora_pct,
     }
 
 
@@ -660,9 +660,12 @@ A liberação do valor ocorre após a assinatura final.
 
 Sobre o valor bruto pago pelo LICENCIADO incidirá:
 - {{plataforma_pct}}% ({{plataforma_pct_extenso}}) de taxa de intermediação devida à GRAVAN, na qualidade de TERCEIRA BENEFICIÁRIA, conforme o plano de assinatura vigente do AUTOR PRINCIPAL na data deste licenciamento ({{plano_titular_label}});
-- O saldo remanescente de {{liquido_autores_pct_trilateral}}% é devido ao(s) AUTOR(ES) e à EDITORA DETENTORA DOS DIREITOS, distribuídos entre si exclusivamente nos termos do contrato de edição vigente entre eles, sendo a EDITORA responsável pela distribuição conforme declarado na CLÁUSULA 4.
+- {{editora_pct}}% ({{editora_pct_extenso}}) destinados à EDITORA DETENTORA DOS DIREITOS, na qualidade de detentora dos direitos editoriais sobre a composição;
+- {{liquido_autores_pct_trilateral}}% remanescentes, distribuídos entre o(s) AUTOR(ES) na proporção declarada na CLÁUSULA 7 (SPLIT).
 
-Parágrafo Único: A taxa da plataforma GRAVAN segue a tabela: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda. A Gravan não define nem interfere na distribuição do saldo remanescente entre a EDITORA e os AUTORES, a qual é regida exclusivamente pelo contrato de edição vigente.{{clausula_split_editora}}
+Parágrafo Primeiro: A taxa da plataforma GRAVAN segue a tabela: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda.
+
+Parágrafo Segundo: O percentual de {{editora_pct}}% ({{editora_pct_extenso}}) destinado à EDITORA é fixo e independe do plano de assinatura do AUTOR PRINCIPAL.{{clausula_split_editora}}
 
 CLÁUSULA 4 — DECLARAÇÃO DA EDITORA DETENTORA DOS DIREITOS
 
@@ -685,9 +688,9 @@ Parágrafo Quarto — Renovação (licença EXCLUSIVA): Findo o prazo de exclusi
 
 CLÁUSULA 6 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
 
-A GRAVAN, na qualidade de TERCEIRA BENEFICIÁRIA, é beneficiária de 5% (cinco por cento) dos rendimentos provenientes de execução pública arrecadados pelo ECAD relativos a esta obra, registrados em seu nome como plataforma intermediária.
+Os rendimentos provenientes de execução pública arrecadados pelo ECAD são distribuídos conforme os registros vigentes entre os AUTORES e a EDITORA DETENTORA DOS DIREITOS, sem interferência deste instrumento nesses direitos.
 
-Os 95% (noventa e cinco por cento) restantes são distribuídos conforme os registros vigentes no ECAD e os termos do contrato de edição em vigor entre a EDITORA DETENTORA DOS DIREITOS e o(s) AUTOR(ES). O presente instrumento não altera, substitui nem interfere nos direitos editoriais já registrados da EDITORA DETENTORA DOS DIREITOS junto ao ECAD ou em qualquer outra entidade de gestão coletiva.
+A EDITORA DETENTORA DOS DIREITOS compromete-se a repassar à GRAVAN, na qualidade de TERCEIRA BENEFICIÁRIA, 5% (cinco por cento) de todos os valores por ela recebidos a título de execução pública (ECAD) decorrentes da exploração desta obra. Este fee é devido sobre os valores brutos recebidos pela EDITORA, independentemente do valor total distribuído pelo ECAD.
 
 CLÁUSULA 7 — AUTORIA E DIVISÃO IGUALITÁRIA PRÓ-RATA DE DIREITOS (SPLIT)
 
