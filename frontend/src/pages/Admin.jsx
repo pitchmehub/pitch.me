@@ -1086,7 +1086,7 @@ function AnaliticosPanel({ resumo, extras, reloadingExtras, reloadExtras }) {
           Ofertas de catálogo (intérpretes → compositores)
         </h3>
         <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 12 }}>
-          Total negociado em ofertas aceitas: <strong style={{ color: 'var(--success)' }}>{fmt(o.total_negociado_cents || 0)}</strong>
+          Total negociado (aceitas + pagas): <strong style={{ color: 'var(--success)' }}>{fmt(o.total_negociado_cents || 0)}</strong>
           {' · '}Ticket médio: <strong>{fmt(o.ticket_medio_cents || 0)}</strong>
           {' · '}Taxa de aceite: <strong>{o.taxa_aceite_pct || 0}%</strong>
         </div>
@@ -1095,7 +1095,8 @@ function AnaliticosPanel({ resumo, extras, reloadingExtras, reloadExtras }) {
         }}>
           <StatCard label="Total de ofertas" value={o.total || 0} big />
           <StatCard label="Pendentes" value={o.pendentes || 0} color="var(--warning)" />
-          <StatCard label="Aceitas" value={o.aceitas || 0} color="var(--success)" />
+          <StatCard label="Aceitas (em negoc.)" value={(o.aceitas || 0) - (o.pagas || 0)} color="#0891b2" />
+          <StatCard label="Pagas (concluídas)" value={o.pagas || 0} color="var(--success)" />
           <StatCard label="Recusadas" value={o.recusadas || 0} color="var(--danger)" />
           <StatCard label="Canceladas/expiradas" value={o.canceladas || 0} />
           <StatCard label="Exclusividade" value={o.exclusividade || 0} color="var(--brand)" />

@@ -154,15 +154,17 @@ def bi_extras():
         pass
 
     of_pendentes = sum(1 for o in ofertas_catalogo if o.get("status") == "pendente")
-    of_aceitas   = sum(1 for o in ofertas_catalogo if o.get("status") == "aceita")
+    # "paga" é o estado final após pagamento Stripe confirmado — conta como aceita/concluída
+    of_aceitas   = sum(1 for o in ofertas_catalogo if o.get("status") in ("aceita", "paga", "contra_proposta"))
+    of_pagas     = sum(1 for o in ofertas_catalogo if o.get("status") == "paga")
     of_recusadas = sum(1 for o in ofertas_catalogo if o.get("status") == "recusada")
     of_canceladas = sum(1 for o in ofertas_catalogo
                         if o.get("status") in ("cancelada", "expirada"))
     of_total_negociado = sum(int(o.get("valor_cents") or 0)
-                             for o in ofertas_catalogo if o.get("status") == "aceita")
-    of_ticket_medio = (int(of_total_negociado / of_aceitas)
-                       if of_aceitas else 0)
-    taxa_aceite = (round(of_aceitas / (of_aceitas + of_recusadas) * 100, 1)
+                             for o in ofertas_catalogo if o.get("status") in ("aceita", "paga"))
+    of_ticket_medio = (int(of_total_negociado / max(of_pagas, of_aceitas))
+                       if (of_pagas or of_aceitas) else 0)
+    taxa_aceite = (round((of_aceitas) / (of_aceitas + of_recusadas) * 100, 1)
                    if (of_aceitas + of_recusadas) > 0 else 0)
     of_exclusividade = sum(1 for o in ofertas_catalogo
                            if (o.get("tipo") or "").lower() == "exclusividade")
@@ -181,11 +183,15 @@ def bi_extras():
     lic_total          = len(ofertas_lic)
     lic_em_andamento   = sum(1 for o in ofertas_lic
                              if o.get("status") in (
+                                 "aguardando_pagamento",
                                  "aguardando_editora",
-                                 "aguardando_assinaturas",
+                                 "editora_cadastrada",
+                                 "em_assinatura",
                              ))
     lic_concluidas     = sum(1 for o in ofertas_lic
-                             if o.get("status") in ("aceita", "concluida", "concluído"))
+                             if o.get("status") in (
+                                 "concluida", "concluído", "confirmada",
+                             ))
 
     # ── 6. Saques pagos (saídas reais para os artistas) ────────────
     total_pago_artistas = 0
@@ -243,6 +249,7 @@ def bi_extras():
             "total":               len(ofertas_catalogo),
             "pendentes":           of_pendentes,
             "aceitas":             of_aceitas,
+            "pagas":               of_pagas,
             "recusadas":           of_recusadas,
             "canceladas":          of_canceladas,
             "exclusividade":       of_exclusividade,
