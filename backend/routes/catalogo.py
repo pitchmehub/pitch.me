@@ -472,6 +472,7 @@ def ofertas_recebidas():
 @catalogo_bp.route("/ofertas/enviadas", methods=["GET"])
 @require_auth
 def ofertas_enviadas():
+    import logging
     sb = get_supabase()
     expirar_pendentes()
     resp = (
@@ -481,7 +482,12 @@ def ofertas_enviadas():
         .order("created_at", desc=True)
         .execute()
     )
-    return jsonify(resp.data or []), 200
+    data = resp.data or []
+    logging.warning(
+        "[DEBUG ofertas_enviadas] user_id=%s count=%d ids=%s",
+        g.user.id, len(data), [o.get("id") for o in data],
+    )
+    return jsonify(data), 200
 
 
 @catalogo_bp.route("/ofertas/editora", methods=["GET"])
