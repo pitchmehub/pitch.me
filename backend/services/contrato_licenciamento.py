@@ -88,7 +88,7 @@ Parágrafo Único: Os percentuais aplicados pela plataforma são: 25% (vinte e c
 
 Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão distribuídos da seguinte forma:
 - 85% (oitenta e cinco por cento) para os AUTORES da obra, repartidos entre si na proporção pró-rata declarada na CLÁUSULA 10 (SPLIT) deste instrumento;
-- 10% (dez por cento) para o INTÉRPRETE;
+- 10% (dez por cento) para a EDITORA DETENTORA DOS DIREITOS;
 - 5% (cinco por cento) para a EDITORA GRAVAN.
 
 CLÁUSULA 6 — CRÉDITOS E IDENTIFICAÇÃO
@@ -603,7 +603,7 @@ Pelo presente instrumento particular, são partes:
 AUTOR(ES) DA COMPOSIÇÃO:
 {{autores_bloco}}
 
-EDITORA DETENTORA DOS DIREITOS DE EDIÇÃO (TERCEIRA EDITORA):
+EDITORA DETENTORA DOS DIREITOS:
 Razão Social: {{editora_razao}}
 CNPJ: {{editora_cnpj}}
 Responsável: {{editora_responsavel}}
@@ -628,9 +628,9 @@ Têm entre si justo e contratado o seguinte:
 CLÁUSULA 1 — RECONHECIMENTO DE EDIÇÃO PRÉVIA
 
 A obra abaixo identificada possui contrato de edição em vigor com a EDITORA
-TERCEIRA. As partes reconhecem expressamente a titularidade dos direitos
-editoriais da EDITORA TERCEIRA sobre a composição e a anuência desta para
-o licenciamento ora celebrado.
+DETENTORA DOS DIREITOS. As partes reconhecem expressamente a titularidade dos
+direitos editoriais da EDITORA DETENTORA DOS DIREITOS sobre a composição e a
+anuência desta para o licenciamento ora celebrado.
 
 Título da Obra: {{obra_nome}}
 
@@ -638,7 +638,7 @@ CLÁUSULA 2 — OBJETO
 
 O presente contrato tem por objeto a autorização para fixação da obra em
 fonograma e sua exploração comercial pelo LICENCIADO, com a participação
-da EDITORA TERCEIRA na qualidade de detentora dos direitos editoriais e
+da EDITORA DETENTORA DOS DIREITOS na qualidade de detentora dos direitos editoriais e
 da GRAVAN como plataforma intermediária.
 
 CORPO DA OBRA, conforme cadastrada pelo(s) AUTOR(ES) na plataforma
@@ -658,16 +658,16 @@ A liberação do valor ocorre após a assinatura final.
 
 Sobre o valor bruto pago pelo LICENCIADO incidirá:
 - {{plataforma_pct}}% ({{plataforma_pct_extenso}}) de taxa de intermediação devida à plataforma GRAVAN, conforme o plano de assinatura vigente do AUTOR PRINCIPAL na data deste licenciamento ({{plano_titular_label}});
-- {{editora_pct}}% ({{editora_pct_extenso}}) destinados à EDITORA TERCEIRA, na qualidade de detentora dos direitos editoriais sobre a composição;
+- {{editora_pct}}% ({{editora_pct_extenso}}) destinados à EDITORA DETENTORA DOS DIREITOS, na qualidade de detentora dos direitos editoriais sobre a composição;
 - {{liquido_autores_pct_trilateral}}% remanescentes, distribuídos entre o(s) AUTOR(ES) na proporção declarada na CLÁUSULA 7 (SPLIT).
 
 Parágrafo Primeiro: A taxa da plataforma GRAVAN segue a tabela: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda.
 
 Parágrafo Segundo: O percentual de 10% (dez por cento) destinado à EDITORA é fixo e independe do plano de assinatura do AUTOR PRINCIPAL.{{clausula_split_editora}}
 
-CLÁUSULA 4 — DECLARAÇÃO DA EDITORA TERCEIRA
+CLÁUSULA 4 — DECLARAÇÃO DA EDITORA DETENTORA DOS DIREITOS
 
-A EDITORA TERCEIRA declara: (i) possuir contrato de edição em vigor sobre a
+A EDITORA DETENTORA DOS DIREITOS declara: (i) possuir contrato de edição em vigor sobre a
 obra; (ii) ter ciência e concordância com o presente licenciamento;
 (iii) responsabilizar-se pela distribuição dos valores cabíveis ao(s)
 AUTOR(ES) nos termos do contrato de edição existente entre as partes.
@@ -689,7 +689,7 @@ CLÁUSULA 6 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
 Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão
 distribuídos da seguinte forma:
 - 85% (oitenta e cinco por cento) para os AUTORES da obra, repartidos entre si na proporção pró-rata declarada na CLÁUSULA 7 (SPLIT) deste instrumento;
-- 10% (dez por cento) para o INTÉRPRETE;
+- 10% (dez por cento) para a EDITORA DETENTORA DOS DIREITOS;
 - 5% (cinco por cento) para a EDITORA GRAVAN.
 
 CLÁUSULA 7 — AUTORIA E DIVISÃO IGUALITÁRIA PRÓ-RATA DE DIREITOS (SPLIT)

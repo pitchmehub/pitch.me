@@ -77,7 +77,7 @@ CLÁUSULA SÉTIMA — DISPOSIÇÕES GERAIS
 
 7.1 Este Contrato cancela e substitui qualquer acordo anterior firmado entre as PARTES, verbal ou escrito, referente ao mesmo objeto, obrigando as PARTES por si, seus herdeiros e sucessores.
 
-7.2 Este Contrato poderá ser rescindido a qualquer tempo, por qualquer das PARTES, mediante notificação prévia e expressa com até 6 (seis) meses da efetiva rescisão. Toda e qualquer licença concedida durante a vigência, inclusive nos 6 (seis) meses seguintes à notificação, reputar-se-ão válidas e definitivas.
+7.2 O presente Contrato terá vigência inicial de 5 (cinco) anos, contados da data de assinatura eletrônica, com renovação automática por igual período, independentemente de notificação. A autorização é concedida em caráter mundial, sem limitação territorial. Qualquer das PARTES poderá rescindir este Contrato, a qualquer tempo, mediante notificação prévia e expressa com antecedência mínima de 30 (trinta) dias antes do término do período vigente. Toda e qualquer licença concedida durante a vigência reputar-se-á válida e definitiva.
 
 7.3 A EDITORA procederá trimestralmente, na conta bancária em nome do AUTOR indicada no cadastro da plataforma, à liquidação dos direitos eventualmente devidos ao AUTOR, mediante a transferência das receitas que lhe pertencem, acompanhada dos respectivos demonstrativos, mencionando a fonte pagadora, o período a que se refere o crédito, o título da OBRA e o valor de cada crédito, devendo efetuá-la dentro dos 60 (sessenta) dias posteriores ao fim de cada trimestre.
 
@@ -106,7 +106,7 @@ CNPJ: {{plataforma_cnpj}}
 (EDITORA)
 """
 
-CONTRATO_VERSAO = "v2.4 - Abr/2026"
+CONTRATO_VERSAO = "v2.5 - Abr/2026"
 
 CONTRATO_PUBLISHER_TEMPLATE = """CONTRATO DE EDIÇÃO DE OBRAS MUSICAIS — EDITORA
 
@@ -167,8 +167,10 @@ Parágrafo Quarto: A EDITORA se compromete a manter registros financeiros e forn
 
 Parágrafo Quinto: O não pagamento dentro do prazo estipulado poderá resultar na suspensão da conta da EDITORA na plataforma e nas medidas legais cabíveis.
 
-CLÁUSULA SEXTA — RESCISÃO
-6.1 Este Contrato pode ser rescindido por qualquer das PARTES mediante notificação prévia de 90 (noventa) dias.
+CLÁUSULA SEXTA — PRAZO, TERRITÓRIO E RESCISÃO
+6.1 O presente Contrato terá vigência inicial de 5 (cinco) anos, contados da data de assinatura eletrônica, com renovação automática por igual período, independentemente de notificação. A autorização é concedida em caráter mundial, sem limitação territorial.
+
+6.2 Qualquer das PARTES poderá rescindir este Contrato, a qualquer tempo, mediante notificação prévia e expressa com antecedência mínima de 30 (trinta) dias antes do término do período vigente. Toda e qualquer licença concedida durante a vigência reputar-se-á válida e definitiva.
 
 CLÁUSULA SÉTIMA — FORO
 7.1 Fica eleito o foro da comarca da cidade do Rio de Janeiro/RJ.
