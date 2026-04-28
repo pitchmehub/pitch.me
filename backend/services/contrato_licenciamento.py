@@ -44,7 +44,7 @@ CORPO DA OBRA, conforme cadastrada pelo(s) AUTOR(ES) na plataforma GRAVAN, parte
 
 CLÁUSULA 2 — CESSÃO DE DIREITOS
 
-O(s) AUTOR(ES) autoriza(m), de forma irrevogável e irretratável, o LICENCIADO a:
+O(s) AUTOR(ES) autoriza(m), nos termos e pelo prazo deste instrumento, o LICENCIADO a:
 I. Reproduzir a obra em qualquer formato ou suporte;
 II. Distribuir e comercializar a obra em meios físicos e digitais;
 III. Disponibilizar a obra em plataformas de streaming, incluindo, mas não se limitando a Spotify e Apple Music;
@@ -55,7 +55,7 @@ CLÁUSULA 3 — TERRITÓRIO, PRAZO, RESCISÃO E EXCLUSIVIDADE
 
 A presente autorização é concedida em caráter mundial.
 
-Parágrafo Primeiro — Prazo e renovação (licença NÃO EXCLUSIVA): Quando este licenciamento for contratado em caráter NÃO EXCLUSIVO, terá validade de 5 (cinco) anos contados da data de emissão deste instrumento, com renovação automática por igual período, independentemente de notificação. Qualquer das partes poderá rescindir este instrumento mediante comunicação formal e expressa enviada por e-mail aos endereços indicados neste instrumento, com antecedência mínima de 30 (trinta) dias. Toda e qualquer exploração comercial realizada antes da efetiva rescisão reputa-se válida e definitiva.
+Parágrafo Primeiro — Prazo e renovação (licença NÃO EXCLUSIVA): Quando este licenciamento for contratado em caráter NÃO EXCLUSIVO, terá validade de 5 (cinco) anos contados da data de emissão deste instrumento, com renovação automática por igual período. Qualquer das partes poderá rescindi-lo ao término de cada período de 5 (cinco) anos, mediante comunicação formal e expressa enviada por e-mail aos endereços indicados neste instrumento, com antecedência mínima de 30 (trinta) dias em relação ao final do período vigente; não havendo manifestação tempestiva, o instrumento renova-se automaticamente. Toda e qualquer exploração comercial realizada antes da efetiva rescisão reputa-se válida e definitiva.
 
 Parágrafo Segundo — Não exclusividade (regra geral): Salvo se este licenciamento tiver sido contratado em caráter EXCLUSIVO (oferta de exclusividade aceita e paga por meio da plataforma GRAVAN), a autorização é concedida em caráter NÃO EXCLUSIVO, podendo o(s) AUTOR(ES) licenciar a mesma obra a terceiros.
 
@@ -86,10 +86,9 @@ Parágrafo Único: Os percentuais aplicados pela plataforma são: 25% (vinte e c
 
 5.3 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
 
-Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão distribuídos da seguinte forma:
+No presente contrato bilateral, a GRAVAN EDITORA MUSICAL LTDA. (CNPJ 64.342.514/0001-08) é a editora detentora dos direitos de edição da obra, nos termos do contrato de edição vigente com o(s) AUTOR(ES). Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão distribuídos da seguinte forma:
 - 85% (oitenta e cinco por cento) para os AUTORES da obra, repartidos entre si na proporção pró-rata declarada na CLÁUSULA 10 (SPLIT) deste instrumento;
-- 10% (dez por cento) para a EDITORA DETENTORA DOS DIREITOS;
-- 5% (cinco por cento) para a EDITORA GRAVAN.
+- 15% (quinze por cento) para a GRAVAN EDITORA MUSICAL LTDA., sendo 10% (dez por cento) na qualidade de editora detentora dos direitos de edição e 5% (cinco por cento) na qualidade de plataforma intermediária.
 
 CLÁUSULA 6 — CRÉDITOS E IDENTIFICAÇÃO
 
@@ -118,7 +117,7 @@ III. Integra as regras da plataforma GRAVAN.
 
 CLÁUSULA 10 — AUTORIA E DIVISÃO IGUALITÁRIA PRÓ-RATA DE DIREITOS (SPLIT)
 
-Todos os signatários abaixo são reconhecidos como AUTORES da obra, sendo cada um titular de direitos autorais patrimoniais e morais em partes iguais, calculadas pela divisão de 100% (cem por cento) dos direitos pela quantidade total de autores cadastrados na obra:
+Os AUTORES identificados abaixo são reconhecidos como titulares dos direitos autorais patrimoniais e morais sobre a obra, em partes iguais, calculadas pela divisão de 100% (cem por cento) dos direitos pela quantidade total de autores cadastrados:
 {{split_lista}}
 
 Parágrafo Primeiro: A divisão é calculada automaticamente pela plataforma GRAVAN de forma igualitária e pró-rata — cada AUTOR recebe exatamente 1/N dos direitos, onde N é o número total de autores da obra — conforme o disposto nos arts. 5º, VIII, e 15 da Lei nº 9.610/1998.
@@ -676,7 +675,7 @@ CLÁUSULA 5 — TERRITÓRIO, PRAZO, RESCISÃO E EXCLUSIVIDADE
 
 Autorização mundial.
 
-Parágrafo Primeiro — Prazo e renovação (licença NÃO EXCLUSIVA): Quando este licenciamento for contratado em caráter NÃO EXCLUSIVO, terá validade de 5 (cinco) anos contados da data de emissão deste instrumento, com renovação automática por igual período, independentemente de notificação. Qualquer das partes poderá rescindir este instrumento mediante comunicação formal e expressa enviada por e-mail aos endereços indicados neste instrumento, com antecedência mínima de 30 (trinta) dias. As explorações comerciais realizadas antes da efetiva rescisão reputam-se válidas e definitivas.
+Parágrafo Primeiro — Prazo e renovação (licença NÃO EXCLUSIVA): Quando este licenciamento for contratado em caráter NÃO EXCLUSIVO, terá validade de 5 (cinco) anos contados da data de emissão deste instrumento, com renovação automática por igual período. Qualquer das partes poderá rescindi-lo ao término de cada período de 5 (cinco) anos, mediante comunicação formal e expressa enviada por e-mail aos endereços indicados neste instrumento, com antecedência mínima de 30 (trinta) dias em relação ao final do período vigente; não havendo manifestação tempestiva, o instrumento renova-se automaticamente. As explorações comerciais realizadas antes da efetiva rescisão reputam-se válidas e definitivas.
 
 Parágrafo Segundo — Não exclusividade (regra geral): Salvo se este licenciamento tiver sido contratado em caráter EXCLUSIVO por meio da plataforma GRAVAN, a autorização é concedida em caráter NÃO EXCLUSIVO, podendo o(s) AUTOR(ES), com a anuência da EDITORA DETENTORA DOS DIREITOS, licenciar a mesma obra a terceiros.
 
@@ -694,7 +693,7 @@ distribuídos da seguinte forma:
 
 CLÁUSULA 7 — AUTORIA E DIVISÃO IGUALITÁRIA PRÓ-RATA DE DIREITOS (SPLIT)
 
-Todos os signatários abaixo são reconhecidos como AUTORES da obra, sendo cada um titular de direitos autorais patrimoniais e morais em partes iguais, calculadas pela divisão de 100% (cem por cento) dos direitos pela quantidade total de autores cadastrados na obra:
+Os AUTORES identificados abaixo são reconhecidos como titulares dos direitos autorais patrimoniais e morais sobre a obra, em partes iguais, calculadas pela divisão de 100% (cem por cento) dos direitos pela quantidade total de autores cadastrados:
 {{split_lista}}
 
 Parágrafo Primeiro: A divisão é calculada automaticamente pela plataforma GRAVAN de forma igualitária e pró-rata — cada AUTOR recebe exatamente 1/N dos direitos, onde N é o número total de autores da obra — conforme o disposto nos arts. 5º, VIII, e 15 da Lei nº 9.610/1998.

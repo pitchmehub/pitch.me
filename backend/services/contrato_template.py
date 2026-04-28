@@ -77,7 +77,7 @@ CLÁUSULA SÉTIMA — DISPOSIÇÕES GERAIS
 
 7.1 Este Contrato cancela e substitui qualquer acordo anterior firmado entre as PARTES, verbal ou escrito, referente ao mesmo objeto, obrigando as PARTES por si, seus herdeiros e sucessores.
 
-7.2 O presente Contrato terá vigência inicial de 5 (cinco) anos, contados da data de assinatura eletrônica, com renovação automática por igual período, independentemente de notificação. A autorização é concedida em caráter mundial, sem limitação territorial. Qualquer das PARTES poderá rescindir este Contrato mediante comunicação formal e expressa enviada por e-mail ao endereço cadastrado na plataforma, com antecedência mínima de 30 (trinta) dias. Toda e qualquer licença e exploração concedida durante a vigência reputar-se-á válida e definitiva.
+7.2 O presente Contrato terá vigência inicial de 5 (cinco) anos, contados da data de assinatura eletrônica, com renovação automática por igual período. Qualquer das PARTES poderá rescindi-lo ao término de cada período de 5 (cinco) anos, mediante comunicação formal e expressa enviada por e-mail ao endereço cadastrado na plataforma, com antecedência mínima de 30 (trinta) dias em relação ao final do período vigente; não havendo manifestação tempestiva, o contrato renova-se automaticamente. A autorização é concedida em caráter mundial, sem limitação territorial. Toda e qualquer licença e exploração concedida durante a vigência reputar-se-á válida e definitiva.
 
 7.3 A EDITORA procederá trimestralmente, na conta bancária em nome do AUTOR indicada no cadastro da plataforma, à liquidação dos direitos eventualmente devidos ao AUTOR, mediante a transferência das receitas que lhe pertencem, acompanhada dos respectivos demonstrativos, mencionando a fonte pagadora, o período a que se refere o crédito, o título da OBRA e o valor de cada crédito, devendo efetuá-la dentro dos 60 (sessenta) dias posteriores ao fim de cada trimestre.
 
@@ -106,7 +106,7 @@ CNPJ: {{plataforma_cnpj}}
 (EDITORA)
 """
 
-CONTRATO_VERSAO = "v2.6 - Abr/2026"
+CONTRATO_VERSAO = "v2.7 - Abr/2026"
 
 CONTRATO_PUBLISHER_TEMPLATE = """CONTRATO DE EDIÇÃO DE OBRAS MUSICAIS — EDITORA
 
@@ -168,9 +168,9 @@ Parágrafo Quarto: A EDITORA se compromete a manter registros financeiros e forn
 Parágrafo Quinto: O não pagamento dentro do prazo estipulado poderá resultar na suspensão da conta da EDITORA na plataforma e nas medidas legais cabíveis.
 
 CLÁUSULA SEXTA — PRAZO, TERRITÓRIO E RESCISÃO
-6.1 O presente Contrato terá vigência inicial de 5 (cinco) anos, contados da data de assinatura eletrônica, com renovação automática por igual período, independentemente de notificação. A autorização é concedida em caráter mundial, sem limitação territorial.
+6.1 O presente Contrato terá vigência inicial de 5 (cinco) anos, contados da data de assinatura eletrônica, com renovação automática por igual período. A autorização é concedida em caráter mundial, sem limitação territorial.
 
-6.2 Qualquer das PARTES poderá rescindir este Contrato mediante comunicação formal e expressa enviada por e-mail ao endereço cadastrado na plataforma, com antecedência mínima de 30 (trinta) dias. Toda e qualquer licença e exploração concedida durante a vigência reputar-se-á válida e definitiva.
+6.2 Qualquer das PARTES poderá rescindi-lo ao término de cada período de 5 (cinco) anos, mediante comunicação formal e expressa enviada por e-mail ao endereço cadastrado na plataforma, com antecedência mínima de 30 (trinta) dias em relação ao final do período vigente; não havendo manifestação tempestiva, o contrato renova-se automaticamente. Toda e qualquer licença e exploração concedida durante a vigência reputar-se-á válida e definitiva.
 
 CLÁUSULA SÉTIMA — FORO
 7.1 Fica eleito o foro da comarca da cidade do Rio de Janeiro/RJ.
