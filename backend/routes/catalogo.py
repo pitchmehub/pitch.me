@@ -359,7 +359,7 @@ def contra_propor_oferta(oferta_id):
         abort(409, description="Esta oferta aguarda resposta do intérprete.")
 
     obra = sb.table("obras").select(
-        "id, nome, preco_cents, titular_id, is_exclusive, editora_terceira_id"
+        "id, nome, preco_cents, titular_id, is_exclusive, editora_terceira_id, status"
     ).eq("id", of["obra_id"]).single().execute().data or {}
     if obra.get("titular_id") != g.user.id:
         abort(403, description="Apenas o titular da obra pode contra-propor.")
