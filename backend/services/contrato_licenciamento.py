@@ -19,7 +19,15 @@ AUTOR(ES):
 doravante denominado(s) "AUTOR(ES)".
 
 TERCEIRA BENEFICIÁRIA E EDITORA DETENTORA DOS DIREITOS:
-GRAVAN EDITORA MUSICAL LTDA., CNPJ 64.342.514/0001-08, sediada na cidade do Rio de Janeiro/RJ, operadora da plataforma GRAVAN, atuando neste instrumento em dupla capacidade: (i) como EDITORA DETENTORA DOS DIREITOS da obra, nos termos do contrato de edição vigente com o(s) AUTOR(ES); e (ii) como TERCEIRA BENEFICIÁRIA, na qualidade de operadora da infraestrutura tecnológica e plataforma utilizada nesta transação. Tais papéis, embora exercidos pela mesma pessoa jurídica, são juridicamente distintos e geram direitos independentes conforme declarado nas cláusulas de remuneração deste instrumento.
+GRAVAN EDITORA MUSICAL LTDA., CNPJ 64.342.514/0001-08, sediada na cidade do Rio de Janeiro/RJ, operadora da plataforma GRAVAN.
+
+Atua neste instrumento em dupla capacidade, com papéis juridicamente distintos:
+
+(i) Como EDITORA DETENTORA DOS DIREITOS: detém os direitos editoriais sobre esta obra nos termos do contrato de edição vigente com o(s) AUTOR(ES). Nesta frente, cabe à GRAVAN gerir, explorar e zelar pelos direitos autorais patrimoniais da obra, responsabilizando-se pela distribuição das receitas editoriais ao(s) AUTOR(ES) conforme o contrato de edição vigente.
+
+(ii) Como TERCEIRA BENEFICIÁRIA: atua como operadora da infraestrutura tecnológica e plataforma de gestão e licenciamento por meio da qual esta transação é realizada. Nesta frente, faz jus à taxa de plataforma sobre o valor do licenciamento (buyout) e ao fee de 5% sobre as receitas brutas de exploração comercial da obra, conforme declarado nas cláusulas de remuneração deste instrumento.
+
+Embora exercidos pela mesma pessoa jurídica (CNPJ 64.342.514/0001-08), estes papéis são independentes entre si e geram direitos e obrigações autônomos.
 doravante denominada "GRAVAN".
 
 LICENCIADO (INTÉRPRETE/PRODUTOR):
@@ -32,9 +40,9 @@ doravante denominado "LICENCIADO".
 
 Têm entre si justo e contratado o seguinte:
 
-CLÁUSULA 1 — OBJETO
+CLÁUSULA 1 — RECONHECIMENTO DO CONTRATO DE EDIÇÃO VIGENTE
 
-O presente contrato tem por objeto a autorização para fixação da obra musical em fonograma, bem como sua exploração comercial pelo LICENCIADO, com a participação da GRAVAN na qualidade de EDITORA DETENTORA DOS DIREITOS e de TERCEIRA BENEFICIÁRIA.
+A obra identificada neste instrumento possui contrato de edição em vigor entre o(s) AUTOR(ES) e a GRAVAN, na qualidade de EDITORA DETENTORA DOS DIREITOS. As partes reconhecem expressamente esta titularidade e a anuência da GRAVAN para o licenciamento ora celebrado.
 
 Título da Obra: {{obra_nome}}
 
@@ -44,7 +52,11 @@ CORPO DA OBRA, conforme cadastrada pelo(s) AUTOR(ES) na plataforma GRAVAN, parte
 {{obra_letra}}
 — FIM DO CORPO DA OBRA —
 
-CLÁUSULA 2 — CESSÃO DE DIREITOS
+CLÁUSULA 2 — OBJETO
+
+O presente contrato tem por objeto a autorização para fixação da obra em fonograma e sua exploração comercial pelo LICENCIADO, com a participação da GRAVAN em dupla capacidade: como EDITORA DETENTORA DOS DIREITOS e como TERCEIRA BENEFICIÁRIA, operadora da plataforma por meio da qual esta transação é viabilizada.
+
+CLÁUSULA 3 — CESSÃO DE DIREITOS
 
 O(s) AUTOR(ES) autoriza(m), nos termos e pelo prazo deste instrumento, o LICENCIADO a:
 I. Reproduzir a obra em qualquer formato ou suporte;
@@ -53,7 +65,7 @@ III. Disponibilizar a obra em plataformas de streaming, incluindo, mas não se l
 IV. Utilizar a obra em redes sociais e plataformas digitais;
 V. Sincronizar a obra com conteúdos audiovisuais.
 
-CLÁUSULA 3 — TERRITÓRIO, PRAZO, RESCISÃO E EXCLUSIVIDADE
+CLÁUSULA 4 — TERRITÓRIO, PRAZO, RESCISÃO E EXCLUSIVIDADE
 
 A presente autorização é concedida em caráter mundial.
 
@@ -61,39 +73,40 @@ Parágrafo Primeiro — Prazo e renovação (licença NÃO EXCLUSIVA): Quando es
 
 Parágrafo Segundo — Não exclusividade (regra geral): Salvo se este licenciamento tiver sido contratado em caráter EXCLUSIVO (oferta de exclusividade aceita e paga por meio da plataforma GRAVAN), a autorização é concedida em caráter NÃO EXCLUSIVO, podendo o(s) AUTOR(ES) licenciar a mesma obra a terceiros.
 
-Parágrafo Terceiro — Prazo (licença EXCLUSIVA): Quando este licenciamento for contratado em caráter EXCLUSIVO, terá validade de 5 (cinco) anos de exclusividade contados da data de emissão deste instrumento, durante os quais o(s) AUTOR(ES) e a plataforma GRAVAN obrigam-se a NÃO licenciar a mesma obra a terceiros. Eventuais contratos pré-existentes de licenciamento NÃO EXCLUSIVO da mesma obra serão automaticamente notificados de rescisão pela GRAVAN, mediante comunicação formal e expressa por e-mail, indicando como motivo a venda de exclusividade.
+Parágrafo Terceiro — Prazo (licença EXCLUSIVA): Quando este licenciamento for contratado em caráter EXCLUSIVO, terá validade de 5 (cinco) anos de exclusividade contados da data de emissão deste instrumento, durante os quais o(s) AUTOR(ES) e a GRAVAN obrigam-se a NÃO licenciar a mesma obra a terceiros. Eventuais contratos pré-existentes de licenciamento NÃO EXCLUSIVO da mesma obra serão automaticamente notificados de rescisão pela GRAVAN, mediante comunicação formal e expressa por e-mail, indicando como motivo a venda de exclusividade.
 
 Parágrafo Quarto — Renovação (licença EXCLUSIVA): Findo o prazo de exclusividade, a renovação dependerá de novo acordo formal, escrito e assinado pelas partes. A não renovação não impede o LICENCIADO de continuar explorando as gravações já realizadas durante o período contratual.
 
-CLÁUSULA 4 — GARANTIA DE TITULARIDADE
+CLÁUSULA 5 — GARANTIA DE TITULARIDADE
 
 O(s) AUTOR(ES) declara(m) que:
 I. São legítimos titulares da obra;
 II. A obra é original e não infringe direitos de terceiros;
-III. Assumem total responsabilidade por eventuais reivindicações.
+III. Assumem total responsabilidade por eventuais reivindicações de terceiros.
 
-O LICENCIADO fica isento de qualquer responsabilidade perante terceiros.
+O LICENCIADO fica isento de qualquer responsabilidade perante terceiros decorrente de vícios de titularidade.
 
-CLÁUSULA 5 — REMUNERAÇÃO
+CLÁUSULA 6 — REMUNERAÇÃO
 
-5.1 — BUYOUT (VENDA DA COMPOSIÇÃO)
+6.1 — BUYOUT (VALOR DO LICENCIAMENTO)
 
-O LICENCIADO pagará o valor bruto de {{valor_buyout_extenso}} referente à aquisição da composição por meio da plataforma GRAVAN.
+O LICENCIADO pagará o valor bruto de {{valor_buyout_extenso}} referente ao licenciamento desta obra por meio da plataforma GRAVAN, retido em escrow até a assinatura eletrônica de todas as partes, sendo liberado após a assinatura final.
 
-5.2 — TAXA DE INTERMEDIAÇÃO DA PLATAFORMA GRAVAN
+6.2 — PARTICIPAÇÃO DA TERCEIRA BENEFICIÁRIA NO BUYOUT
 
-Sobre o valor bruto pago pelo LICENCIADO incidirá uma taxa de intermediação devida à plataforma GRAVAN, no percentual de {{plataforma_pct}}% ({{plataforma_pct_extenso}}), correspondente ao plano de assinatura vigente do AUTOR PRINCIPAL na data deste licenciamento ({{plano_titular_label}}). O saldo remanescente, equivalente a {{liquido_autores_pct}}% do valor bruto, será distribuído entre os AUTORES da obra na proporção pró-rata declarada na CLÁUSULA 10 (SPLIT) deste instrumento.
+Sobre o valor bruto pago pelo LICENCIADO, a GRAVAN reterá {{plataforma_pct}}% ({{plataforma_pct_extenso}}) a título de taxa de plataforma, na qualidade de TERCEIRA BENEFICIÁRIA, conforme o plano de assinatura vigente do AUTOR PRINCIPAL na data deste licenciamento ({{plano_titular_label}}).
 
-Parágrafo Único: Os percentuais aplicados pela plataforma são: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda.
+O saldo remanescente de {{liquido_autores_pct}}% ({{liquido_autores_pct_extenso}}) será distribuído entre o(s) AUTOR(ES) na proporção pró-rata declarada na CLÁUSULA 10 (SPLIT) deste instrumento, nos termos do contrato de edição vigente entre os AUTORES e a GRAVAN na qualidade de EDITORA DETENTORA DOS DIREITOS.
 
-5.3 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
+Parágrafo Único: A taxa de plataforma segue a tabela: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda.
 
-A GRAVAN, na qualidade de EDITORA DETENTORA DOS DIREITOS, é titular dos direitos editoriais da obra nos termos do contrato de edição vigente com o(s) AUTOR(ES). Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão distribuídos da seguinte forma:
-- 85% (oitenta e cinco por cento) para os AUTORES da obra, repartidos entre si na proporção pró-rata declarada na CLÁUSULA 10 (SPLIT) deste instrumento;
-- 10% (dez por cento) para a GRAVAN, na qualidade de EDITORA DETENTORA DOS DIREITOS;
-- 5% (cinco por cento) para a GRAVAN, na qualidade de TERCEIRA BENEFICIÁRIA (plataforma).
+6.3 — FEE DE PLATAFORMA SOBRE EXPLORAÇÃO COMERCIAL DA OBRA
 
-CLÁUSULA 6 — CRÉDITOS E IDENTIFICAÇÃO
+A GRAVAN, na qualidade de EDITORA DETENTORA DOS DIREITOS, reconhece e registra em favor de si mesma, na qualidade de TERCEIRA BENEFICIÁRIA, 5% (cinco por cento) do valor bruto por ela recebido a qualquer título decorrente da exploração comercial desta obra — incluindo, mas não se limitando a: execução pública (ECAD e demais associações de gestão coletiva), sincronização, distribuição digital, streaming e quaisquer outras formas de exploração.
+
+Este percentual constitui receita autônoma da frente de plataforma da GRAVAN, distinta da receita editorial, e deverá ser contabilizado separadamente sob o CNPJ 64.342.514/0001-08, identificado como "fee de plataforma — Terceira Beneficiária".
+
+CLÁUSULA 7 — CRÉDITOS E IDENTIFICAÇÃO
 
 O LICENCIADO compromete-se a creditar corretamente o(s) AUTOR(ES) utilizando o(s) seguinte(s) nome(s) autoral(is)/artístico(s): {{autores_nomes_artisticos}}.
 
@@ -101,22 +114,16 @@ Dados técnicos:
 - ISRC: {{isrc}}
 - ISWC: {{iswc}}
 
-CLÁUSULA 7 — EXPLORAÇÃO
+CLÁUSULA 8 — EXPLORAÇÃO
 
 O LICENCIADO terá liberdade para:
 - Definir estratégias de lançamento;
 - Distribuir a obra globalmente;
 - Firmar parcerias e sublicenças.
 
-CLÁUSULA 8 — IRRETRATABILIDADE DA EXPLORAÇÃO
+CLÁUSULA 9 — IRRETRATABILIDADE DA EXPLORAÇÃO
 
-Ressalvado o direito de rescisão previsto na CLÁUSULA 3, Parágrafo Primeiro, este contrato é celebrado em caráter irretratável quanto às explorações comerciais e gravações já realizadas durante a sua vigência.
-
-CLÁUSULA 9 — DISPOSIÇÕES GERAIS
-
-I. Este contrato obriga as partes e seus sucessores;
-II. Pode ser firmado digitalmente, nos termos da MP nº 2.200-2/2001 e Lei nº 14.063/2020;
-III. Integra as regras da plataforma GRAVAN.
+Ressalvado o direito de rescisão previsto na CLÁUSULA 4, Parágrafo Primeiro, este contrato é celebrado em caráter irretratável quanto às explorações comerciais e gravações já realizadas durante a sua vigência.
 
 CLÁUSULA 10 — AUTORIA E DIVISÃO IGUALITÁRIA PRÓ-RATA DE DIREITOS (SPLIT)
 
@@ -131,7 +138,13 @@ Parágrafo Terceiro: Todos os valores decorrentes de remuneração, royalties e 
 
 Parágrafo Quarto: Cada autor declara estar ciente e de acordo com o presente critério de divisão igualitária, reconhecendo os demais como co-titulares em igual proporção pró-rata.
 
-CLÁUSULA 11 — FORO
+CLÁUSULA 11 — DISPOSIÇÕES GERAIS
+
+I. Este contrato obriga as partes e seus sucessores;
+II. Pode ser firmado digitalmente, nos termos da MP nº 2.200-2/2001 e Lei nº 14.063/2020;
+III. Integra as regras da plataforma GRAVAN.
+
+CLÁUSULA 12 — FORO
 
 Fica eleito o foro da comarca da cidade do Rio de Janeiro/RJ, com renúncia de qualquer outro, por mais privilegiado que seja.
 
@@ -180,13 +193,22 @@ def _info_plano(titular: dict) -> dict:
     extenso = {15: "quinze por cento", 20: "vinte por cento"}.get(plataforma_pct, f"{plataforma_pct} por cento")
     editora_pct = int(round(float(EDITORA_RATE) * 100))
     editora_extenso = {10: "dez por cento"}.get(editora_pct, f"{editora_pct} por cento")
+    liquido_pct = 100 - plataforma_pct
+    liquido_extenso_map = {
+        65: "sessenta e cinco por cento",
+        70: "setenta por cento",
+        75: "setenta e cinco por cento",
+        80: "oitenta por cento",
+        85: "oitenta e cinco por cento",
+    }
     return {
         "plataforma_pct": plataforma_pct,
         "plataforma_pct_extenso": extenso,
         "plano_titular_label": plano_label,
         "editora_pct": editora_pct,
         "editora_pct_extenso": editora_extenso,
-        "liquido_autores_pct": 100 - plataforma_pct,
+        "liquido_autores_pct": liquido_pct,
+        "liquido_autores_pct_extenso": liquido_extenso_map.get(liquido_pct, f"{liquido_pct} por cento"),
         "liquido_autores_pct_trilateral": 100 - plataforma_pct - editora_pct,
     }
 
@@ -307,8 +329,9 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
         .replace("{{plataforma_pct}}",         str(info["plataforma_pct"]))
         .replace("{{plataforma_pct_extenso}}", info["plataforma_pct_extenso"])
         .replace("{{plano_titular_label}}",    info["plano_titular_label"])
-        .replace("{{liquido_autores_pct}}",    str(info["liquido_autores_pct"]))
-        .replace("{{data_emissao}}",           datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
+        .replace("{{liquido_autores_pct}}",         str(info["liquido_autores_pct"]))
+        .replace("{{liquido_autores_pct_extenso}}", info["liquido_autores_pct_extenso"])
+        .replace("{{data_emissao}}",                datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
     )
 
     # Hash do conteúdo
@@ -486,11 +509,13 @@ def gerar_contrato_trilateral_agregado(
         .replace("{{plataforma_pct}}",         str(info["plataforma_pct"]))
         .replace("{{plataforma_pct_extenso}}", info["plataforma_pct_extenso"])
         .replace("{{plano_titular_label}}",    info["plano_titular_label"])
-        .replace("{{editora_pct}}",            str(info["editora_pct"]))
-        .replace("{{editora_pct_extenso}}",    info["editora_pct_extenso"])
-        .replace("{{liquido_autores_pct_trilateral}}", str(info["liquido_autores_pct_trilateral"])) 
-        .replace("{{clausula_split_editora}}", clausula_split_editora)
-        .replace("{{data_emissao}}",           datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
+        .replace("{{editora_pct}}",                  str(info["editora_pct"]))
+        .replace("{{editora_pct_extenso}}",          info["editora_pct_extenso"])
+        .replace("{{liquido_autores_pct_trilateral}}", str(info["liquido_autores_pct_trilateral"]))
+        .replace("{{liquido_autores_pct}}",          str(info["liquido_autores_pct"]))
+        .replace("{{liquido_autores_pct_extenso}}",  info["liquido_autores_pct_extenso"])
+        .replace("{{clausula_split_editora}}",       clausula_split_editora)
+        .replace("{{data_emissao}}",                 datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
     )
     content_hash = hashlib.sha256(conteudo.encode("utf-8")).hexdigest()
     conteudo = conteudo.replace("{{conteudo_hash}}", content_hash)
@@ -598,12 +623,14 @@ def gerar_contrato_trilateral_agregado(
     return contract
 
 
-TEMPLATE_TRILATERAL = """CONTRATO DE AUTORIZAÇÃO PARA GRAVAÇÃO E EXPLORAÇÃO DE OBRA MUSICAL COM INTERMEDIAÇÃO
+TEMPLATE_TRILATERAL = """CONTRATO DE AUTORIZAÇÃO PARA GRAVAÇÃO E EXPLORAÇÃO DE OBRA MUSICAL COM PARTICIPAÇÃO DE EDITORA E PLATAFORMA
 
 Pelo presente instrumento particular, são partes:
 
 AUTOR(ES) DA COMPOSIÇÃO:
 {{autores_bloco}}
+
+doravante denominado(s) "AUTOR(ES)".
 
 EDITORA DETENTORA DOS DIREITOS:
 Razão Social: {{editora_razao}}
@@ -612,8 +639,10 @@ Responsável: {{editora_responsavel}}
 E-mail: {{editora_email}}
 Endereço: {{editora_endereco}}
 
+doravante denominada "EDITORA DETENTORA DOS DIREITOS".
+
 TERCEIRA BENEFICIÁRIA:
-GRAVAN EDITORA MUSICAL LTDA., CNPJ 64.342.514/0001-08, sediada na cidade do Rio de Janeiro/RJ, operadora da plataforma GRAVAN, atuando exclusivamente como TERCEIRA BENEFICIÁRIA neste instrumento, na qualidade de operadora da infraestrutura tecnológica utilizada nesta transação.
+GRAVAN EDITORA MUSICAL LTDA., CNPJ 64.342.514/0001-08, sediada na cidade do Rio de Janeiro/RJ, operadora da plataforma GRAVAN. Atua neste instrumento exclusivamente como TERCEIRA BENEFICIÁRIA, na qualidade de operadora da infraestrutura tecnológica e plataforma de gestão e licenciamento por meio da qual esta transação é realizada. Não exerce função editorial sobre esta obra.
 doravante denominada "GRAVAN".
 
 LICENCIADO (INTÉRPRETE/PRODUTOR):
@@ -625,58 +654,60 @@ E-mail: {{interprete_email}}
 Endereço: {{interprete_endereco}}
 Cidade/UF: {{interprete_cidade_uf}}
 
+doravante denominado "LICENCIADO".
+
 Têm entre si justo e contratado o seguinte:
 
-CLÁUSULA 1 — RECONHECIMENTO DE EDIÇÃO PRÉVIA
+CLÁUSULA 1 — RECONHECIMENTO DO CONTRATO DE EDIÇÃO VIGENTE
 
-A obra abaixo identificada possui contrato de edição em vigor com a EDITORA
-DETENTORA DOS DIREITOS. As partes reconhecem expressamente a titularidade dos
-direitos editoriais da EDITORA DETENTORA DOS DIREITOS sobre a composição e a
-anuência desta para o licenciamento ora celebrado.
+A obra identificada neste instrumento possui contrato de edição em vigor com a EDITORA DETENTORA DOS DIREITOS. As partes reconhecem expressamente a titularidade dos direitos editoriais da EDITORA DETENTORA DOS DIREITOS sobre a composição e a anuência desta para o licenciamento ora celebrado. Os direitos e obrigações da EDITORA perante o(s) AUTOR(ES) são regidos exclusivamente pelo contrato de edição vigente entre eles, ao qual este instrumento não altera nem substitui.
 
 Título da Obra: {{obra_nome}}
 
 CLÁUSULA 2 — OBJETO
 
-O presente contrato tem por objeto a autorização para fixação da obra em
-fonograma e sua exploração comercial pelo LICENCIADO, com a participação
-da EDITORA DETENTORA DOS DIREITOS na qualidade de detentora dos direitos editoriais e
-da GRAVAN como TERCEIRA BENEFICIÁRIA.
+O presente contrato tem por objeto a autorização para fixação da obra em fonograma e sua exploração comercial pelo LICENCIADO, com a participação da EDITORA DETENTORA DOS DIREITOS na qualidade de detentora dos direitos editoriais e da GRAVAN como TERCEIRA BENEFICIÁRIA, operadora da plataforma por meio da qual esta transação é viabilizada.
 
-CORPO DA OBRA, conforme cadastrada pelo(s) AUTOR(ES) na plataforma
-GRAVAN, parte integrante e indissociável deste Contrato:
+CORPO DA OBRA, conforme cadastrada pelo(s) AUTOR(ES) na plataforma GRAVAN, parte integrante e indissociável deste Contrato:
 
 — CORPO DA OBRA —
 {{obra_letra}}
 — FIM DO CORPO DA OBRA —
 
-CLÁUSULA 3 — VALOR E ESCROW
+CLÁUSULA 3 — CESSÃO DE DIREITOS
 
-O LICENCIADO pagará pelo licenciamento o valor bruto de {{valor_buyout_extenso}},
-retido em escrow pela GRAVAN até a assinatura eletrônica de todas as partes.
-A liberação do valor ocorre após a assinatura final.
+O(s) AUTOR(ES), com a anuência da EDITORA DETENTORA DOS DIREITOS, autoriza(m), nos termos e pelo prazo deste instrumento, o LICENCIADO a:
+I. Reproduzir a obra em qualquer formato ou suporte;
+II. Distribuir e comercializar a obra em meios físicos e digitais;
+III. Disponibilizar a obra em plataformas de streaming, incluindo, mas não se limitando a Spotify e Apple Music;
+IV. Utilizar a obra em redes sociais e plataformas digitais;
+V. Sincronizar a obra com conteúdos audiovisuais.
 
-3.1 — DISTRIBUIÇÃO DO VALOR DO BUYOUT
+CLÁUSULA 4 — VALOR, ESCROW E DISTRIBUIÇÃO DO BUYOUT
 
-Sobre o valor bruto pago pelo LICENCIADO incidirá:
-- {{plataforma_pct}}% ({{plataforma_pct_extenso}}) de taxa de intermediação devida à GRAVAN, na qualidade de TERCEIRA BENEFICIÁRIA, conforme o plano de assinatura vigente do AUTOR PRINCIPAL na data deste licenciamento ({{plano_titular_label}});
-- {{editora_pct}}% ({{editora_pct_extenso}}) destinados à EDITORA DETENTORA DOS DIREITOS, na qualidade de detentora dos direitos editoriais sobre a composição;
-- {{liquido_autores_pct_trilateral}}% remanescentes, distribuídos entre o(s) AUTOR(ES) na proporção declarada na CLÁUSULA 7 (SPLIT).
+O LICENCIADO pagará pelo licenciamento o valor bruto de {{valor_buyout_extenso}}, retido em escrow pela GRAVAN até a assinatura eletrônica de todas as partes, sendo liberado após a assinatura final.
 
-Parágrafo Primeiro: A taxa da plataforma GRAVAN segue a tabela: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda.
+4.1 — PARTICIPAÇÃO DA TERCEIRA BENEFICIÁRIA NO BUYOUT
 
-Parágrafo Segundo: O percentual de {{editora_pct}}% ({{editora_pct_extenso}}) destinado à EDITORA é fixo e independe do plano de assinatura do AUTOR PRINCIPAL.{{clausula_split_editora}}
+Sobre o valor bruto pago pelo LICENCIADO, a GRAVAN reterá {{plataforma_pct}}% ({{plataforma_pct_extenso}}) a título de taxa de plataforma, na qualidade de TERCEIRA BENEFICIÁRIA, conforme o plano de assinatura vigente do AUTOR PRINCIPAL na data deste licenciamento ({{plano_titular_label}}).
 
-CLÁUSULA 4 — DECLARAÇÃO DA EDITORA DETENTORA DOS DIREITOS
+O saldo remanescente de {{liquido_autores_pct}}% será integralmente repassado à EDITORA DETENTORA DOS DIREITOS, que é responsável pela distribuição entre si e o(s) AUTOR(ES) conforme os termos do contrato de edição vigente entre as partes — para o qual este instrumento não define nem interfere.
 
-A EDITORA DETENTORA DOS DIREITOS declara: (i) possuir contrato de edição em vigor sobre a
-obra; (ii) ter ciência e concordância com o presente licenciamento;
-(iii) responsabilizar-se pela distribuição dos valores cabíveis ao(s)
-AUTOR(ES) nos termos do contrato de edição existente entre as partes.
+Parágrafo Único: A taxa de plataforma segue a tabela: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda.{{clausula_split_editora}}
 
-CLÁUSULA 5 — TERRITÓRIO, PRAZO, RESCISÃO E EXCLUSIVIDADE
+CLÁUSULA 5 — FEE DE PLATAFORMA SOBRE EXPLORAÇÃO COMERCIAL DA OBRA
 
-Autorização mundial.
+A EDITORA DETENTORA DOS DIREITOS compromete-se a repassar à GRAVAN, na qualidade de TERCEIRA BENEFICIÁRIA e operadora da plataforma por meio da qual esta obra é gerida e licenciada, 5% (cinco por cento) do valor bruto por ela recebido a qualquer título decorrente da exploração comercial desta obra — incluindo, mas não se limitando a: execução pública (ECAD e demais associações de gestão coletiva), sincronização, distribuição digital, streaming e quaisquer outras formas de exploração.
+
+O repasse será realizado mediante transferência bancária para conta de titularidade da GRAVAN EDITORA MUSICAL LTDA. (CNPJ 64.342.514/0001-08), no prazo máximo de 30 (trinta) dias corridos contados do recebimento de cada distribuição ou pagamento pela EDITORA.
+
+CLÁUSULA 6 — DECLARAÇÃO DA EDITORA DETENTORA DOS DIREITOS
+
+A EDITORA DETENTORA DOS DIREITOS declara: (i) possuir contrato de edição em vigor sobre esta obra; (ii) ter ciência e concordância com o presente licenciamento; (iii) ser responsável pela distribuição do saldo do buyout ao(s) AUTOR(ES) nos termos do contrato de edição vigente; (iv) comprometer-se ao repasse do fee de plataforma à GRAVAN nos termos da CLÁUSULA 5.
+
+CLÁUSULA 7 — TERRITÓRIO, PRAZO, RESCISÃO E EXCLUSIVIDADE
+
+A presente autorização é concedida em caráter mundial.
 
 Parágrafo Primeiro — Prazo e renovação (licença NÃO EXCLUSIVA): Quando este licenciamento for contratado em caráter NÃO EXCLUSIVO, terá validade de 5 (cinco) anos contados da data de emissão deste instrumento, com renovação automática por igual período. Qualquer das partes poderá rescindi-lo ao término de cada período de 5 (cinco) anos, mediante comunicação formal e expressa enviada por e-mail aos endereços indicados neste instrumento, com antecedência mínima de 30 (trinta) dias em relação ao final do período vigente; não havendo manifestação tempestiva, o instrumento renova-se automaticamente. As explorações comerciais realizadas antes da efetiva rescisão reputam-se válidas e definitivas.
 
@@ -686,33 +717,24 @@ Parágrafo Terceiro — Prazo (licença EXCLUSIVA): Quando este licenciamento fo
 
 Parágrafo Quarto — Renovação (licença EXCLUSIVA): Findo o prazo de exclusividade, a renovação dependerá de novo acordo formal, escrito e assinado pelas partes. A não renovação não impede o LICENCIADO de continuar explorando as gravações já realizadas durante o período contratual.
 
-CLÁUSULA 6 — FEE DE PLATAFORMA SOBRE EXECUÇÃO PÚBLICA
-
-Os direitos de execução pública desta obra são arrecadados pelas associações de gestão coletiva competentes (ECAD e outras) e distribuídos diretamente à EDITORA DETENTORA DOS DIREITOS e ao(s) AUTOR(ES) conforme os registros vigentes. A GRAVAN não figura como beneficiária direta nessas distribuições para fins desta obra.
-
-A EDITORA DETENTORA DOS DIREITOS compromete-se a repassar à GRAVAN, na qualidade de TERCEIRA BENEFICIÁRIA e operadora da plataforma por meio da qual esta obra é gerida e licenciada, o equivalente a 5% (cinco por cento) do valor bruto por ela recebido a título de execução pública, mediante transferência bancária para conta de titularidade da GRAVAN EDITORA MUSICAL LTDA. (CNPJ 64.342.514/0001-08), no prazo máximo de 30 (trinta) dias corridos contados do recebimento de cada distribuição.
-
-CLÁUSULA 7 — AUTORIA E DIVISÃO IGUALITÁRIA PRÓ-RATA DE DIREITOS (SPLIT)
+CLÁUSULA 8 — AUTORIA E DIVISÃO IGUALITÁRIA PRÓ-RATA DE DIREITOS (SPLIT)
 
 Os AUTORES identificados abaixo são reconhecidos como titulares dos direitos autorais patrimoniais e morais sobre a obra, em partes iguais, calculadas pela divisão de 100% (cem por cento) dos direitos pela quantidade total de autores cadastrados:
 {{split_lista}}
 
 Parágrafo Primeiro: A divisão é calculada automaticamente pela plataforma GRAVAN de forma igualitária e pró-rata — cada AUTOR recebe exatamente 1/N dos direitos, onde N é o número total de autores da obra — conforme o disposto nos arts. 5º, VIII, e 15 da Lei nº 9.610/1998.
 
-Parágrafo Segundo: Todos os valores decorrentes de remuneração, royalties e quaisquer receitas relacionadas à obra — incluindo execução pública (ECAD), sincronização, streaming, distribuição digital e o buyout desta transação — serão distribuídos entre os AUTORES em partes iguais, na proporção pró-rata acima.
+Parágrafo Segundo: Todos os valores decorrentes de remuneração, royalties e quaisquer receitas relacionadas à obra distribuídos diretamente ao(s) AUTOR(ES) serão repartidos em partes iguais, na proporção pró-rata acima.
 
 Parágrafo Terceiro: Cada autor declara estar ciente e de acordo com o presente critério de divisão igualitária, reconhecendo os demais como co-titulares em igual proporção pró-rata.
 
-CLÁUSULA 8 — IRREVOGABILIDADE E ASSINATURAS ELETRÔNICAS
+CLÁUSULA 9 — IRREVOGABILIDADE E ASSINATURAS ELETRÔNICAS
 
-Este instrumento é firmado eletronicamente, com registro de data, hora,
-IP anonimizado (SHA-256) e hash de integridade. A aceitação eletrônica de
-cada parte configura assinatura válida e vinculante (MP 2.200-2/2001;
-Lei 14.063/2020).
+Este instrumento é firmado eletronicamente, com registro de data, hora, IP anonimizado (SHA-256) e hash de integridade do conteúdo. A aceitação eletrônica de cada parte configura assinatura válida e vinculante (MP 2.200-2/2001; Lei 14.063/2020).
 
-CLÁUSULA 9 — FORO
+CLÁUSULA 10 — FORO
 
-Foro da comarca da cidade do Rio de Janeiro/RJ.
+Fica eleito o foro da comarca da cidade do Rio de Janeiro/RJ, com renúncia de qualquer outro, por mais privilegiado que seja.
 
 Data de emissão: {{data_emissao}}
 Hash SHA-256 do documento: {{conteudo_hash}}

@@ -248,8 +248,10 @@ def preview():
             .replace("{{editora_pct}}",            str(info["editora_pct"]))
             .replace("{{editora_pct_extenso}}",    info["editora_pct_extenso"])
             .replace("{{liquido_autores_pct_trilateral}}", str(info["liquido_autores_pct_trilateral"]))
-            .replace("{{clausula_split_editora}}", clausula_split_editora)
-            .replace("{{data_emissao}}",           datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
+            .replace("{{liquido_autores_pct}}",          str(info["liquido_autores_pct"]))
+            .replace("{{liquido_autores_pct_extenso}}",  info["liquido_autores_pct_extenso"])
+            .replace("{{clausula_split_editora}}",       clausula_split_editora)
+            .replace("{{data_emissao}}",                 datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
         )
         tipo = "trilateral"
     else:
@@ -270,8 +272,9 @@ def preview():
             .replace("{{plataforma_pct}}",           str(info["plataforma_pct"]))
             .replace("{{plataforma_pct_extenso}}",   info["plataforma_pct_extenso"])
             .replace("{{plano_titular_label}}",      info["plano_titular_label"])
-            .replace("{{liquido_autores_pct}}",      str(info["liquido_autores_pct"]))
-            .replace("{{data_emissao}}",             datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
+            .replace("{{liquido_autores_pct}}",         str(info["liquido_autores_pct"]))
+            .replace("{{liquido_autores_pct_extenso}}", info["liquido_autores_pct_extenso"])
+            .replace("{{data_emissao}}",                datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
         )
         tipo = "bilateral"
 
@@ -341,8 +344,10 @@ def preview_oferta(token):
         .replace("{{editora_pct}}",            str(info["editora_pct"]))
         .replace("{{editora_pct_extenso}}",    info["editora_pct_extenso"])
         .replace("{{liquido_autores_pct_trilateral}}", str(info["liquido_autores_pct_trilateral"]))
-        .replace("{{clausula_split_editora}}", "")
-        .replace("{{data_emissao}}",           datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
+        .replace("{{liquido_autores_pct}}",          str(info["liquido_autores_pct"]))
+        .replace("{{liquido_autores_pct_extenso}}",  info["liquido_autores_pct_extenso"])
+        .replace("{{clausula_split_editora}}",       "")
+        .replace("{{data_emissao}}",                 datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
     )
     h = hashlib.sha256(conteudo.encode("utf-8")).hexdigest()
     conteudo = conteudo.replace("{{conteudo_hash}}", f"{h} (preview — recalculado quando todas as partes assinarem)")
