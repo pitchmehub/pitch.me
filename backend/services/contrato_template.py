@@ -106,7 +106,7 @@ CNPJ: {{plataforma_cnpj}}
 (EDITORA)
 """
 
-CONTRATO_VERSAO = "v2.8 - Abr/2026"
+CONTRATO_VERSAO = "v2.9 - Abr/2026"
 
 CONTRATO_PUBLISHER_TEMPLATE = """CONTRATO DE EDIÇÃO DE OBRAS MUSICAIS — EDITORA
 
@@ -118,7 +118,11 @@ e, de outro lado:
 
 EDITORA: {{publisher_razao_social}} (nome fantasia: {{publisher_nome_fantasia}}), inscrita no CNPJ/MF sob o nº {{publisher_cnpj}}, com sede em {{publisher_endereco}}, neste ato representada por seu responsável legal {{publisher_responsavel_nome}}, CPF {{publisher_responsavel_cpf}}, doravante denominada "EDITORA";
 
-AUTOR e EDITORA, em conjunto "PARTES", firmam o presente Contrato de Edição de Obras Musicais, mediante as cláusulas a seguir.
+e, como TERCEIRA BENEFICIÁRIA:
+
+GRAVAN EDITORA MUSICAL LTDA., CNPJ 64.342.514/0001-08, sediada na cidade do Rio de Janeiro/RJ, operadora da plataforma GRAVAN, por meio da qual este contrato é firmado e gerido, doravante denominada "GRAVAN".
+
+AUTOR e EDITORA, em conjunto "PARTES", firmam o presente Contrato de Edição de Obras Musicais, mediante as cláusulas a seguir, reconhecendo a GRAVAN como TERCEIRA BENEFICIÁRIA das obrigações aqui estabelecidas.
 
 CONSIDERANDO QUE:
 (i) o AUTOR é titular de {{share_autor_pct}}% dos direitos autorais sobre a obra "{{obra_nome}}", doravante "OBRA", sendo todos os coautores igualmente reconhecidos como AUTORES da OBRA, com direitos divididos de forma igualitária e pró-rata — cada AUTOR recebe 1/N dos direitos, onde N é o número total de autores cadastrados;
@@ -149,8 +153,8 @@ CLÁUSULA QUARTA — REMUNERAÇÃO DO AUTOR
 
 Parágrafo Único: Na hipótese de coautoria, os valores acima devidos ao AUTOR correspondem exclusivamente à sua participação igualitária pró-rata de {{share_autor_pct}}% sobre a OBRA (calculada dividindo-se 100% pelo número total de autores). Os demais coautores — igualmente reconhecidos como AUTORES — possuem contratos individuais com suas participações iguais, e cada qual recebe sua parte de forma autônoma e igualitária, conforme divisão registrada na plataforma GRAVAN.
 
-CLÁUSULA QUINTA — REMUNERAÇÃO DA PLATAFORMA (FEE DE INTERMEDIAÇÃO EDITORIAL)
-5.1 Em razão da utilização da plataforma GRAVAN e dos serviços de intermediação, gestão e disponibilização de obras musicais, a EDITORA concorda em pagar à GRAVAN o equivalente a 5% (cinco por cento) sobre todos os valores brutos recebidos pela EDITORA decorrentes da exploração econômica das obras cadastradas na plataforma.
+CLÁUSULA QUINTA — REMUNERAÇÃO DA TERCEIRA BENEFICIÁRIA (FEE DE PLATAFORMA)
+5.1 Em razão da utilização da plataforma GRAVAN e dos serviços de infraestrutura tecnológica, gestão e disponibilização de obras musicais, a EDITORA reconhece o direito autônomo e exigível da GRAVAN, na qualidade de TERCEIRA BENEFICIÁRIA, de receber o equivalente a 5% (cinco por cento) sobre todos os valores brutos recebidos pela EDITORA decorrentes da exploração econômica das obras cadastradas na plataforma.
 
 Parágrafo Primeiro: O percentual incidirá sobre todas as receitas, incluindo, mas não se limitando a cessão de direitos, sincronização, distribuição digital e execução pública.
 

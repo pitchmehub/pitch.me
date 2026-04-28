@@ -11,16 +11,18 @@ from db.supabase_client import get_supabase
 
 TEMPLATE_LICENCIAMENTO = """CONTRATO DE AUTORIZAÇÃO PARA GRAVAÇÃO E EXPLORAÇÃO DE OBRA MUSICAL
 
-Pelo presente instrumento particular, de um lado:
+Pelo presente instrumento particular, são partes:
 
 AUTOR(ES):
 {{autores_bloco}}
 
 doravante denominado(s) "AUTOR(ES)".
 
-E, de outro lado:
+TERCEIRA BENEFICIÁRIA E EDITORA DETENTORA DOS DIREITOS:
+GRAVAN EDITORA MUSICAL LTDA., CNPJ 64.342.514/0001-08, sediada na cidade do Rio de Janeiro/RJ, operadora da plataforma GRAVAN, atuando neste instrumento em dupla capacidade: (i) como EDITORA DETENTORA DOS DIREITOS da obra, nos termos do contrato de edição vigente com o(s) AUTOR(ES); e (ii) como TERCEIRA BENEFICIÁRIA, na qualidade de operadora da infraestrutura tecnológica e plataforma utilizada nesta transação. Tais papéis, embora exercidos pela mesma pessoa jurídica, são juridicamente distintos e geram direitos independentes conforme declarado nas cláusulas de remuneração deste instrumento.
+doravante denominada "GRAVAN".
 
-INTÉRPRETE/PRODUTOR:
+LICENCIADO (INTÉRPRETE/PRODUTOR):
 Nome/Razão Social: {{interprete_nome}}
 CPF/CNPJ: {{interprete_cpf}}
 Endereço: {{interprete_endereco}}
@@ -32,7 +34,7 @@ Têm entre si justo e contratado o seguinte:
 
 CLÁUSULA 1 — OBJETO
 
-O presente contrato tem por objeto a autorização para fixação da obra musical em fonograma, bem como sua exploração comercial pelo LICENCIADO.
+O presente contrato tem por objeto a autorização para fixação da obra musical em fonograma, bem como sua exploração comercial pelo LICENCIADO, com a participação da GRAVAN na qualidade de EDITORA DETENTORA DOS DIREITOS e de TERCEIRA BENEFICIÁRIA.
 
 Título da Obra: {{obra_nome}}
 
@@ -86,10 +88,10 @@ Parágrafo Único: Os percentuais aplicados pela plataforma são: 25% (vinte e c
 
 5.3 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
 
-No presente contrato, a GRAVAN EDITORA MUSICAL LTDA. (CNPJ 64.342.514/0001-08) atua como EDITORA DETENTORA DOS DIREITOS de edição da obra, nos termos do contrato de edição vigente com o(s) AUTOR(ES). Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão distribuídos da seguinte forma:
+A GRAVAN, na qualidade de EDITORA DETENTORA DOS DIREITOS, é titular dos direitos editoriais da obra nos termos do contrato de edição vigente com o(s) AUTOR(ES). Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão distribuídos da seguinte forma:
 - 85% (oitenta e cinco por cento) para os AUTORES da obra, repartidos entre si na proporção pró-rata declarada na CLÁUSULA 10 (SPLIT) deste instrumento;
-- 10% (dez por cento) para a GRAVAN EDITORA MUSICAL LTDA., na qualidade de EDITORA DETENTORA DOS DIREITOS;
-- 5% (cinco por cento) para a GRAVAN EDITORA MUSICAL LTDA., na qualidade de plataforma intermediária.
+- 10% (dez por cento) para a GRAVAN, na qualidade de EDITORA DETENTORA DOS DIREITOS;
+- 5% (cinco por cento) para a GRAVAN, na qualidade de TERCEIRA BENEFICIÁRIA (plataforma).
 
 CLÁUSULA 6 — CRÉDITOS E IDENTIFICAÇÃO
 
@@ -610,9 +612,9 @@ Responsável: {{editora_responsavel}}
 E-mail: {{editora_email}}
 Endereço: {{editora_endereco}}
 
-INTERMEDIÁRIA / PLATAFORMA:
-GRAVAN EDITORA MUSICAL LTDA., CNPJ 64.342.514/0001-08, sediada na cidade
-do Rio de Janeiro/RJ, doravante "GRAVAN".
+TERCEIRA BENEFICIÁRIA:
+GRAVAN EDITORA MUSICAL LTDA., CNPJ 64.342.514/0001-08, sediada na cidade do Rio de Janeiro/RJ, operadora da plataforma GRAVAN, atuando exclusivamente como TERCEIRA BENEFICIÁRIA neste instrumento, na qualidade de operadora da infraestrutura tecnológica utilizada nesta transação.
+doravante denominada "GRAVAN".
 
 LICENCIADO (INTÉRPRETE/PRODUTOR):
 Nome/Razão Social: {{interprete_nome}}
@@ -639,7 +641,7 @@ CLÁUSULA 2 — OBJETO
 O presente contrato tem por objeto a autorização para fixação da obra em
 fonograma e sua exploração comercial pelo LICENCIADO, com a participação
 da EDITORA DETENTORA DOS DIREITOS na qualidade de detentora dos direitos editoriais e
-da GRAVAN como plataforma intermediária.
+da GRAVAN como TERCEIRA BENEFICIÁRIA.
 
 CORPO DA OBRA, conforme cadastrada pelo(s) AUTOR(ES) na plataforma
 GRAVAN, parte integrante e indissociável deste Contrato:
@@ -689,7 +691,7 @@ CLÁUSULA 6 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
 A EDITORA DETENTORA DOS DIREITOS é identificada no cabeçalho deste instrumento. Os rendimentos provenientes de execução pública arrecadados pelo ECAD serão distribuídos da seguinte forma:
 - 85% (oitenta e cinco por cento) para os AUTORES da obra, repartidos entre si na proporção pró-rata declarada na CLÁUSULA 7 (SPLIT) deste instrumento;
 - 10% (dez por cento) para a EDITORA DETENTORA DOS DIREITOS;
-- 5% (cinco por cento) para a EDITORA GRAVAN, na qualidade de plataforma intermediária.
+- 5% (cinco por cento) para a GRAVAN, na qualidade de TERCEIRA BENEFICIÁRIA (plataforma).
 
 CLÁUSULA 7 — AUTORIA E DIVISÃO IGUALITÁRIA PRÓ-RATA DE DIREITOS (SPLIT)
 
