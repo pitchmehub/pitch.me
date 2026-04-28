@@ -55,13 +55,13 @@ CLÁUSULA 3 — TERRITÓRIO, PRAZO, RESCISÃO E EXCLUSIVIDADE
 
 A presente autorização é concedida em caráter mundial.
 
-Parágrafo Primeiro — Prazo (licença NÃO EXCLUSIVA): Quando este licenciamento for contratado em caráter NÃO EXCLUSIVO, terá validade de 5 (cinco) anos contados da data de emissão deste instrumento, podendo ser rescindido pela plataforma GRAVAN, mediante comunicação formal e expressa enviada por e-mail aos endereços indicados neste instrumento, EXCLUSIVAMENTE em caso de venda de exclusividade da mesma obra a terceiro por meio da plataforma GRAVAN. Toda e qualquer exploração comercial realizada antes da efetiva rescisão reputa-se válida e definitiva.
+Parágrafo Primeiro — Prazo e renovação (licença NÃO EXCLUSIVA): Quando este licenciamento for contratado em caráter NÃO EXCLUSIVO, terá validade de 5 (cinco) anos contados da data de emissão deste instrumento, com renovação automática por igual período, independentemente de notificação. Qualquer das partes poderá rescindir este instrumento mediante comunicação formal e expressa enviada por e-mail aos endereços indicados neste instrumento, com antecedência mínima de 30 (trinta) dias. Toda e qualquer exploração comercial realizada antes da efetiva rescisão reputa-se válida e definitiva.
 
 Parágrafo Segundo — Não exclusividade (regra geral): Salvo se este licenciamento tiver sido contratado em caráter EXCLUSIVO (oferta de exclusividade aceita e paga por meio da plataforma GRAVAN), a autorização é concedida em caráter NÃO EXCLUSIVO, podendo o(s) AUTOR(ES) licenciar a mesma obra a terceiros.
 
-Parágrafo Terceiro — Prazo (licença EXCLUSIVA): Quando este licenciamento for contratado em caráter EXCLUSIVO, terá validade de 5 (cinco) anos de exclusividade contados da data de emissão deste instrumento, durante os quais o(s) AUTOR(ES) e a plataforma GRAVAN obrigam-se a NÃO licenciar a mesma obra a terceiros. Eventuais contratos pré-existentes de licenciamento NÃO EXCLUSIVO da mesma obra serão automaticamente notificados de rescisão pela GRAVAN, na forma do Parágrafo Primeiro, indicando como motivo a venda de exclusividade.
+Parágrafo Terceiro — Prazo (licença EXCLUSIVA): Quando este licenciamento for contratado em caráter EXCLUSIVO, terá validade de 5 (cinco) anos de exclusividade contados da data de emissão deste instrumento, durante os quais o(s) AUTOR(ES) e a plataforma GRAVAN obrigam-se a NÃO licenciar a mesma obra a terceiros. Eventuais contratos pré-existentes de licenciamento NÃO EXCLUSIVO da mesma obra serão automaticamente notificados de rescisão pela GRAVAN, mediante comunicação formal e expressa por e-mail, indicando como motivo a venda de exclusividade.
 
-Parágrafo Quarto — Renovação: Findo o prazo, o contrato poderá ser renovado mediante acordo escrito entre as partes. A não renovação não impede o LICENCIADO de continuar explorando as gravações realizadas durante o período contratual.
+Parágrafo Quarto — Renovação (licença EXCLUSIVA): Findo o prazo de exclusividade, a renovação dependerá de novo acordo formal, escrito e assinado pelas partes. A não renovação não impede o LICENCIADO de continuar explorando as gravações já realizadas durante o período contratual.
 
 CLÁUSULA 4 — GARANTIA DE TITULARIDADE
 
@@ -676,13 +676,13 @@ CLÁUSULA 5 — TERRITÓRIO, PRAZO, RESCISÃO E EXCLUSIVIDADE
 
 Autorização mundial.
 
-Parágrafo Primeiro — Prazo (licença NÃO EXCLUSIVA): Quando este licenciamento for contratado em caráter NÃO EXCLUSIVO, terá validade de 5 (cinco) anos contados da data de emissão deste instrumento, podendo ser rescindido pela plataforma GRAVAN, mediante comunicação formal e expressa enviada por e-mail aos endereços indicados neste instrumento, EXCLUSIVAMENTE em caso de venda de exclusividade da mesma obra a terceiro por meio da plataforma GRAVAN. As explorações comerciais realizadas antes da efetiva rescisão reputam-se válidas e definitivas.
+Parágrafo Primeiro — Prazo e renovação (licença NÃO EXCLUSIVA): Quando este licenciamento for contratado em caráter NÃO EXCLUSIVO, terá validade de 5 (cinco) anos contados da data de emissão deste instrumento, com renovação automática por igual período, independentemente de notificação. Qualquer das partes poderá rescindir este instrumento mediante comunicação formal e expressa enviada por e-mail aos endereços indicados neste instrumento, com antecedência mínima de 30 (trinta) dias. As explorações comerciais realizadas antes da efetiva rescisão reputam-se válidas e definitivas.
 
-Parágrafo Segundo — Não exclusividade (regra geral): Salvo se este licenciamento tiver sido contratado em caráter EXCLUSIVO por meio da plataforma GRAVAN, a autorização é concedida em caráter NÃO EXCLUSIVO, podendo o(s) AUTOR(ES), com a anuência da EDITORA, licenciar a mesma obra a terceiros.
+Parágrafo Segundo — Não exclusividade (regra geral): Salvo se este licenciamento tiver sido contratado em caráter EXCLUSIVO por meio da plataforma GRAVAN, a autorização é concedida em caráter NÃO EXCLUSIVO, podendo o(s) AUTOR(ES), com a anuência da EDITORA DETENTORA DOS DIREITOS, licenciar a mesma obra a terceiros.
 
-Parágrafo Terceiro — Prazo (licença EXCLUSIVA): Quando este licenciamento for contratado em caráter EXCLUSIVO, terá validade de 5 (cinco) anos de exclusividade contados da data de emissão deste instrumento, durante os quais o(s) AUTOR(ES), a EDITORA e a GRAVAN obrigam-se a NÃO licenciar a mesma obra a terceiros. Eventuais contratos pré-existentes de licenciamento NÃO EXCLUSIVO da mesma obra serão automaticamente notificados de rescisão pela GRAVAN, na forma do Parágrafo Primeiro, indicando como motivo a venda de exclusividade.
+Parágrafo Terceiro — Prazo (licença EXCLUSIVA): Quando este licenciamento for contratado em caráter EXCLUSIVO, terá validade de 5 (cinco) anos de exclusividade contados da data de emissão deste instrumento, durante os quais o(s) AUTOR(ES), a EDITORA DETENTORA DOS DIREITOS e a GRAVAN obrigam-se a NÃO licenciar a mesma obra a terceiros. Eventuais contratos pré-existentes de licenciamento NÃO EXCLUSIVO da mesma obra serão automaticamente notificados de rescisão pela GRAVAN, mediante comunicação formal e expressa por e-mail, indicando como motivo a venda de exclusividade.
 
-Parágrafo Quarto — Renovação: Findo o prazo, o contrato poderá ser renovado mediante acordo escrito entre as partes. A não renovação não impede o LICENCIADO de continuar explorando as gravações realizadas durante o período contratual.
+Parágrafo Quarto — Renovação (licença EXCLUSIVA): Findo o prazo de exclusividade, a renovação dependerá de novo acordo formal, escrito e assinado pelas partes. A não renovação não impede o LICENCIADO de continuar explorando as gravações já realizadas durante o período contratual.
 
 CLÁUSULA 6 — ROYALTIES AUTORAIS (EXECUÇÃO PÚBLICA)
 

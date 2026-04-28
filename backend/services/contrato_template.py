@@ -40,7 +40,7 @@ CLÁUSULA PRIMEIRA — OBJETO
 
 CLÁUSULA SEGUNDA — DIREITOS
 
-2.1 Pelo presente Contrato, ficam sob a égide da EDITORA, sem quaisquer limitações e durante todo o tempo de proteção legal dos direitos autorais e em todos os países do mundo, a totalidade dos direitos e faculdades que no seu conjunto constituem o direito autoral do AUTOR sobre a OBRA, em todos os seus aspectos, manifestações e aplicações diretas ou indiretas, processos de reprodução e divulgação ou extensões e ampliações, tais como, mas não limitados a: edição gráfica e fonomecânica em todas as suas formas, aplicações, sistemas e processos, quer atuais, quer os que venham a ser inventados ou aperfeiçoados no futuro; transcrição; adaptação; versões; variação; redução; execução; irradiação; distribuição física ou eletrônica, incluindo, mas não se limitando a download, streaming, ringtone, truetone, qualquer tipo de sincronização em suporte físico ou digital, existente ou que venha a existir, tais como televisão, VOD, adaptação e/ou inclusão cinematográfica, ou, ainda, em peças publicitárias, com a adaptação da letra e/ou melodia, em publicidade gráfica, sonora ou audiovisual, bem como qualquer forma de exploração, reprodução e divulgação da OBRA, incluindo sua execução pública, sem nenhuma exceção, mesmo que no futuro outras venham a ser as denominações da técnica ou da praxe, com todas as faculdades de exploração comercial e industrial necessárias para o exercício dos respectivos direitos, a exclusivo arbítrio da EDITORA. Serve o presente Contrato como título para que a EDITORA possa efetuar, onde lhe for útil ou conveniente, os registros e depósitos necessários para o irrestrito reconhecimento de seu direito, em todos os países do mundo, com faculdade de transferir os direitos ora adquiridos a terceiros, no todo ou em parte, a qualquer título.
+2.1 Pelo presente Contrato, ficam sob a égide da EDITORA, sem quaisquer limitações territoriais e durante o prazo de vigência deste Contrato (conforme Cláusula Sétima), a totalidade dos direitos e faculdades que no seu conjunto constituem o direito autoral do AUTOR sobre a OBRA, em todos os seus aspectos, manifestações e aplicações diretas ou indiretas, processos de reprodução e divulgação ou extensões e ampliações, tais como, mas não limitados a: edição gráfica e fonomecânica em todas as suas formas, aplicações, sistemas e processos, quer atuais, quer os que venham a ser inventados ou aperfeiçoados no futuro; transcrição; adaptação; versões; variação; redução; execução; irradiação; distribuição física ou eletrônica, incluindo, mas não se limitando a download, streaming, ringtone, truetone, qualquer tipo de sincronização em suporte físico ou digital, existente ou que venha a existir, tais como televisão, VOD, adaptação e/ou inclusão cinematográfica, ou, ainda, em peças publicitárias, com a adaptação da letra e/ou melodia, em publicidade gráfica, sonora ou audiovisual, bem como qualquer forma de exploração, reprodução e divulgação da OBRA, incluindo sua execução pública, sem nenhuma exceção, mesmo que no futuro outras venham a ser as denominações da técnica ou da praxe, com todas as faculdades de exploração comercial e industrial necessárias para o exercício dos respectivos direitos, a exclusivo arbítrio da EDITORA. Serve o presente Contrato como título para que a EDITORA possa efetuar, onde lhe for útil ou conveniente, os registros e depósitos necessários para o irrestrito reconhecimento de seu direito, em todos os países do mundo, com faculdade de transferir os direitos ora adquiridos a terceiros, no todo ou em parte, a qualquer título.
 
 2.2 Fica reservada ao AUTOR, na forma da lei, a integralidade dos direitos morais sobre sua parte na OBRA, nos termos do art. 24 da Lei nº 9.610/1998.
 
@@ -77,7 +77,7 @@ CLÁUSULA SÉTIMA — DISPOSIÇÕES GERAIS
 
 7.1 Este Contrato cancela e substitui qualquer acordo anterior firmado entre as PARTES, verbal ou escrito, referente ao mesmo objeto, obrigando as PARTES por si, seus herdeiros e sucessores.
 
-7.2 O presente Contrato terá vigência inicial de 5 (cinco) anos, contados da data de assinatura eletrônica, com renovação automática por igual período, independentemente de notificação. A autorização é concedida em caráter mundial, sem limitação territorial. Qualquer das PARTES poderá rescindir este Contrato, a qualquer tempo, mediante notificação prévia e expressa com antecedência mínima de 30 (trinta) dias antes do término do período vigente. Toda e qualquer licença concedida durante a vigência reputar-se-á válida e definitiva.
+7.2 O presente Contrato terá vigência inicial de 5 (cinco) anos, contados da data de assinatura eletrônica, com renovação automática por igual período, independentemente de notificação. A autorização é concedida em caráter mundial, sem limitação territorial. Qualquer das PARTES poderá rescindir este Contrato mediante comunicação formal e expressa enviada por e-mail ao endereço cadastrado na plataforma, com antecedência mínima de 30 (trinta) dias. Toda e qualquer licença e exploração concedida durante a vigência reputar-se-á válida e definitiva.
 
 7.3 A EDITORA procederá trimestralmente, na conta bancária em nome do AUTOR indicada no cadastro da plataforma, à liquidação dos direitos eventualmente devidos ao AUTOR, mediante a transferência das receitas que lhe pertencem, acompanhada dos respectivos demonstrativos, mencionando a fonte pagadora, o período a que se refere o crédito, o título da OBRA e o valor de cada crédito, devendo efetuá-la dentro dos 60 (sessenta) dias posteriores ao fim de cada trimestre.
 
@@ -106,7 +106,7 @@ CNPJ: {{plataforma_cnpj}}
 (EDITORA)
 """
 
-CONTRATO_VERSAO = "v2.5 - Abr/2026"
+CONTRATO_VERSAO = "v2.6 - Abr/2026"
 
 CONTRATO_PUBLISHER_TEMPLATE = """CONTRATO DE EDIÇÃO DE OBRAS MUSICAIS — EDITORA
 
@@ -170,7 +170,7 @@ Parágrafo Quinto: O não pagamento dentro do prazo estipulado poderá resultar 
 CLÁUSULA SEXTA — PRAZO, TERRITÓRIO E RESCISÃO
 6.1 O presente Contrato terá vigência inicial de 5 (cinco) anos, contados da data de assinatura eletrônica, com renovação automática por igual período, independentemente de notificação. A autorização é concedida em caráter mundial, sem limitação territorial.
 
-6.2 Qualquer das PARTES poderá rescindir este Contrato, a qualquer tempo, mediante notificação prévia e expressa com antecedência mínima de 30 (trinta) dias antes do término do período vigente. Toda e qualquer licença concedida durante a vigência reputar-se-á válida e definitiva.
+6.2 Qualquer das PARTES poderá rescindir este Contrato mediante comunicação formal e expressa enviada por e-mail ao endereço cadastrado na plataforma, com antecedência mínima de 30 (trinta) dias. Toda e qualquer licença e exploração concedida durante a vigência reputar-se-á válida e definitiva.
 
 CLÁUSULA SÉTIMA — FORO
 7.1 Fica eleito o foro da comarca da cidade do Rio de Janeiro/RJ.
