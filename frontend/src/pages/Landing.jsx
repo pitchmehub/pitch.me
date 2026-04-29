@@ -586,17 +586,17 @@ export default function Landing() {
         .hero-note {
           position: absolute;
           color: var(--text);
-          opacity: 0.07;
+          opacity: 0.18;
           line-height: 1;
           user-select: none;
           animation: gvNoteFloat linear infinite;
         }
         @keyframes gvNoteFloat {
-          0%   { transform: translate(0px, 0px) rotate(0deg);    opacity: 0.05; }
-          25%  { transform: translate(8px, -16px) rotate(6deg);  opacity: 0.09; }
-          50%  { transform: translate(-5px, -28px) rotate(-4deg); opacity: 0.06; }
-          75%  { transform: translate(7px, -14px) rotate(8deg);  opacity: 0.10; }
-          100% { transform: translate(0px, 0px) rotate(0deg);    opacity: 0.05; }
+          0%   { transform: translate(0px, 0px) rotate(0deg);    opacity: 0.13; }
+          25%  { transform: translate(8px, -16px) rotate(6deg);  opacity: 0.22; }
+          50%  { transform: translate(-5px, -28px) rotate(-4deg); opacity: 0.15; }
+          75%  { transform: translate(7px, -14px) rotate(8deg);  opacity: 0.20; }
+          100% { transform: translate(0px, 0px) rotate(0deg);    opacity: 0.13; }
         }
         .hero-typer {
           position: absolute;
@@ -608,23 +608,23 @@ export default function Landing() {
         }
         .typer-text {
           font-family: 'Space Grotesk', sans-serif;
-          font-size: 11px;
-          letter-spacing: 0.20em;
+          font-size: 13px;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
           color: var(--muted);
-          opacity: 0.6;
+          opacity: 1;
         }
         .typer-cursor {
           font-family: monospace;
-          font-size: 12px;
+          font-size: 14px;
           color: var(--accent);
-          opacity: 0.7;
-          margin-left: 1px;
+          opacity: 1;
+          margin-left: 2px;
           animation: gvBlink .9s steps(1) infinite;
         }
         @keyframes gvBlink {
-          0%, 100% { opacity: 0.7; }
-          50%       { opacity: 0;   }
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0; }
         }
         .eyebrow {
           display: inline-flex;
