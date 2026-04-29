@@ -74,6 +74,22 @@ def create_app() -> Flask:
     _env_origins = os.getenv("ALLOWED_ORIGINS", "").strip()
     allowed = [o.strip() for o in _env_origins.split(",") if o.strip()]
 
+    # Always allow the configured frontend URL (set on Render/Vercel)
+    frontend_url = os.getenv("FRONTEND_URL", "").strip()
+    if frontend_url and frontend_url not in allowed:
+        allowed.append(frontend_url)
+
+    # Always allow production Gravan domains
+    _production_origins = [
+        "https://gravan.vercel.app",
+        "https://www.gravan.vercel.app",
+        "https://gravan.com.br",
+        "https://www.gravan.com.br",
+    ]
+    for _o in _production_origins:
+        if _o not in allowed:
+            allowed.append(_o)
+
     # Support Replit dynamic domains
     replit_dev_domain = os.getenv("REPLIT_DEV_DOMAIN", "")
     if replit_dev_domain:
@@ -82,8 +98,12 @@ def create_app() -> Flask:
             if origin not in allowed:
                 allowed.append(origin)
 
-    if not allowed:
-        allowed = ["http://localhost:3000"] if os.getenv("FLASK_ENV") != "production" else []
+    # Development fallback
+    if "http://localhost:3000" not in allowed:
+        allowed.append("http://localhost:3000")
+    if "http://localhost:5173" not in allowed:
+        allowed.append("http://localhost:5173")
+
     CORS(
         app,
         resources={
