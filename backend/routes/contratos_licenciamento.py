@@ -407,8 +407,16 @@ def detalhe(contract_id):
 
     # Contratos bilaterais (não trilaterais): Gravan é EDITORA DETENTORA DOS DIREITOS.
     # Se ainda não consta nos signers (contratos gerados antes da mudança), injeta agora.
+    # A Gravan pode estar armazenada com role='editora_agregadora' (fallback de constraint)
+    # ou 'editora_detentora' (após migration). Em ambos os casos, normaliza para exibição.
     eh_trilateral = bool(c.get("trilateral"))
     gravan_ja_presente = any(s.get("user_id") == GRAVAN_EDITORA_UUID for s in signers)
+    # Normaliza role da Gravan se estiver como editora_agregadora (fallback de constraint)
+    for s in signers:
+        if s.get("user_id") == GRAVAN_EDITORA_UUID and s.get("role") == "editora_agregadora":
+            s["role"] = "editora_detentora"
+            if s.get("perfis"):
+                s["perfis"]["nome"] = "GRAVAN Editora Musical Ltda."
     if not eh_trilateral and not gravan_ja_presente:
         signers.append({
             "user_id":   GRAVAN_EDITORA_UUID,

@@ -416,16 +416,28 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
         "signed_at":   agora_iso,
         "ip_hash":     (ip_remote or "")[:64] or None,
     })
-    # INSERT resiliente: cada signer individual (ver explicação no trilateral).
+    # INSERT resiliente: cada signer individual.
+    # Para a Gravan (editora_detentora): se a constraint do banco ainda não foi
+    # atualizada com a migration_signers_role_editora_detentora.sql, faz fallback
+    # para 'editora_agregadora' (semanticamente equivalente para fins de escrow).
     for s in signers:
         try:
             sb.table("contract_signers").insert(s).execute()
         except Exception as e:
+            err_str = str(e)
+            # Fallback: constraint não inclui editora_detentora → tenta editora_agregadora
+            if s.get("role") == "editora_detentora" and "signers_role_check" in err_str:
+                try:
+                    s_fallback = {**s, "role": "editora_agregadora"}
+                    sb.table("contract_signers").insert(s_fallback).execute()
+                    continue  # fallback ok, não registra como erro
+                except Exception as e_fb:
+                    err_str = str(e_fb)
             try:
                 sb.table("contract_events").insert({
                     "contract_id": contract["id"],
                     "event_type":  "signers_error",
-                    "payload":     {"erro": str(e), "signer": s},
+                    "payload":     {"erro": err_str, "signer": s},
                 }).execute()
             except Exception:
                 pass
