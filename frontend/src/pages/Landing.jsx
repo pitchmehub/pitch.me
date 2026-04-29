@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import DEFAULT_CONTENT from '../config/landing.default.json'
@@ -10,6 +10,7 @@ export default function Landing() {
   const [showContato, setShowContato] = useState(false)
   const [stats, setStats] = useState(null)
   const [content, setContent] = useState(DEFAULT_CONTENT)
+  const [navScrolled, setNavScrolled] = useState(false)
   const { user, loading } = useAuth()
   const navigate = useNavigate()
 
@@ -71,6 +72,31 @@ export default function Landing() {
     return () => { mounted = false }
   }, [])
 
+  // Nav shadow on scroll
+  useEffect(() => {
+    const onScroll = () => setNavScrolled(window.scrollY > 24)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // Scroll reveal via IntersectionObserver
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -48px 0px' }
+    )
+    const targets = document.querySelectorAll('[data-reveal]')
+    targets.forEach(el => observer.observe(el))
+    return () => observer.disconnect()
+  }, [content])
+
   const handleCTA = () => {
     if (user) {
       navigate('/descoberta')
@@ -101,7 +127,7 @@ export default function Landing() {
   return (
     <div className="landing-v1">
       {/* Navigation */}
-      <nav className="nav-minimal" data-testid="landing-nav">
+      <nav className={`nav-minimal${navScrolled ? ' is-scrolled' : ''}`} data-testid="landing-nav">
         <div className="nav-container">
           <a href="#" className="logo" data-testid="logo" aria-label={content.brand.logoText}>
             <GravanLogo height={52} />
@@ -176,14 +202,14 @@ export default function Landing() {
 
       {/* Como Funciona */}
       <section className="section-block" id="como-funciona" data-testid="section-como-funciona">
-        <div className="block-header">
+        <div className="block-header" data-reveal>
           <span className="section-index">01</span>
           <h2 className="section-title">{content.comoFunciona.sectionTitle}</h2>
           <p className="section-lead">
             {content.comoFunciona.sectionLead}
           </p>
         </div>
-        <div className="grid-two">
+        <div className="grid-two" data-reveal data-delay="1">
           <div className="grid-col" data-testid="card-compositores">
             <div className="col-head">
               <span className="col-label">{content.comoFunciona.compositoresLabel}</span>
@@ -223,13 +249,13 @@ export default function Landing() {
 
       {/* Recursos */}
       <section className="section-block section-features" id="recursos" data-testid="section-recursos">
-        <div className="block-header">
+        <div className="block-header" data-reveal>
           <span className="section-index">02</span>
           <h2 className="section-title">{content.recursos.title}</h2>
         </div>
         <div className="features-grid">
           {(content.recursos.items || []).map((item, i) => (
-            <div key={i} className="feature-cell" data-testid={`feature-${i}`}>
+            <div key={i} className="feature-cell" data-reveal data-delay={String(i)} data-testid={`feature-${i}`}>
               <div className="feature-label">{item.label}</div>
               <h4>{item.title}</h4>
               <p>{item.text}</p>
@@ -240,7 +266,7 @@ export default function Landing() {
 
       {/* Manifesto */}
       <section className="testimonial" data-testid="section-manifesto">
-        <div className="testimonial-inner">
+        <div className="testimonial-inner" data-reveal>
           <span className="quote-mark">"</span>
           <blockquote className="testimonial-quote">
             {content.manifesto.line1}<br />
@@ -257,14 +283,14 @@ export default function Landing() {
 
       {/* Preços */}
       <section className="section-block" id="precos" data-testid="section-precos">
-        <div className="block-header">
+        <div className="block-header" data-reveal>
           <span className="section-index">03</span>
           <h2 className="section-title">{content.precos.title}</h2>
           <p className="section-lead">
             {content.precos.lead}
           </p>
         </div>
-        <div className="pricing-grid">
+        <div className="pricing-grid" data-reveal data-delay="1">
           <div className="price-cell" data-testid="plan-basico">
             <div className="price-label">{content.precos.basico.label}</div>
             <div className="price-value">{content.precos.basico.price}</div>
@@ -321,7 +347,7 @@ export default function Landing() {
               </a>
             </div>
           </div>
-          <div className="footer-cta">
+          <div className="footer-cta" data-reveal>
             <h2>{content.footer.ctaTitle}</h2>
             <button
               className="btn-primary footer-btn"
@@ -492,6 +518,66 @@ export default function Landing() {
         @keyframes pulse {
           0%,100% { box-shadow: 0 0 0 4px rgba(12,68,124,0.18); }
           50% { box-shadow: 0 0 0 8px rgba(12,68,124,0.05); }
+        }
+
+        /* ─── ANIMATION KEYFRAMES ─────────────────────────── */
+        @keyframes gvFadeSlideUp {
+          from { opacity: 0; transform: translateY(32px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes gvFadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @keyframes gvScaleReveal {
+          from { opacity: 0; transform: scale(0.97) translateY(12px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* ─── HERO ENTRANCE (page load, no scroll) ────────── */
+        .hero-text .eyebrow {
+          animation: gvFadeSlideUp .55s cubic-bezier(.22,.68,0,1.2) .08s both;
+        }
+        .hero-text .hero-title {
+          animation: gvFadeSlideUp .65s cubic-bezier(.22,.68,0,1.15) .2s both;
+        }
+        .hero-text .hero-subtitle {
+          animation: gvFadeSlideUp .55s ease .38s both;
+        }
+        .hero-text .hero-cta-row {
+          animation: gvFadeSlideUp .5s ease .52s both;
+        }
+        .hero-text .hero-meta {
+          animation: gvFadeSlideUp .5s ease .64s both;
+        }
+        .hero-media {
+          animation: gvScaleReveal .8s cubic-bezier(.22,.68,0,1.05) .18s both;
+        }
+
+        /* ─── SCROLL REVEAL ────────────────────────────────── */
+        [data-reveal] {
+          opacity: 0;
+          transform: translateY(30px);
+          transition:
+            opacity  .65s cubic-bezier(.22,.68,0,1.1),
+            transform .65s cubic-bezier(.22,.68,0,1.1);
+        }
+        [data-reveal].is-visible {
+          opacity: 1;
+          transform: none;
+        }
+        [data-reveal][data-delay="1"] { transition-delay: .12s; }
+        [data-reveal][data-delay="2"] { transition-delay: .24s; }
+        [data-reveal][data-delay="3"] { transition-delay: .36s; }
+        [data-reveal][data-delay="4"] { transition-delay: .48s; }
+        [data-reveal][data-delay="5"] { transition-delay: .56s; }
+
+        /* ─── NAV SCROLL SHADOW ────────────────────────────── */
+        .nav-minimal {
+          transition: box-shadow .3s ease;
+        }
+        .nav-minimal.is-scrolled {
+          box-shadow: 0 2px 24px rgba(44,44,42,0.10);
         }
         .hero-title {
           font-size: clamp(44px, 6.4vw, 92px);
@@ -713,9 +799,15 @@ export default function Landing() {
           border-right: 1px solid var(--border);
           border-bottom: 1px solid var(--border);
           padding: 40px 36px;
-          transition: background .2s ease;
+          transition: background .25s ease, transform .25s ease, box-shadow .25s ease;
         }
-        .feature-cell:hover { background: var(--surface); }
+        .feature-cell:hover {
+          background: var(--surface);
+          transform: translateY(-3px);
+          box-shadow: 0 8px 24px rgba(44,44,42,0.07);
+          position: relative;
+          z-index: 1;
+        }
         .feature-label {
           font-family: 'Space Grotesk', sans-serif;
           font-size: 12px;
@@ -791,8 +883,14 @@ export default function Landing() {
           padding: 48px 40px;
           border-right: 1px solid var(--border);
           position: relative;
+          transition: transform .3s cubic-bezier(.22,.68,0,1.2), box-shadow .3s ease;
         }
         .price-cell:last-child { border-right: none; }
+        .price-cell:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 16px 40px rgba(44,44,42,0.12);
+          z-index: 1;
+        }
         .price-cell-feature {
           background: var(--text);
           color: #FFFFFF;
