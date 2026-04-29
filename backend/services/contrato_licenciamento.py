@@ -518,12 +518,18 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
 
     agora_iso = datetime.now(timezone.utc).isoformat()
 
-    # Signers: todos os coautores (role autor/coautor) + Gravan (editora detentora, auto-assina) + intérprete
+    # Signers: autores/coautores (assinatura MANUAL) + Gravan (editora detentora, auto-assina)
+    # + intérprete (auto-assina via pagamento).
     #
-    # AUTO-ASSINATURA DE AUTORES: a publicação da obra na plataforma com preço definido
-    # constitui aceite eletrônico prévio de todos os futuros contratos de licenciamento
-    # — equivalente a uma licença-moldura. Não há necessidade de assinatura manual por
-    # venda individual. Isso espelha o modelo padrão de marketplaces digitais de conteúdo.
+    # MODELO DE ASSINATURA MANUAL: cada autor/coautor humano DEVE acessar o contrato e
+    # clicar "Concordo" individualmente. O contrato só transita para 'concluído' (e as
+    # wallets só são creditadas) quando TODOS os autores humanos assinaram de fato.
+    # Esta é a regra de escrow real exigida pela Gravan.
+    #
+    # Exceções ao modelo manual:
+    #   • COMPRADOR (intérprete): aceite eletrônico no checkout (pagamento = assinatura).
+    #   • GRAVAN (editora_detentora bilateral): autoassinatura institucional — a Gravan
+    #     já consente em ser editora detentora ao manter a obra no catálogo.
     signers = []
     for c in ordered:
         signers.append({
@@ -531,8 +537,8 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
             "user_id":     c["perfil_id"],
             "role":        "autor" if c["perfil_id"] == titular["id"] else "coautor",
             "share_pct":   float(c["share_pct"]),
-            "signed":      True,
-            "signed_at":   agora_iso,
+            "signed":      False,
+            "signed_at":   None,
         })
     # Gravan como EDITORA DETENTORA DOS DIREITOS — assina automaticamente na geração
     signers.append({
@@ -593,6 +599,31 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
             "event_type":  "signed",
             "payload":     {"origem": "checkout", "ip": (ip_remote or "")[:32]},
         }).execute()
+    except Exception:
+        pass
+
+    # Notifica autores/coautores que precisam assinar manualmente o contrato
+    # para liberar o pagamento. Esta notificação é essencial no MODELO MANUAL:
+    # sem ela, o contrato fica em "pendente" indefinidamente porque ninguém
+    # sabe que precisa assinar.
+    try:
+        from services.notificacoes import notify
+        obra_nome = obra.get("nome") or "obra"
+        for c in ordered:
+            try:
+                notify(
+                    c["perfil_id"],
+                    tipo="contrato_pendente",
+                    titulo="Contrato aguardando sua assinatura",
+                    mensagem=(
+                        f'A obra "{obra_nome}" foi licenciada. Acesse o contrato e '
+                        f'clique em "Concordo" para liberar o pagamento.'
+                    ),
+                    link=f"/contratos/licenciamento/{contract['id']}",
+                    payload={"contract_id": contract["id"], "obra_id": obra["id"]},
+                )
+            except Exception:
+                continue
     except Exception:
         pass
 
@@ -733,8 +764,14 @@ def gerar_contrato_trilateral_agregado(
 
     # 6) Signers: coautores + editora-mãe + comprador
     #
-    # AUTO-ASSINATURA DE AUTORES: publicar a obra para venda = aceite prévio de
-    # todos os futuros licenciamentos. Assinatura manual por venda não é necessária.
+    # MODELO DE ASSINATURA MANUAL (TRILATERAL): cada autor humano E a editora-mãe
+    # DEVEM acessar o contrato e clicar "Concordo" individualmente. O contrato só
+    # transita para 'concluído' (e as wallets só são creditadas) quando todos os
+    # humanos assinaram de fato.
+    #
+    # Exceção: o COMPRADOR (intérprete) auto-assina via pagamento (aceite no
+    # checkout). A Gravan NÃO é signatária no trilateral — a editora-mãe é a
+    # editora_detentora; Gravan apenas intermedeia.
     _agora_iso_tri = datetime.now(timezone.utc).isoformat()
     signers = []
     for c in ordered:
@@ -743,24 +780,19 @@ def gerar_contrato_trilateral_agregado(
             "user_id":     c["perfil_id"],
             "role":        "autor" if c["perfil_id"] == titular["id"] else "coautor",
             "share_pct":   float(c["share_pct"]),
-            "signed":      True,
-            "signed_at":   _agora_iso_tri,
+            "signed":      False,
+            "signed_at":   None,
         })
     # A editora à qual o compositor é agregado É a Editora Detentora dos Direitos
     # no contrato trilateral — não uma mera "agregadora". Gravan apenas intermedeia.
-    #
-    # AUTO-ASSINATURA: a editora JÁ deu consentimento ao aceitar o Termo de Agregação
-    # com o compositor. Esse aceite cobre todos os futuros licenciamentos das obras
-    # registradas no período de vigência da agregação — o mesmo princípio pelo qual
-    # o comprador auto-assina ao realizar o pagamento (aceite eletrônico).
-    # Portanto, a editora assina automaticamente na geração do contrato.
+    # A editora também precisa assinar MANUALMENTE cada licenciamento.
     editora_signer_payload = {
         "contract_id": contract["id"],
         "user_id":     editora["id"],
         "role":        "editora_detentora",   # role preferencial (fallback → editora_agregadora)
         "share_pct":   None,
-        "signed":      True,
-        "signed_at":   datetime.now(timezone.utc).isoformat(),
+        "signed":      False,
+        "signed_at":   None,
     }
     # Comprador assina no checkout (pagamento = aceite eletrônico).
     signers.append({
@@ -807,20 +839,41 @@ def gerar_contrato_trilateral_agregado(
     except Exception:
         pass
 
-    # 7) Notifica a editora-mãe que há um novo contrato a assinar
+    # 7) Notifica a editora-mãe E os autores/coautores que precisam assinar
+    # manualmente. No MODELO MANUAL, essa notificação é essencial para que
+    # o contrato saia de "pendente" — sem ela ninguém sabe que precisa agir.
     try:
         from services.notificacoes import notify
-        notify(
-            editora["id"],
-            tipo="contrato_pendente",
-            titulo="Novo contrato para assinatura",
-            mensagem=(
-                f'Um agregado seu vendeu a obra "{obra.get("nome","—")}". '
-                "Como editora vinculada, sua assinatura é necessária."
-            ),
-            link=f"/contratos/licenciamento/{contract['id']}",
-            payload={"contract_id": contract["id"], "obra_id": obra["id"]},
-        )
+        obra_nome = obra.get("nome") or "—"
+        try:
+            notify(
+                editora["id"],
+                tipo="contrato_pendente",
+                titulo="Novo contrato para assinatura",
+                mensagem=(
+                    f'Um agregado seu vendeu a obra "{obra_nome}". '
+                    "Como editora vinculada, sua assinatura é necessária."
+                ),
+                link=f"/contratos/licenciamento/{contract['id']}",
+                payload={"contract_id": contract["id"], "obra_id": obra["id"]},
+            )
+        except Exception:
+            pass
+        for c in ordered:
+            try:
+                notify(
+                    c["perfil_id"],
+                    tipo="contrato_pendente",
+                    titulo="Contrato aguardando sua assinatura",
+                    mensagem=(
+                        f'A obra "{obra_nome}" foi licenciada. Acesse o contrato e '
+                        f'clique em "Concordo" para liberar o pagamento.'
+                    ),
+                    link=f"/contratos/licenciamento/{contract['id']}",
+                    payload={"contract_id": contract["id"], "obra_id": obra["id"]},
+                )
+            except Exception:
+                continue
     except Exception:
         pass
 
