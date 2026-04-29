@@ -87,10 +87,10 @@ def criar_checkout():
     if metodo not in METODO_TO_STRIPE:
         abort(422, description=f"Método inválido: {metodo}")
 
-    # Busca a obra
+    # Busca a obra (inclui publisher_id e gravan_editora_id para calcular split da editora)
     obra_resp = (
         sb.table("obras")
-        .select("id, nome, preco_cents, status, titular_id")
+        .select("id, nome, preco_cents, status, titular_id, publisher_id, gravan_editora_id")
         .eq("id", obra_id)
         .single()
         .execute()
@@ -119,7 +119,10 @@ def criar_checkout():
     titular_nome  = t_data.get("nome", "Gravan")
     plano_titular = t_data.get("plano", "STARTER")
     status_ass    = t_data.get("status_assinatura", "inativa")
-    publisher_id  = t_data.get("publisher_id")
+    # publisher_id: lê do perfil do titular; se nulo, usa o publisher da obra
+    # (compositores sem editora têm obras.publisher_id = Gravan, mas perfis.publisher_id = null)
+    publisher_id  = t_data.get("publisher_id") or \
+                    obra.get("publisher_id") or obra.get("gravan_editora_id")
     # PRO efetivo apenas com assinatura em dia
     if plano_titular == "PRO" and status_ass not in ("ativa", "cancelada", "past_due"):
         plano_titular = "STARTER"

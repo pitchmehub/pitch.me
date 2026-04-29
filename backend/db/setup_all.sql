@@ -1761,7 +1761,7 @@ create table if not exists public.repasses (
   enviado_at      timestamptz,
   liberado_at     timestamptz,
   constraint repasses_status_check check (status in
-    ('pendente', 'retido', 'enviado', 'falhou', 'revertido'))
+    ('pendente', 'retido', 'enviado', 'falhou', 'revertido', 'plataforma'))
 );
 
 create index if not exists idx_repasses_transacao on public.repasses(transacao_id);
