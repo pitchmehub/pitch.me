@@ -384,7 +384,10 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
     }).execute()
     contract = insert.data[0]
 
-    # Signers: todos os coautores (role autor/coautor) + intérprete
+    GRAVAN_EDITORA_UUID = "00000000-0000-0000-0000-000000000001"
+    agora_iso = datetime.now(timezone.utc).isoformat()
+
+    # Signers: todos os coautores (role autor/coautor) + Gravan (editora detentora, auto-assina) + intérprete
     signers = []
     for c in ordered:
         signers.append({
@@ -393,6 +396,15 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
             "role":        "autor" if c["perfil_id"] == titular["id"] else "coautor",
             "share_pct":   float(c["share_pct"]),
         })
+    # Gravan como EDITORA DETENTORA DOS DIREITOS — assina automaticamente na geração
+    signers.append({
+        "contract_id": contract["id"],
+        "user_id":     GRAVAN_EDITORA_UUID,
+        "role":        "editora_detentora",
+        "share_pct":   None,
+        "signed":      True,
+        "signed_at":   agora_iso,
+    })
     # Comprador assina no momento do checkout (pagamento = aceite eletrônico).
     # Não há nova assinatura depois.
     signers.append({
@@ -401,7 +413,7 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
         "role":        "interprete",
         "share_pct":   None,
         "signed":      True,
-        "signed_at":   datetime.now(timezone.utc).isoformat(),
+        "signed_at":   agora_iso,
         "ip_hash":     (ip_remote or "")[:64] or None,
     })
     # INSERT resiliente: cada signer individual (ver explicação no trilateral).

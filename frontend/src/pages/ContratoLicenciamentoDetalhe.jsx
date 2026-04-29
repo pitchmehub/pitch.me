@@ -3,6 +3,18 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
 
+const GRAVAN_EDITORA_UUID = '00000000-0000-0000-0000-000000000001'
+
+const ROLE_LABEL = {
+  autor:              'Autor principal',
+  coautor:            'Coautor',
+  interprete:         'Intérprete',
+  'intérprete':       'Intérprete',
+  editora_detentora:  'Editora Detentora dos Direitos',
+  editora_agregadora: 'Editora Agregadora',
+  editora_terceira:   'Editora',
+}
+
 export default function ContratoLicenciamentoDetalhe() {
  const { id } = useParams()
  const { user } = useAuth()
@@ -126,28 +138,36 @@ export default function ContratoLicenciamentoDetalhe() {
  <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 1 }}>
  Participantes
  </h3>
- {c.signers?.map((s, i) => (
+ {c.signers?.map((s, i) => {
+ const isGravan = s.user_id === GRAVAN_EDITORA_UUID
+ const nome = isGravan
+  ? 'GRAVAN Editora Musical Ltda.'
+  : (s?.perfis?.nome_completo || s?.perfis?.nome || 'Sem nome')
+ return (
  <div key={s.user_id} data-testid={`signer-${i}`} style={{
  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
  padding: '8px 0', borderBottom: i < c.signers.length - 1 ? '1px solid var(--border)' : 'none',
  }}>
  <div>
  <div style={{ fontSize: 13, fontWeight: 600 }}>
- {s?.perfis?.nome_completo || s?.perfis?.nome || 'Sem nome'}
+ {nome}
  {s.user_id === user?.id && <span style={{ color: 'var(--brand)', fontSize: 11, marginLeft: 6 }}>(você)</span>}
  </div>
  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
- {{ autor: 'Autor principal', coautor: 'Coautor', interprete: 'Intérprete', 'intérprete': 'Intérprete' }[s.role] || s.role}
+ {ROLE_LABEL[s.role] || s.role}
  {s.share_pct != null && ` · ${Number(s.share_pct).toFixed(2)}%`}
  </div>
  </div>
  <div style={{ fontSize: 11, fontWeight: 600 }}>
  {s.signed
- ? <span style={{ color: '#0E6B2B' }}>✓ Assinou {s.signed_at ? new Date(s.signed_at).toLocaleDateString('pt-BR') : ''}</span>
+ ? <span style={{ color: '#0E6B2B' }}>
+   ✓ {isGravan ? 'Assinatura automática' : 'Assinou'}{s.signed_at ? ` · ${new Date(s.signed_at).toLocaleDateString('pt-BR')}` : ''}
+  </span>
  : <span style={{ color: 'var(--text-muted)' }}>⏱ Pendente</span>}
  </div>
  </div>
- ))}
+ )
+ })}
  </div>
 
  {/* Conteúdo do contrato */}
