@@ -42,7 +42,7 @@ def status():
         "status_assinatura": p.get("status_assinatura", "inativa"),
         "assinatura_inicio": p.get("assinatura_inicio"),
         "assinatura_fim":    p.get("assinatura_fim"),
-        "fee_pct":           20 if p.get("plano") == "PRO" else 25,
+        "fee_pct":           25,
         "preco_pro_cents":   PRO_PRICE_CENTS,
         "migration_applied": True,
     }), 200

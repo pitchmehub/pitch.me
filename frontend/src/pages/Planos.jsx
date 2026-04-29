@@ -70,7 +70,7 @@ export default function Planos() {
  Escolha seu plano
  </h1>
  <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>
- Economize <b>{feeSavingPct}% em todas as transações</b> assinando o PRO.
+ Taxa de plataforma única de <b>25%</b> para todos os planos.
  </p>
  </header>
 
@@ -107,8 +107,11 @@ export default function Planos() {
  <li>Acesso completo ao catálogo</li>
  <li>Upload ilimitado de obras</li>
  <li>Curtir &amp; salvar na biblioteca</li>
- <li>Licenciamento de obras</li>
- <li><b>Taxa de 25%</b> por transação</li>
+ <li>Licenciamento de obras (compra direta)</li>
+ <li>Taxa de 25% por transação</li>
+ <li style={{ color: 'var(--text-muted)' }}>✗ Sem propostas/negociação</li>
+ <li style={{ color: 'var(--text-muted)' }}>✗ Preço máximo: R$ 1.000</li>
+ <li style={{ color: 'var(--text-muted)' }}>✗ Sem analytics</li>
  </ul>
  <button
  data-testid="btn-starter"
@@ -129,8 +132,9 @@ export default function Planos() {
  <p style={priceStyle}>R$ 49,90<span style={priceSuffix}>/mês</span></p>
  <ul style={listStyle}>
  <li>Tudo do Starter</li>
- <li><b style={{ color: 'var(--brand)' }}>Taxa reduzida de 20%</b> (economize 5%)</li>
- <li>Painel de analytics (plays, curtidas)</li>
+ <li><b style={{ color: 'var(--brand)' }}>Enviar e receber propostas</b> de licenciamento</li>
+ <li><b style={{ color: 'var(--brand)' }}>Precificar até R$ 10.000</b> por obra</li>
+ <li><b style={{ color: 'var(--brand)' }}>Painel de analytics</b> (plays, curtidas, vendas)</li>
  <li>Destaque na plataforma</li>
  <li>Selo PRO no seu perfil</li>
  <li>Acesso antecipado a novos recursos</li>

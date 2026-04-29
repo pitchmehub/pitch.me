@@ -1030,7 +1030,7 @@ function AnaliticosPanel({ resumo, extras, reloadingExtras, reloadExtras }) {
           {fmt(a.economia_total_cents || 0)}
         </div>
         <div style={{ fontSize: 12, color: 'rgba(255,255,255,.7)', marginBottom: 14 }}>
-          Quanto os assinantes pouparam ao pagar 20% (PRO) em vez de 25% (STARTER) sobre suas vendas.
+          Volume de vendas gerado por usuários PRO na plataforma.
         </div>
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
           <div>

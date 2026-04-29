@@ -3,9 +3,8 @@ Motor Financeiro do Gravan.
 
 Todos os cálculos são realizados EXCLUSIVAMENTE aqui, no servidor.
 
-Estrutura de receita (fee varia com o plano do TITULAR da obra):
-  Titular Grátis (STARTER): 25% plataforma | 75% compositores
-  Titular PRO:              20% plataforma | 80% compositores
+Estrutura de receita (taxa ÚNICA de plataforma, independente do plano):
+  25% plataforma | 75% compositores
 
 Quando a obra possui editora vinculada (titular agregado a uma editora,
 ou seja, perfis.publisher_id preenchido), 10% do valor é destinado à
@@ -17,13 +16,13 @@ percentuais (share_pct).
 from decimal import Decimal, ROUND_DOWN
 from dataclasses import dataclass, field
 
-PLATFORM_RATE_STARTER = Decimal("0.25")  # 25%
-PLATFORM_RATE_PRO     = Decimal("0.20")  # 20%
-EDITORA_RATE          = Decimal("0.10")  # 10% para editora vinculada
+PLATFORM_RATE = Decimal("0.25")   # 25% — taxa única para todos os planos
+EDITORA_RATE  = Decimal("0.10")   # 10% para editora vinculada
 
 
 def fee_rate_for_plano(plano: str | None) -> Decimal:
-    return PLATFORM_RATE_PRO if (plano or "").upper() == "PRO" else PLATFORM_RATE_STARTER
+    """Taxa de plataforma é fixa em 25% independente do plano."""
+    return PLATFORM_RATE
 
 
 @dataclass

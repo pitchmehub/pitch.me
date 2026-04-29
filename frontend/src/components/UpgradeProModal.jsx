@@ -18,7 +18,7 @@ export default function UpgradeProModal({
   open,
   onClose,
   titulo = 'Esta funcionalidade é exclusiva do plano PRO',
-  mensagem = 'Assine o plano PRO e tenha acesso a compradores de alto valor, comissão menor (20%) e analytics completo.',
+  mensagem = 'Assine o plano PRO para enviar e receber propostas de licenciamento, precificar até R$ 10.000 e acessar o analytics completo.',
   ctaLabel = 'Assinar PRO agora',
   contexto,
 }) {
@@ -57,11 +57,11 @@ export default function UpgradeProModal({
           </p>
 
           <ul style={{ textAlign: 'left', fontSize: 13, color: 'var(--text-primary)', listStyle: 'none', padding: 0, marginBottom: 22 }}>
+            <li style={{ padding: '6px 0' }}>✓ Enviar e receber propostas de licenciamento</li>
             <li style={{ padding: '6px 0' }}>✓ Precificação até R$ 10.000 por obra</li>
-            <li style={{ padding: '6px 0' }}>✓ Comissão de 15% (em vez de 20%)</li>
-            <li style={{ padding: '6px 0' }}>✓ Receba ofertas de exclusividade</li>
+            <li style={{ padding: '6px 0' }}>✓ Analytics completo de receita e propostas</li>
             <li style={{ padding: '6px 0' }}>✓ Selo PRO no seu perfil e obras</li>
-            <li style={{ padding: '6px 0' }}>✓ Analytics completo de receita e ofertas</li>
+            <li style={{ padding: '6px 0' }}>✓ Destaque na plataforma</li>
           </ul>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

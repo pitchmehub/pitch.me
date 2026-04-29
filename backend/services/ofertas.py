@@ -107,10 +107,12 @@ def validar_nova_oferta(
     if tipo not in ("padrao", "exclusividade"):
         return "Tipo de oferta inválido."
 
+    # Apenas compositores PRO podem receber propostas (padrão ou exclusividade)
+    if not _is_pro_efetivo(titular):
+        return ("Este compositor ainda não ativou o plano PRO. "
+                "Apenas obras de compositores PRO aceitam propostas.")
+
     if tipo == "exclusividade":
-        if not _is_pro_efetivo(titular):
-            return ("Ofertas de exclusividade só podem ser feitas para obras "
-                    "de compositores PRO.")
         if valor_cents < preco:
             return (f"Para exclusividade, o valor mínimo é o preço integral "
                     f"da obra ({_moeda(preco)}).")

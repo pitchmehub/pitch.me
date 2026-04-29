@@ -192,9 +192,9 @@ def on_subscription_deleted(sub_obj: dict):
             tipo="assinatura",
             titulo="Sua assinatura PRO foi encerrada",
             mensagem=(
-                "Sua conta voltou para o plano STARTER. As condições do plano "
-                "STARTER (taxa de plataforma de 25%) já valem para suas próximas "
-                "vendas. Você pode reativar o PRO quando quiser na página de Planos."
+                "Sua conta voltou para o plano STARTER. O envio e recebimento de "
+                "propostas e o painel de analytics ficam suspensos. Você pode "
+                "reativar o PRO quando quiser na página de Planos."
             ),
             link="/planos",
         )

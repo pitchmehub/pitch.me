@@ -149,7 +149,7 @@ def resumo():
     )
 
     # Receita líquida (após comissão da plataforma)
-    fee_rate = 0.20 if is_pro_user else 0.25
+    fee_rate = 0.25  # taxa única de plataforma para todos os planos
     receita_liquida_total_cents = int(round(receita_total_cents * (1 - fee_rate)))
     receita_liquida_mes_cents = int(round(receita_mes_cents * (1 - fee_rate)))
 

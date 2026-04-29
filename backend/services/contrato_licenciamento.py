@@ -98,7 +98,7 @@ Sobre o valor bruto pago pelo LICENCIADO, a GRAVAN reterá {{plataforma_pct}}% (
 
 O saldo remanescente de {{liquido_autores_pct}}% ({{liquido_autores_pct_extenso}}) será distribuído entre o(s) AUTOR(ES) na proporção pró-rata declarada na CLÁUSULA 10 (SPLIT) deste instrumento, nos termos do contrato de edição vigente entre os AUTORES e a GRAVAN na qualidade de EDITORA DETENTORA DOS DIREITOS.
 
-Parágrafo Único: A taxa de plataforma segue a tabela: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda.
+Parágrafo Único: A taxa de plataforma da GRAVAN é de 25% (vinte e cinco por cento) sobre o valor bruto do licenciamento, aplicada de forma uniforme a todos os titulares independentemente do plano de assinatura.
 
 6.3 — FEE DE PLATAFORMA SOBRE EXPLORAÇÃO COMERCIAL DA OBRA
 
@@ -190,10 +190,14 @@ def _info_plano(titular: dict) -> dict:
     plano = (titular or {}).get("plano", "STARTER")
     status_ass = (titular or {}).get("status_assinatura", "inativa")
     is_pro = (plano == "PRO" and status_ass in ("ativa", "cancelada", "past_due"))
-    rate = fee_rate_for_plano("PRO" if is_pro else "STARTER")
+    rate = fee_rate_for_plano(plano)
     plataforma_pct = int(round(float(rate) * 100))
     plano_label = "Plano PRO" if is_pro else "Plano GRÁTIS"
-    extenso = {15: "quinze por cento", 20: "vinte por cento"}.get(plataforma_pct, f"{plataforma_pct} por cento")
+    extenso = {
+        15: "quinze por cento",
+        20: "vinte por cento",
+        25: "vinte e cinco por cento",
+    }.get(plataforma_pct, f"{plataforma_pct} por cento")
     editora_pct = int(round(float(EDITORA_RATE) * 100))
     editora_extenso = {10: "dez por cento"}.get(editora_pct, f"{editora_pct} por cento")
     liquido_pct = 100 - plataforma_pct
@@ -947,7 +951,7 @@ O saldo remanescente de {{liquido_autores_pct}}% ({{liquido_autores_pct_extenso}
 - EDITORA DETENTORA DOS DIREITOS: {{editora_pct}}% ({{editora_pct_extenso}}) do valor bruto do buyout;
 - AUTOR(ES): {{liquido_autores_pct_trilateral}}% ({{liquido_autores_pct_trilateral_extenso}}) do valor bruto do buyout, distribuídos entre si na proporção de participação registrada na CLÁUSULA 8.
 
-Parágrafo Único: A taxa de plataforma segue a tabela: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda.{{clausula_split_editora}}
+Parágrafo Único: A taxa de plataforma da GRAVAN é de 25% (vinte e cinco por cento) sobre o valor bruto do licenciamento, aplicada de forma uniforme a todos os titulares independentemente do plano de assinatura.{{clausula_split_editora}}
 
 CLÁUSULA 5 — FEE DE PLATAFORMA SOBRE EXPLORAÇÃO COMERCIAL DA OBRA
 

@@ -240,6 +240,18 @@ def criar_oferta(obra_id):
     if obra["titular_id"] == g.user.id:
         abort(422, description="Você não pode ofertar em uma obra de sua autoria.")
 
+    # Apenas intérpretes PRO podem enviar propostas
+    interprete_perfil = sb.table("perfis").select(
+        "id, plano, status_assinatura"
+    ).eq("id", g.user.id).single().execute().data or {}
+    ip_plano = (interprete_perfil.get("plano") or "STARTER")
+    ip_status = (interprete_perfil.get("status_assinatura") or "inativa")
+    if ip_plano != "PRO" or ip_status not in ("ativa", "cancelada", "past_due"):
+        abort(402, description=(
+            "Enviar propostas é um recurso exclusivo do plano PRO. "
+            "Assine o PRO para negociar diretamente com compositores."
+        ))
+
     titular = sb.table("perfis").select(
         "id, nome, plano, status_assinatura"
     ).eq("id", obra["titular_id"]).single().execute().data or {}

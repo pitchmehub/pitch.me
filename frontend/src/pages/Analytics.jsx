@@ -27,11 +27,11 @@ function AnalyticsPaywall() {
 
   const beneficios = [
     {
-      icone: '%',
-      titulo: 'COMISSÃO',
+      icone: '⇆',
+      titulo: 'PROPOSTAS',
       itens: [
-        'Fee reduzido de 25% para 20%',
-        'Mais lucro em cada venda',
+        'Envie e receba propostas de licenciamento',
+        'Negocie diretamente com intérpretes',
       ],
     },
     {
@@ -389,25 +389,37 @@ function AnalyticsDashboard() {
             </div>
           </Section>
 
-          {/* ── 2. ECONOMIA PRO ────────────────────────── */}
+          {/* ── 2. PROPOSTAS ───────────────────────────── */}
           <Section
-            title="Sua economia PRO"
-            subtitle="A diferença entre 25% (Grátis) e 20% (PRO) sobre cada venda volta para o seu bolso."
+            title="Propostas"
+            subtitle="Resumo das suas negociações diretas com intérpretes."
           >
-            <div style={kpiGrid}>
-              <KPI
-                label="Economia este mês"
-                value={fmtBRL(data.economia_mes_cents)}
-                accent="#10b981"
-                testid="kpi-economia-mes"
-              />
-              <KPI
-                label="Economia acumulada"
-                value={fmtBRL(data.economia_total_cents)}
-                accent="#10b981"
-                testid="kpi-economia-total"
-              />
-            </div>
+            {(() => {
+              const of = data.ofertas || {}
+              const total = (of.pendentes || 0) + (of.aceitas || 0) + (of.recusadas || 0) +
+                            (of.expiradas || 0) + (of.pagas || 0) + (of.contra_proposta || 0)
+              const aceitas = (of.aceitas || 0) + (of.pagas || 0)
+              return (
+                <div style={kpiGrid}>
+                  <KPI
+                    label="Propostas recebidas"
+                    value={total.toLocaleString('pt-BR')}
+                    testid="kpi-ofertas-total"
+                  />
+                  <KPI
+                    label="Propostas aceitas"
+                    value={aceitas.toLocaleString('pt-BR')}
+                    accent="#10b981"
+                    testid="kpi-ofertas-aceitas"
+                  />
+                  <KPI
+                    label="Taxa de conversão"
+                    value={of.taxa_conversao_pct != null ? `${of.taxa_conversao_pct}%` : '—'}
+                    testid="kpi-conversao"
+                  />
+                </div>
+              )
+            })()}
           </Section>
 
           {/* ── 3. FINANCEIRO ──────────────────────────── */}
