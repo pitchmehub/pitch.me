@@ -92,9 +92,24 @@ def _verificar_acesso_obra(obra_id: str, perfil: dict) -> dict:
     if r.data:
         return r.data[0]
 
-    # Editora vinculada via contracts_edicao
+    # Editora vinculada via publisher_id ou editora_terceira_id na própria obra
     try:
         r2 = (
+            sb.table("obras")
+            .select("*")
+            .eq("id", obra_id)
+            .or_(f"publisher_id.eq.{g.user.id},editora_terceira_id.eq.{g.user.id}")
+            .limit(1)
+            .execute()
+        )
+        if r2.data:
+            return r2.data[0]
+    except Exception as e:
+        logger.warning("Falha ao consultar obras por publisher: %s", e)
+
+    # Editora vinculada via contracts_edicao
+    try:
+        r3 = (
             sb.table("contracts_edicao")
             .select("obra_id")
             .eq("obra_id", obra_id)
@@ -102,10 +117,10 @@ def _verificar_acesso_obra(obra_id: str, perfil: dict) -> dict:
             .limit(1)
             .execute()
         )
-        if r2.data:
-            r3 = sb.table("obras").select("*").eq("id", obra_id).limit(1).execute()
-            if r3.data:
-                return r3.data[0]
+        if r3.data:
+            r4 = sb.table("obras").select("*").eq("id", obra_id).limit(1).execute()
+            if r4.data:
+                return r4.data[0]
     except Exception as e:
         logger.warning("Falha ao consultar contracts_edicao: %s", e)
 

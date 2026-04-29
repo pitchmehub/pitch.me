@@ -348,6 +348,111 @@ function ContratosEditora() {
  )
 }
 
+function DossiesEditora() {
+  const [obras, setObras] = useState(null)
+  const [gerando, setGerando] = useState(null)
+  const [baixando, setBaixando] = useState(null)
+  const [msg, setMsg] = useState({})
+
+  useEffect(() => {
+    api.get('/publishers/obras-gerenciadas').then(setObras).catch(() => setObras([]))
+  }, [])
+
+  async function gerarDossie(obra) {
+    setGerando(obra.id)
+    setMsg(m => ({ ...m, [obra.id]: '' }))
+    try {
+      const d = await api.post(`/dossies/obras/${obra.id}`, {})
+      setMsg(m => ({ ...m, [obra.id]: `Dossiê gerado em ${fmtData(d.created_at)}` }))
+      setObras(list => list.map(o => o.id === obra.id ? { ...o, dossie: { id: d.id, created_at: d.created_at } } : o))
+    } catch (e) {
+      setMsg(m => ({ ...m, [obra.id]: `Erro: ${e.message}` }))
+    } finally {
+      setGerando(null)
+    }
+  }
+
+  async function baixarDossie(obra) {
+    const dossieId = obra.dossie?.id
+    if (!dossieId) return
+    setBaixando(obra.id)
+    try {
+      const filename = `dossie_${(obra.nome || dossieId).replace(/\s+/g, '_')}.zip`
+      await api.download(`/dossies/${dossieId}/download`, filename)
+    } catch (e) {
+      setMsg(m => ({ ...m, [obra.id]: `Erro ao baixar: ${e.message}` }))
+    } finally {
+      setBaixando(null)
+    }
+  }
+
+  if (!obras) return null
+  if (obras.length === 0) return null
+
+  return (
+    <div style={{ marginBottom: 28 }}>
+      <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Dossiês das obras</h2>
+      <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
+        Obras administradas pela sua editora ou de artistas agregados.
+      </p>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+            <thead>
+              <tr style={{ background: 'rgba(0,0,0,.04)', textAlign: 'left' }}>
+                <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)' }}>Obra</th>
+                <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)' }}>Titular</th>
+                <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)' }}>Dossiê</th>
+                <th style={{ padding: '10px 14px', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-muted)' }}>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {obras.map(o => (
+                <tr key={o.id} style={{ borderTop: '1px solid var(--border)' }}>
+                  <td style={{ padding: '10px 14px', fontWeight: 600 }}>{o.nome || '—'}</td>
+                  <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>{o.titular_nome || '—'}</td>
+                  <td style={{ padding: '10px 14px' }}>
+                    {o.dossie
+                      ? <span style={{ color: 'var(--success)', fontSize: 12 }}>Gerado em {fmtData(o.dossie.created_at)}</span>
+                      : <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Não gerado</span>}
+                    {msg[o.id] && (
+                      <div style={{ fontSize: 11, marginTop: 2, color: msg[o.id].startsWith('Erro') ? 'var(--danger)' : 'var(--success)' }}>
+                        {msg[o.id]}
+                      </div>
+                    )}
+                  </td>
+                  <td style={{ padding: '10px 14px' }}>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        disabled={gerando === o.id}
+                        onClick={() => gerarDossie(o)}
+                        style={{ fontSize: 12 }}
+                      >
+                        {gerando === o.id ? 'Gerando…' : o.dossie ? 'Reger' : 'Gerar'}
+                      </button>
+                      {o.dossie && (
+                        <button
+                          className="btn btn-primary btn-sm"
+                          disabled={baixando === o.id}
+                          onClick={() => baixarDossie(o)}
+                          style={{ fontSize: 12 }}
+                        >
+                          {baixando === o.id ? 'Baixando…' : 'Baixar ZIP'}
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function CartaoSaque() {
  const [wallet, setWallet] = useState(null)
 
@@ -427,6 +532,8 @@ export default function PublisherDashboard() {
  </div>
 
  <ContratosEditora />
+
+ <DossiesEditora />
 
  <HistoricoLicenciamentos />
 

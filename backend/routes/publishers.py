@@ -256,18 +256,16 @@ def historico_licenciamentos():
 
     tx_ids = list({p["transacao_id"] for p in pagamentos if p.get("transacao_id")})
 
-    # Carrega transações (com obra e comprador)
+    # Carrega transações com obra (join direto)
     tx_map = {}
     if tx_ids:
         try:
             tx = (sb.table("transacoes")
                     .select("id, valor_cents, status, created_at, obra_id, comprador_id, "
-                            "obras(id, nome, titular_id), "
-                            "comprador:perfis!comprador_id(id, nome_completo, nome_artistico)")
+                            "obras(id, nome, titular_id)")
                     .in_("id", tx_ids).execute()).data or []
             tx_map = {t["id"]: t for t in tx}
         except Exception:
-            # Fallback simples sem joins
             try:
                 tx = (sb.table("transacoes")
                         .select("id, valor_cents, status, created_at, obra_id, comprador_id")
@@ -276,30 +274,38 @@ def historico_licenciamentos():
             except Exception:
                 tx_map = {}
 
-    # Coleta titular_ids para resolver nomes
-    titular_ids = set()
+    # Coleta perfil_ids (titular + comprador) para resolver nomes em batch
+    perfil_ids = set()
     for t in tx_map.values():
         obra = t.get("obras") or {}
         if obra.get("titular_id"):
-            titular_ids.add(obra["titular_id"])
+            perfil_ids.add(obra["titular_id"])
+        if t.get("comprador_id"):
+            perfil_ids.add(t["comprador_id"])
 
-    titular_map = {}
-    if titular_ids:
+    perfil_map = {}
+    if perfil_ids:
         try:
-            tit = (sb.table("perfis")
-                     .select("id, nome_completo, nome_artistico")
-                     .in_("id", list(titular_ids)).execute()).data or []
-            titular_map = {p["id"]: p for p in tit}
+            prfs = (sb.table("perfis")
+                      .select("id, nome_completo, nome_artistico")
+                      .in_("id", list(perfil_ids)).execute()).data or []
+            perfil_map = {p["id"]: p for p in prfs}
         except Exception:
             pass
+
+    def _nome(perfil_id):
+        p = perfil_map.get(perfil_id) or {}
+        return p.get("nome_artistico") or p.get("nome_completo")
+
+    titular_map = perfil_map  # compatibilidade com bloco abaixo
 
     itens = []
     total_cents = 0
     for p in pagamentos:
         t = tx_map.get(p.get("transacao_id")) or {}
         obra = t.get("obras") or {}
-        titular = titular_map.get(obra.get("titular_id")) or {}
-        comprador = t.get("comprador") or {}
+        titular_id   = obra.get("titular_id")
+        comprador_id = t.get("comprador_id")
         itens.append({
             "id":                p["id"],
             "data":              p.get("created_at"),
@@ -312,12 +318,12 @@ def historico_licenciamentos():
                 "nome": obra.get("nome"),
             },
             "titular": {
-                "id":   titular.get("id"),
-                "nome": titular.get("nome_artistico") or titular.get("nome_completo"),
+                "id":   titular_id,
+                "nome": _nome(titular_id),
             },
             "comprador": {
-                "id":   comprador.get("id"),
-                "nome": comprador.get("nome_artistico") or comprador.get("nome_completo"),
+                "id":   comprador_id,
+                "nome": _nome(comprador_id),
             },
         })
         total_cents += p.get("valor_cents", 0)
@@ -327,3 +333,116 @@ def historico_licenciamentos():
         "total_cents":      total_cents,
         "total_transacoes": len(tx_ids),
     })
+
+
+# ══════════════════════════════════════════════════════════════════
+# GET /api/publishers/obras-gerenciadas
+# ══════════════════════════════════════════════════════════════════
+@publishers_bp.get("/obras-gerenciadas")
+@require_auth
+def obras_gerenciadas():
+    """
+    Retorna todas as obras que a editora logada gerencia, para fins de
+    geração de dossiê. Inclui:
+      1. Obras com publisher_id ou editora_terceira_id = editora
+      2. Obras com contracts_edicao assinado pela editora
+      3. Obras de artistas agregados (publisher_id no perfil)
+    """
+    sb = get_supabase()
+    me = sb.table("perfis").select("role").eq("id", g.user.id).single().execute()
+    if not me.data or me.data.get("role") != "publisher":
+        abort(403, description="Apenas editoras.")
+
+    pub_id = str(g.user.id)
+    obra_ids = set()
+
+    # 1) obras onde publisher_id ou editora_terceira_id é esta editora
+    try:
+        r = (sb.table("obras")
+               .select("id, nome, status, titular_id")
+               .or_(f"publisher_id.eq.{pub_id},editora_terceira_id.eq.{pub_id}")
+               .execute()).data or []
+        for o in r:
+            obra_ids.add(o["id"])
+    except Exception:
+        pass
+
+    # 2) obras via contracts_edicao
+    try:
+        r2 = (sb.table("contracts_edicao")
+                .select("obra_id")
+                .eq("publisher_id", pub_id)
+                .execute()).data or []
+        for row in r2:
+            if row.get("obra_id"):
+                obra_ids.add(row["obra_id"])
+    except Exception:
+        pass
+
+    # 3) obras de artistas agregados
+    try:
+        agregados = (sb.table("perfis")
+                       .select("id")
+                       .eq("publisher_id", pub_id)
+                       .execute()).data or []
+        agg_ids = [a["id"] for a in agregados if a.get("id")]
+        if agg_ids:
+            r3 = (sb.table("obras")
+                    .select("id, nome, status, titular_id")
+                    .in_("titular_id", agg_ids)
+                    .execute()).data or []
+            for o in r3:
+                obra_ids.add(o["id"])
+    except Exception:
+        pass
+
+    if not obra_ids:
+        return jsonify([])
+
+    # Busca dados completos das obras
+    obras = (sb.table("obras")
+               .select("id, nome, status, titular_id, created_at")
+               .in_("id", list(obra_ids))
+               .order("nome")
+               .execute()).data or []
+
+    # Verifica quais já têm dossiê gerado
+    dossie_map = {}
+    try:
+        dossies = (sb.table("dossies")
+                     .select("obra_id, id, created_at")
+                     .in_("obra_id", list(obra_ids))
+                     .execute()).data or []
+        for d in dossies:
+            dossie_map[d["obra_id"]] = d
+    except Exception:
+        pass
+
+    # Resolve nomes dos titulares
+    titular_ids = list({o["titular_id"] for o in obras if o.get("titular_id")})
+    titular_map = {}
+    if titular_ids:
+        try:
+            tit = (sb.table("perfis")
+                     .select("id, nome_completo, nome_artistico")
+                     .in_("id", titular_ids)
+                     .execute()).data or []
+            titular_map = {p["id"]: (p.get("nome_artistico") or p.get("nome_completo")) for p in tit}
+        except Exception:
+            pass
+
+    resultado = []
+    for o in obras:
+        d = dossie_map.get(o["id"])
+        resultado.append({
+            "id":            o["id"],
+            "nome":          o.get("nome"),
+            "status":        o.get("status"),
+            "titular_nome":  titular_map.get(o.get("titular_id")),
+            "dossie": {
+                "id":         d["id"],
+                "created_at": d["created_at"],
+            } if d else None,
+        })
+
+    return jsonify(resultado)
