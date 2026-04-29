@@ -9,7 +9,8 @@ import {
   Music, 
   Mic, 
   Headphones,
-  Award
+  Award,
+  Star
 } from 'lucide-react';
 
 export function NoiteEstudio() {
