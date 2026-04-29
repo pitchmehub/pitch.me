@@ -53,6 +53,9 @@ def listar():
     return jsonify(contratos)
 
 
+_GRAVAN_UUID = "e96bd8af-dfb8-4bf1-9ba5-7746207269cd"
+
+
 @contratos_edicao_bp.get("/<cid>")
 @require_auth
 def detalhes(cid):
@@ -65,7 +68,90 @@ def detalhes(cid):
         adm = sb.table("perfis").select("role").eq("id", g.user.id).single().execute()
         if (adm.data or {}).get("role") != "administrador":
             abort(403, description="Sem acesso a este contrato")
+
+    # ── Enriquece com obra e perfis (para a página de detalhe) ──────────────
+    obra = sb.table("obras").select("nome").eq("id", c["obra_id"]).maybe_single().execute().data or {}
+    c["obra_nome"] = obra.get("nome") or ""
+
+    autor_id     = c.get("autor_id")
+    publisher_id = c.get("publisher_id")
+    perfil_ids   = [uid for uid in (autor_id, publisher_id) if uid and uid != _GRAVAN_UUID]
+    perfis_map: dict = {}
+    if perfil_ids:
+        rows = sb.table("perfis").select(
+            "id, nome_completo, nome, nome_artistico, email"
+        ).in_("id", perfil_ids).execute().data or []
+        perfis_map = {p["id"]: p for p in rows}
+
+    def _perfil(uid):
+        if uid == _GRAVAN_UUID:
+            return {"nome_completo": "GRAVAN EDITORA MUSICAL LTDA.", "nome": "GRAVAN", "email": "editora@gravan.com.br"}
+        return perfis_map.get(uid) or {}
+
+    is_gravan_pub = (publisher_id == _GRAVAN_UUID)
+    signers = [
+        {
+            "user_id":   publisher_id,
+            "role":      "editora",
+            "share_pct": None,
+            "signed":    bool(c.get("signed_by_publisher_at") or is_gravan_pub),
+            "signed_at": c.get("signed_by_publisher_at") or (c.get("created_at") if is_gravan_pub else None),
+            "ip_hash":   c.get("publisher_ip_hash"),
+            "user_agent": None,
+            "perfis":    _perfil(publisher_id),
+        },
+        {
+            "user_id":   autor_id,
+            "role":      "compositor",
+            "share_pct": c.get("share_pct"),
+            "signed":    bool(c.get("signed_by_autor_at")),
+            "signed_at": c.get("signed_by_autor_at"),
+            "ip_hash":   c.get("autor_ip_hash"),
+            "user_agent": None,
+            "perfis":    _perfil(autor_id),
+        },
+    ]
+    c["signers"] = signers
     return jsonify(c)
+
+
+@contratos_edicao_bp.get("/<cid>/pdf")
+@require_auth
+def pdf_edicao(cid):
+    """Gera e devolve o PDF do Contrato de Edição Musical."""
+    import io
+    from flask import send_file
+    from services.contrato_pdf import gerar_pdf_contrato
+
+    sb = get_supabase()
+    r = sb.table("contracts_edicao").select("*").eq("id", cid).maybe_single().execute()
+    if not r or not r.data:
+        abort(404, description="Contrato não encontrado")
+    c = r.data
+    if g.user.id not in (c["autor_id"], c["publisher_id"]):
+        adm = sb.table("perfis").select("role").eq("id", g.user.id).single().execute()
+        if (adm.data or {}).get("role") != "administrador":
+            abort(403, description="Sem acesso a este contrato")
+
+    obra = sb.table("obras").select("nome").eq("id", c["obra_id"]).maybe_single().execute().data or {}
+    obra_nome = obra.get("nome") or "obra"
+
+    doc_dict = {
+        "id":            c["id"],
+        "obra_id":       c.get("obra_id"),
+        "versao":        c.get("versao") or "v1.0",
+        "assinado_em":   c.get("completed_at") or c.get("created_at"),
+        "ip_assinatura": c.get("autor_ip_hash") or "—",
+        "dados_titular": {"conteudo_hash": c.get("certificado_hash") or ""},
+        "conteudo":      c.get("contract_text") or "",
+    }
+    pdf_bytes = gerar_pdf_contrato(doc_dict)
+    buf = io.BytesIO(pdf_bytes); buf.seek(0)
+    slug = obra_nome.lower().replace(" ", "-")[:40]
+    return send_file(
+        buf, mimetype="application/pdf", as_attachment=True,
+        download_name=f"contrato-edicao-{slug}-{cid[:8]}.pdf",
+    )
 
 
 GRAVAN_EDITORA_UUID = "e96bd8af-dfb8-4bf1-9ba5-7746207269cd"

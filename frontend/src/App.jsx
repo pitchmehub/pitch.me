@@ -17,6 +17,7 @@ import NovaObra      from './pages/NovaObra'
 import MinhasObras   from './pages/MinhasObras'
 import MeusContratos from './pages/MeusContratos'
 import ContratoLicenciamentoDetalhe from './pages/ContratoLicenciamentoDetalhe'
+import ContratoEdicaoDetalhe from './pages/ContratoEdicaoDetalhe'
 import Biblioteca    from './pages/Biblioteca'
 import Analytics     from './pages/Analytics'
 import Planos        from './pages/Planos'
@@ -160,6 +161,7 @@ function AppRoutes() {
       <Route path="/obras/nova"    element={<PrivateRoute roles={['compositor','administrador','publisher']}><AppShell><NovaObra /></AppShell></PrivateRoute>} />
       <Route path="/contratos"     element={<PrivateRoute><AppShell><MeusContratos /></AppShell></PrivateRoute>} />
       <Route path="/contratos/licenciamento/:id" element={<PrivateRoute><AppShell><ContratoLicenciamentoDetalhe /></AppShell></PrivateRoute>} />
+      <Route path="/contratos/edicao/:id" element={<PrivateRoute><AppShell><ContratoEdicaoDetalhe /></AppShell></PrivateRoute>} />
       <Route path="/biblioteca"    element={<PrivateRoute><AppShell><Biblioteca /></AppShell></PrivateRoute>} />
       <Route path="/analytics"     element={<PrivateRoute roles={['compositor','administrador']}><AppShell><Analytics /></AppShell></PrivateRoute>} />
       <Route path="/planos"        element={<PrivateRoute><AppShell><Planos /></AppShell></PrivateRoute>} />

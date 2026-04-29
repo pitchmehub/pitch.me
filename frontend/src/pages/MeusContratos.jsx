@@ -1,21 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { api } from '../lib/api'
 import { useAuth } from '../contexts/AuthContext'
 import ContratosLicenciamentoLista from '../components/ContratosLicenciamentoLista'
-
-const GRAVAN_EDITORA_UUID = 'e96bd8af-dfb8-4bf1-9ba5-7746207269cd'
-
-function fmtData(iso) {
- if (!iso) return null
- try { return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }
- catch { return iso }
-}
 
 export default function MeusContratos() {
  const [searchParams] = useSearchParams()
  const contratoIdParam = searchParams.get('contrato')
  const { user } = useAuth()
+ const navigate = useNavigate()
 
  const [aba, setAba] = useState('edicao')
  const [contratos, setContratos] = useState([])
@@ -24,10 +17,6 @@ export default function MeusContratos() {
  const [erro, setErro] = useState('')
  const [baixando, setBaixando] = useState(null)
  const [verConteudo, setVerConteudo] = useState(null)
- const [verEdicao, setVerEdicao] = useState(null)
- const [carregandoEdicao, setCarregandoEdicao] = useState(false)
- const [concordoEdicao, setConcordoEdicao] = useState(false)
- const [assinando, setAssinando] = useState(null)
 
  async function carregarTudo() {
   setLoading(true); setErro('')
@@ -37,21 +26,16 @@ export default function MeusContratos() {
     api.get('/contratos-edicao').catch(() => []),
    ])
    const sortByDate = arr => [...(arr || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-   const sortedLegacy = sortByDate(legacy)
-   const sortedEdicao = sortByDate(edicao)
-   setContratos(sortedLegacy)
-   setEdicaoLista(sortedEdicao)
-   return sortedEdicao
-  } catch (e) { setErro(e.message); return [] }
+   setContratos(sortByDate(legacy))
+   setEdicaoLista(sortByDate(edicao))
+  } catch (e) { setErro(e.message) }
   finally { setLoading(false) }
  }
 
  useEffect(() => {
-  carregarTudo().then(lista => {
-   if (contratoIdParam && lista.length > 0) {
-    const alvo = lista.find(c => c.id === contratoIdParam)
-    if (alvo) abrirEdicao(alvo)
-   }
+  carregarTudo().then(() => {
+   // Se há um contrato específico na URL, navega direto para ele
+   if (contratoIdParam) navigate(`/contratos/edicao/${contratoIdParam}`, { replace: true })
   })
  }, []) // eslint-disable-line
 
@@ -71,33 +55,6 @@ export default function MeusContratos() {
   } catch (e) { alert('Erro ao abrir: ' + e.message) }
  }
 
- async function abrirEdicao(c) {
-  setConcordoEdicao(false)
-  setVerEdicao({ ...c, conteudo: '' })
-  setCarregandoEdicao(true)
-  try {
-   const d = await api.get(`/contratos-edicao/${c.id}`)
-   // Mescla todos os campos do detalhe (inclui signed_by_*, publisher_id, etc.)
-   setVerEdicao(prev => ({ ...prev, ...d, conteudo: d?.contract_text || '(este contrato não possui texto registrado)' }))
-  } catch (e) {
-   setVerEdicao(prev => ({ ...prev, conteudo: `Erro ao carregar: ${e.message}` }))
-  } finally {
-   setCarregandoEdicao(false)
-  }
- }
-
- async function assinarEdicao() {
-  if (!concordoEdicao) return
-  const c = verEdicao
-  setAssinando(c.id)
-  try {
-   await api.post(`/contratos-edicao/${c.id}/assinar`, {})
-   setVerEdicao(null)
-   await carregarTudo()
-  } catch (e) { alert('Erro ao assinar: ' + e.message) }
-  finally { setAssinando(null) }
- }
-
  function statusLabel(s) {
   return ({
    pendente:        { txt: 'Pendente',        cor: '#d97706', bg: 'rgba(245,158,11,.15)' },
@@ -106,17 +63,6 @@ export default function MeusContratos() {
    cancelado:       { txt: 'Cancelado',        cor: '#6b7280', bg: 'rgba(107,114,128,.15)' },
   })[s] || { txt: s, cor: '#6b7280', bg: 'rgba(107,114,128,.15)' }
  }
-
- const gravanEPublisher = verEdicao?.publisher_id === GRAVAN_EDITORA_UUID
- const euSouAutor     = verEdicao?.autor_id === user?.id
- const euSouPublisher = verEdicao?.publisher_id === user?.id && !gravanEPublisher
- const jaAssinou      = euSouAutor ? !!verEdicao?.signed_by_autor_at
-                       : euSouPublisher ? !!verEdicao?.signed_by_publisher_at
-                       : false
- const podeAssinarEdicao = verEdicao &&
-  verEdicao.status !== 'assinado' &&
-  verEdicao.status !== 'cancelado' &&
-  !jaAssinou
 
  return (
   <div data-testid="meus-contratos-page" style={{ padding: '32px 20px', maxWidth: 960, margin: '0 auto' }}>
@@ -181,13 +127,13 @@ export default function MeusContratos() {
             {precisaAssinar ? (
              <button className="btn btn-primary"
               style={{ fontSize: 13, padding: '8px 16px', fontWeight: 700, background: '#f59e0b', borderColor: '#f59e0b', color: '#fff' }}
-              onClick={() => abrirEdicao(c)}>
+              onClick={() => navigate(`/contratos/edicao/${c.id}?assinar=1`)}>
               Assinar contrato
              </button>
             ) : (
              <button className="btn btn-ghost"
               style={{ fontSize: 12, padding: '6px 12px' }}
-              onClick={() => abrirEdicao(c)}>
+              onClick={() => navigate(`/contratos/edicao/${c.id}`)}>
               Ver contrato
              </button>
             )}
@@ -263,127 +209,6 @@ export default function MeusContratos() {
     </div>
    )}
 
-   {/* Modal: contrato de edição — visualização + assinatura integradas */}
-   {verEdicao && (
-    <div onClick={e => { if (e.target === e.currentTarget) setVerEdicao(null) }}
-     style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', backdropFilter: 'blur(4px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 700, padding: 24 }}>
-     <div style={{ background: '#fff', borderRadius: 14, width: '100%', maxWidth: 780, maxHeight: '88vh', display: 'flex', flexDirection: 'column' }}>
-
-      {/* Cabeçalho */}
-      <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-       <div>
-        <h2 style={{ fontSize: 15, fontWeight: 700 }}>
-         Contrato de Edição Musical{verEdicao?.obra_nome ? ` — ${verEdicao.obra_nome}` : ''}
-        </h2>
-        <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-         Leia o contrato completo antes de assinar
-        </p>
-       </div>
-       <button onClick={() => setVerEdicao(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
-      </div>
-
-      {/* Corpo — texto integral */}
-      <div style={{ padding: '18px 22px', overflowY: 'auto', flex: 1, fontSize: 12.5, lineHeight: 1.75, whiteSpace: 'pre-wrap', fontFamily: 'Georgia, serif' }}>
-       {carregandoEdicao ? (
-        <p style={{ color: 'var(--text-muted)' }}>Carregando contrato…</p>
-       ) : (
-        verEdicao.conteudo || 'Sem conteúdo.'
-       )}
-      </div>
-
-      {/* Rodapé — assinatura */}
-      <div style={{ padding: '16px 22px', borderTop: '1px solid var(--border)', background: '#fafafa' }}>
-
-       {/* Painel de assinaturas — sempre visível */}
-       <div style={{ marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {/* Gravan (publisher automático) */}
-        {gravanEPublisher && (
-         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5 }}>
-          <span style={{ color: '#16a34a', fontWeight: 700, fontSize: 14 }}>✓</span>
-          <span>
-           <strong>GRAVAN Editora Musical Ltda.</strong>
-           {' — '}
-           <span style={{ color: '#16a34a' }}>
-            Assinatura automática{verEdicao.signed_by_publisher_at ? ` · ${fmtData(verEdicao.signed_by_publisher_at)}` : ''}
-           </span>
-          </span>
-         </div>
-        )}
-
-        {/* Autor */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5 }}>
-         {verEdicao.signed_by_autor_at ? (
-          <span style={{ color: '#16a34a', fontWeight: 700, fontSize: 14 }}>✓</span>
-         ) : (
-          <span style={{ color: '#d97706', fontWeight: 700, fontSize: 14 }}>⏳</span>
-         )}
-         <span>
-          <strong>Compositor</strong>
-          {' — '}
-          {verEdicao.signed_by_autor_at
-           ? <span style={{ color: '#16a34a' }}>Assinado · {fmtData(verEdicao.signed_by_autor_at)}</span>
-           : <span style={{ color: '#d97706' }}>Aguardando assinatura</span>
-          }
-         </span>
-        </div>
-
-        {/* Publisher real (quando não é Gravan) */}
-        {!gravanEPublisher && (
-         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5 }}>
-          {verEdicao.signed_by_publisher_at ? (
-           <span style={{ color: '#16a34a', fontWeight: 700, fontSize: 14 }}>✓</span>
-          ) : (
-           <span style={{ color: '#d97706', fontWeight: 700, fontSize: 14 }}>⏳</span>
-          )}
-          <span>
-           <strong>Editora</strong>
-           {' — '}
-           {verEdicao.signed_by_publisher_at
-            ? <span style={{ color: '#16a34a' }}>Assinado · {fmtData(verEdicao.signed_by_publisher_at)}</span>
-            : <span style={{ color: '#d97706' }}>Aguardando assinatura</span>
-           }
-          </span>
-         </div>
-        )}
-       </div>
-
-       {podeAssinarEdicao ? (
-        <>
-         <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 14, fontSize: 13 }}>
-          <input
-           type="checkbox"
-           checked={concordoEdicao}
-           onChange={e => setConcordoEdicao(e.target.checked)}
-           style={{ marginTop: 3, width: 16, height: 16, accentColor: 'var(--brand)', flexShrink: 0, cursor: 'pointer' }}
-          />
-          <span style={{ lineHeight: 1.5 }}>
-           Li o texto integral acima e <strong>assino eletronicamente</strong> este Contrato de Edição Musical.
-           Entendo que a assinatura eletrônica é juridicamente válida nos termos da MP 2.200-2/2001 e da Lei 14.063/2020.
-          </span>
-         </label>
-         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button className="btn" style={{ padding: '8px 14px' }} onClick={() => setVerEdicao(null)}>Fechar</button>
-          <button
-           className="btn btn-primary"
-           disabled={!concordoEdicao || assinando === verEdicao?.id || carregandoEdicao}
-           style={{ padding: '8px 18px' }}
-           onClick={assinarEdicao}
-          >
-           {assinando === verEdicao?.id ? 'Assinando…' : 'Confirmar assinatura'}
-          </button>
-         </div>
-        </>
-       ) : (
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-         <button className="btn" style={{ padding: '8px 14px' }} onClick={() => setVerEdicao(null)}>Fechar</button>
-        </div>
-       )}
-      </div>
-
-     </div>
-    </div>
-   )}
   </div>
  )
 }
