@@ -521,23 +521,9 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
     # Signers: autores/coautores (assinatura MANUAL) + Gravan (editora detentora, auto-assina)
     # + intérprete (auto-assina via pagamento).
     #
-<<<<<<< HEAD
-    # Autores/coautores NÃO auto-assinam — devem assinar manualmente via dashboard
-    # após a notificação. O valor só é liberado quando TODOS os autores/coautores
-    # assinarem (além da Gravan e do comprador, que auto-assinam).
-    # Gravan auto-assina por ser a operadora da plataforma.
-    # Comprador auto-assina ao realizar o pagamento (aceite eletrônico).
-=======
     # MODELO DE ASSINATURA MANUAL: cada autor/coautor humano DEVE acessar o contrato e
-    # clicar "Concordo" individualmente. O contrato só transita para 'concluído' (e as
-    # wallets só são creditadas) quando TODOS os autores humanos assinaram de fato.
-    # Esta é a regra de escrow real exigida pela Gravan.
-    #
-    # Exceções ao modelo manual:
-    #   • COMPRADOR (intérprete): aceite eletrônico no checkout (pagamento = assinatura).
-    #   • GRAVAN (editora_detentora bilateral): autoassinatura institucional — a Gravan
-    #     já consente em ser editora detentora ao manter a obra no catálogo.
->>>>>>> 6e39709f16772cf8b0de47583f09c08ec33cbc39
+    # clicar "Concordo" individualmente. Wallets só são creditadas quando TODOS assinarem.
+    # Exceções: COMPRADOR auto-assina no checkout; GRAVAN auto-assina como editora_detentora.
     signers = []
     for c in ordered:
         signers.append({
@@ -772,21 +758,9 @@ def gerar_contrato_trilateral_agregado(
 
     # 6) Signers: coautores + editora-mãe + comprador
     #
-<<<<<<< HEAD
-    # Autores/coautores NÃO auto-assinam — devem assinar manualmente via dashboard
-    # após a notificação de nova venda. O valor só é liberado quando TODOS assinarem.
-    # Editora auto-assina (consentiu ao aceitar o Termo de Agregação com o compositor).
-    # Comprador auto-assina ao realizar o pagamento (aceite eletrônico).
-=======
-    # MODELO DE ASSINATURA MANUAL (TRILATERAL): cada autor humano E a editora-mãe
-    # DEVEM acessar o contrato e clicar "Concordo" individualmente. O contrato só
-    # transita para 'concluído' (e as wallets só são creditadas) quando todos os
-    # humanos assinaram de fato.
-    #
-    # Exceção: o COMPRADOR (intérprete) auto-assina via pagamento (aceite no
-    # checkout). A Gravan NÃO é signatária no trilateral — a editora-mãe é a
-    # editora_detentora; Gravan apenas intermedeia.
->>>>>>> 6e39709f16772cf8b0de47583f09c08ec33cbc39
+    # MODELO DE ASSINATURA MANUAL (TRILATERAL): cada autor/coautor humano DEVE acessar
+    # o contrato e clicar "Concordo". Wallets só são creditadas quando TODOS assinarem.
+    # Exceções: COMPRADOR auto-assina no checkout; EDITORA-MÃE auto-assina via Termo.
     _agora_iso_tri = datetime.now(timezone.utc).isoformat()
     signers = []
     for c in ordered:
