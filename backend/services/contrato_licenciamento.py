@@ -518,12 +518,16 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
 
     agora_iso = datetime.now(timezone.utc).isoformat()
 
-    # Signers: autores/coautores (assinatura MANUAL) + Gravan (editora detentora, auto-assina)
+    # Se a transação veio de uma oferta aceita pelo compositor, ele já "assinou"
+    # ao aceitar a oferta — auto-assinamos todos os autores/coautores agora.
+    auto_assinar = bool((tx.get("metadata") or {}).get("oferta_id"))
+
+    # Signers: autores/coautores + Gravan (editora detentora, auto-assina)
     # + intérprete (auto-assina via pagamento).
     #
-    # MODELO DE ASSINATURA MANUAL: cada autor/coautor humano DEVE acessar o contrato e
-    # clicar "Concordo" individualmente. Wallets só são creditadas quando TODOS assinarem.
-    # Exceções: COMPRADOR auto-assina no checkout; GRAVAN auto-assina como editora_detentora.
+    # Se veio de oferta aceita (auto_assinar=True): autores também são auto-assinados,
+    # pois a aceitação da oferta constitui aceite eletrônico do contrato.
+    # Wallets só são creditadas quando TODOS assinarem (comprador sempre assina no checkout).
     signers = []
     for c in ordered:
         signers.append({
@@ -531,8 +535,8 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
             "user_id":     c["perfil_id"],
             "role":        "autor" if c["perfil_id"] == titular["id"] else "coautor",
             "share_pct":   float(c["share_pct"]),
-            "signed":      False,
-            "signed_at":   None,
+            "signed":      auto_assinar,
+            "signed_at":   agora_iso if auto_assinar else None,
         })
     # Gravan como EDITORA DETENTORA DOS DIREITOS — assina automaticamente na geração
     signers.append({
@@ -758,10 +762,12 @@ def gerar_contrato_trilateral_agregado(
 
     # 6) Signers: coautores + editora-mãe + comprador
     #
-    # MODELO DE ASSINATURA MANUAL (TRILATERAL): cada autor/coautor humano DEVE acessar
-    # o contrato e clicar "Concordo". Wallets só são creditadas quando TODOS assinarem.
-    # Exceções: COMPRADOR auto-assina no checkout; EDITORA-MÃE auto-assina via Termo.
+    # Se a transação veio de uma oferta aceita (metadata.oferta_id preenchido),
+    # autores E editora são auto-assinados — a aceitação da oferta constitui aceite.
+    # Caso contrário, permanecem como assinatura manual.
+    # Comprador sempre auto-assina no checkout.
     _agora_iso_tri = datetime.now(timezone.utc).isoformat()
+    auto_assinar_tri = bool((tx.get("metadata") or {}).get("oferta_id"))
     signers = []
     for c in ordered:
         signers.append({
@@ -769,19 +775,18 @@ def gerar_contrato_trilateral_agregado(
             "user_id":     c["perfil_id"],
             "role":        "autor" if c["perfil_id"] == titular["id"] else "coautor",
             "share_pct":   float(c["share_pct"]),
-            "signed":      False,
-            "signed_at":   None,
+            "signed":      auto_assinar_tri,
+            "signed_at":   _agora_iso_tri if auto_assinar_tri else None,
         })
     # A editora à qual o compositor é agregado É a Editora Detentora dos Direitos
-    # no contrato trilateral — não uma mera "agregadora". Gravan apenas intermedeia.
-    # A editora também precisa assinar MANUALMENTE cada licenciamento.
+    # no contrato trilateral. Ao vir de oferta aceita, também é auto-assinada.
     editora_signer_payload = {
         "contract_id": contract["id"],
         "user_id":     editora["id"],
         "role":        "editora_detentora",   # role preferencial (fallback → editora_agregadora)
         "share_pct":   None,
-        "signed":      False,
-        "signed_at":   None,
+        "signed":      auto_assinar_tri,
+        "signed_at":   _agora_iso_tri if auto_assinar_tri else None,
     }
     # Comprador assina no checkout (pagamento = aceite eletrônico).
     signers.append({

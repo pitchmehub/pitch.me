@@ -36,9 +36,12 @@ export default function MeusContratos() {
     api.get('/perfis/me/contratos').catch(() => []),
     api.get('/contratos-edicao').catch(() => []),
    ])
-   setContratos(legacy || [])
-   setEdicaoLista(edicao || [])
-   return edicao || []
+   const sortByDate = arr => [...(arr || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+   const sortedLegacy = sortByDate(legacy)
+   const sortedEdicao = sortByDate(edicao)
+   setContratos(sortedLegacy)
+   setEdicaoLista(sortedEdicao)
+   return sortedEdicao
   } catch (e) { setErro(e.message); return [] }
   finally { setLoading(false) }
  }

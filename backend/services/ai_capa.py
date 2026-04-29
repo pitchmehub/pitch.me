@@ -155,8 +155,11 @@ def _build_prompt(nome: str, genero: str, seed: int | None) -> str:
         f"Album cover for the song '{nome}'. "
         f"Create art in anti-AI, Memphis design — nothing generic. "
         f"Square 1:1 format. "
+        f"ABSOLUTELY NO faces, no people, no human figures, no portraits, "
+        f"no bodies, no hands, no eyes, no skin, no crowd. "
         f"No text, no letters, no words, no numbers, no logo, no watermark, "
-        f"no signature, no typography of any kind."
+        f"no signature, no typography of any kind. "
+        f"Pure abstract or symbolic art only."
     )
 
 
