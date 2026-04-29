@@ -68,6 +68,9 @@ def detalhes(cid):
     return jsonify(c)
 
 
+GRAVAN_EDITORA_UUID = "00000000-0000-0000-0000-000000000001"
+
+
 @contratos_edicao_bp.post("/<cid>/assinar")
 @require_auth
 def assinar(cid):
@@ -83,18 +86,21 @@ def assinar(cid):
     ip_hash = _hash_ip(request.headers.get("X-Forwarded-For", request.remote_addr))
     agora = datetime.now(timezone.utc).isoformat()
 
+    gravan_e_publisher = (c.get("publisher_id") == GRAVAN_EDITORA_UUID)
+
     update = {}
     if g.user.id == c["autor_id"] and not c.get("signed_by_autor_at"):
         update["signed_by_autor_at"] = agora
         update["autor_ip_hash"] = ip_hash
-    elif g.user.id == c["publisher_id"] and not c.get("signed_by_publisher_at"):
+    elif g.user.id == c["publisher_id"] and not c.get("signed_by_publisher_at") and not gravan_e_publisher:
         update["signed_by_publisher_at"] = agora
         update["publisher_ip_hash"] = ip_hash
     else:
         abort(403, description="Você não é parte deste contrato ou já assinou")
 
     autor_ok = bool(update.get("signed_by_autor_at") or c.get("signed_by_autor_at"))
-    pub_ok   = bool(update.get("signed_by_publisher_at") or c.get("signed_by_publisher_at"))
+    # Gravan assina automaticamente na criação — considera sempre assinado pelo publisher
+    pub_ok   = gravan_e_publisher or bool(update.get("signed_by_publisher_at") or c.get("signed_by_publisher_at"))
 
     if autor_ok and pub_ok:
         update["status"] = "assinado"
@@ -110,9 +116,13 @@ def assinar(cid):
 
     try:
         from services.notificacoes import notify
-        outra_parte = c["publisher_id"] if g.user.id == c["autor_id"] else c["autor_id"]
+        # Nunca notifica o UUID fantasma da Gravan
+        partes_reais = {pid for pid in (c["autor_id"], c["publisher_id"])
+                        if pid and pid != GRAVAN_EDITORA_UUID}
+        outra_parte = next((p for p in partes_reais if p != g.user.id), None)
+
         if update["status"] == "assinado":
-            for pid in filter(None, {c["autor_id"], c["publisher_id"]}):
+            for pid in partes_reais:
                 notify(
                     pid,
                     tipo="contrato_assinado",

@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 import ContratosLicenciamentoLista from '../components/ContratosLicenciamentoLista'
+
+const GRAVAN_EDITORA_UUID = '00000000-0000-0000-0000-000000000001'
+
+function fmtData(iso) {
+ if (!iso) return null
+ try { return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }
+ catch { return iso }
+}
 
 export default function MeusContratos() {
  const [searchParams] = useSearchParams()
  const contratoIdParam = searchParams.get('contrato')
+ const { user } = useAuth()
 
  const [aba, setAba] = useState('edicao')
  const [contratos, setContratos] = useState([])
@@ -64,7 +74,8 @@ export default function MeusContratos() {
   setCarregandoEdicao(true)
   try {
    const d = await api.get(`/contratos-edicao/${c.id}`)
-   setVerEdicao(prev => ({ ...prev, conteudo: d?.contract_text || '(este contrato não possui texto registrado)' }))
+   // Mescla todos os campos do detalhe (inclui signed_by_*, publisher_id, etc.)
+   setVerEdicao(prev => ({ ...prev, ...d, conteudo: d?.contract_text || '(este contrato não possui texto registrado)' }))
   } catch (e) {
    setVerEdicao(prev => ({ ...prev, conteudo: `Erro ao carregar: ${e.message}` }))
   } finally {
@@ -93,9 +104,16 @@ export default function MeusContratos() {
   })[s] || { txt: s, cor: '#6b7280', bg: 'rgba(107,114,128,.15)' }
  }
 
+ const gravanEPublisher = verEdicao?.publisher_id === GRAVAN_EDITORA_UUID
+ const euSouAutor     = verEdicao?.autor_id === user?.id
+ const euSouPublisher = verEdicao?.publisher_id === user?.id && !gravanEPublisher
+ const jaAssinou      = euSouAutor ? !!verEdicao?.signed_by_autor_at
+                       : euSouPublisher ? !!verEdicao?.signed_by_publisher_at
+                       : false
  const podeAssinarEdicao = verEdicao &&
   verEdicao.status !== 'assinado' &&
-  verEdicao.status !== 'cancelado'
+  verEdicao.status !== 'cancelado' &&
+  !jaAssinou
 
  return (
   <div data-testid="meus-contratos-page" style={{ padding: '32px 20px', maxWidth: 960, margin: '0 auto' }}>
@@ -274,6 +292,60 @@ export default function MeusContratos() {
 
       {/* Rodapé — assinatura */}
       <div style={{ padding: '16px 22px', borderTop: '1px solid var(--border)', background: '#fafafa' }}>
+
+       {/* Painel de assinaturas — sempre visível */}
+       <div style={{ marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {/* Gravan (publisher automático) */}
+        {gravanEPublisher && (
+         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5 }}>
+          <span style={{ color: '#16a34a', fontWeight: 700, fontSize: 14 }}>✓</span>
+          <span>
+           <strong>GRAVAN Editora Musical Ltda.</strong>
+           {' — '}
+           <span style={{ color: '#16a34a' }}>
+            Assinatura automática{verEdicao.signed_by_publisher_at ? ` · ${fmtData(verEdicao.signed_by_publisher_at)}` : ''}
+           </span>
+          </span>
+         </div>
+        )}
+
+        {/* Autor */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5 }}>
+         {verEdicao.signed_by_autor_at ? (
+          <span style={{ color: '#16a34a', fontWeight: 700, fontSize: 14 }}>✓</span>
+         ) : (
+          <span style={{ color: '#d97706', fontWeight: 700, fontSize: 14 }}>⏳</span>
+         )}
+         <span>
+          <strong>Compositor</strong>
+          {' — '}
+          {verEdicao.signed_by_autor_at
+           ? <span style={{ color: '#16a34a' }}>Assinado · {fmtData(verEdicao.signed_by_autor_at)}</span>
+           : <span style={{ color: '#d97706' }}>Aguardando assinatura</span>
+          }
+         </span>
+        </div>
+
+        {/* Publisher real (quando não é Gravan) */}
+        {!gravanEPublisher && (
+         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5 }}>
+          {verEdicao.signed_by_publisher_at ? (
+           <span style={{ color: '#16a34a', fontWeight: 700, fontSize: 14 }}>✓</span>
+          ) : (
+           <span style={{ color: '#d97706', fontWeight: 700, fontSize: 14 }}>⏳</span>
+          )}
+          <span>
+           <strong>Editora</strong>
+           {' — '}
+           {verEdicao.signed_by_publisher_at
+            ? <span style={{ color: '#16a34a' }}>Assinado · {fmtData(verEdicao.signed_by_publisher_at)}</span>
+            : <span style={{ color: '#d97706' }}>Aguardando assinatura</span>
+           }
+          </span>
+         </div>
+        )}
+       </div>
+
        {podeAssinarEdicao ? (
         <>
          <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 14, fontSize: 13 }}>
@@ -301,10 +373,7 @@ export default function MeusContratos() {
          </div>
         </>
        ) : (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-         <p style={{ fontSize: 13, color: '#16a34a', fontWeight: 600 }}>
-          ✓ {verEdicao.status === 'assinado' ? 'Contrato assinado.' : 'Contrato cancelado.'}
-         </p>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
          <button className="btn" style={{ padding: '8px 14px' }} onClick={() => setVerEdicao(null)}>Fechar</button>
         </div>
        )}

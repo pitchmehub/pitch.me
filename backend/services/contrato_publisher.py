@@ -114,7 +114,11 @@ def gerar_contrato_edicao(obra_id: str, autor_id: str, publisher_id: str) -> dic
     html = "<pre style='white-space:pre-wrap;font-family:Georgia,serif;font-size:14px;line-height:1.6'>" + \
            texto.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;") + "</pre>"
 
-    novo = sb.table("contracts_edicao").insert({
+    GRAVAN_EDITORA_UUID = "00000000-0000-0000-0000-000000000001"
+    gravan_e_publisher = (publisher_id == GRAVAN_EDITORA_UUID)
+    agora_iso = datetime.now(timezone.utc).isoformat()
+
+    novo_payload = {
         "obra_id":        obra_id,
         "publisher_id":   publisher_id,
         "autor_id":       autor_id,
@@ -123,8 +127,12 @@ def gerar_contrato_edicao(obra_id: str, autor_id: str, publisher_id: str) -> dic
         "contract_text":  texto,
         "has_fee_clause": True,
         "conteudo_hash":  conteudo_hash,
-        "status":         "pendente",
-    }).execute()
+        "status":         "assinado_parcial" if gravan_e_publisher else "pendente",
+    }
+    if gravan_e_publisher:
+        novo_payload["signed_by_publisher_at"] = agora_iso
+
+    novo = sb.table("contracts_edicao").insert(novo_payload).execute()
 
     contrato = (novo.data or [{}])[0]
     log_event("contrato.gerado", entity_type="contract_edicao", entity_id=contrato.get("id"),
