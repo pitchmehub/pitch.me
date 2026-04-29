@@ -9,7 +9,7 @@ export function usePendencias() {
 
   const fetch = useCallback(async () => {
     try {
-      const data = await api.get('/contratos/pendencias')
+      const data = await api.get('/contratos/licenciamento/pendencias')
       setTotal(data?.total ?? 0)
     } catch {
       // Silencioso — não mostrar erro se o usuário não estiver autenticado
