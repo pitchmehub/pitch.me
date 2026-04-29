@@ -40,7 +40,6 @@ export default function ContratoLicenciamentoDetalhe() {
  }
  useEffect(() => { reload() /* eslint-disable-next-line */ }, [id])
 
- // Quando entra com ?assinar=1, rola até a área de assinatura
  useEffect(() => {
  if (!loading && focoAssinar && acoesRef.current) {
  setTimeout(() => {
@@ -170,13 +169,38 @@ export default function ContratoLicenciamentoDetalhe() {
  })}
  </div>
 
- {/* Conteúdo do contrato */}
+ {/* Conteúdo do contrato — texto original verbatim */}
  <div style={{
- padding: '32px 36px', background: '#fff', border: '1px solid var(--border)',
- borderRadius: 12, marginBottom: 16, fontSize: 13.5, lineHeight: 1.85,
- color: 'var(--text-secondary)',
+ background: '#fff', border: '1px solid var(--border)',
+ borderRadius: 12, marginBottom: 16, overflow: 'hidden',
  }}>
- <div data-testid="contrato-conteudo" dangerouslySetInnerHTML={{ __html: c.contract_html }} />
+ <div style={{
+ padding: '10px 20px', background: '#f8f8f8',
+ borderBottom: '1px solid var(--border)',
+ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+ }}>
+ <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--text-muted)' }}>
+ Documento original do contrato
+ </span>
+ <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+ Texto exato gerado no momento da transação — sem alterações
+ </span>
+ </div>
+ <pre
+ data-testid="contrato-conteudo"
+ style={{
+ margin: 0,
+ padding: '32px 36px',
+ whiteSpace: 'pre-wrap',
+ wordBreak: 'break-word',
+ fontFamily: 'Georgia, "Times New Roman", serif',
+ fontSize: 13.5,
+ lineHeight: 1.9,
+ color: 'var(--text-secondary)',
+ }}
+ >
+ {c.contract_text}
+ </pre>
  </div>
 
  {/* Ações */}
