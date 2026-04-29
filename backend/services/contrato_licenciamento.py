@@ -125,18 +125,21 @@ CLÁUSULA 9 — IRRETRATABILIDADE DA EXPLORAÇÃO
 
 Ressalvado o direito de rescisão previsto na CLÁUSULA 4, Parágrafo Primeiro, este contrato é celebrado em caráter irretratável quanto às explorações comerciais e gravações já realizadas durante a sua vigência.
 
-CLÁUSULA 10 — AUTORIA E DIVISÃO IGUALITÁRIA PRÓ-RATA DE DIREITOS (SPLIT)
+CLÁUSULA 10 — AUTORIA E SPLIT DE DIREITOS
 
-Os AUTORES identificados abaixo são reconhecidos como titulares dos direitos autorais patrimoniais e morais sobre a obra, em partes iguais, calculadas pela divisão de 100% (cem por cento) dos direitos pela quantidade total de autores cadastrados:
+Os AUTORES identificados abaixo são reconhecidos como titulares dos direitos autorais patrimoniais e morais sobre a obra, nas proporções registradas na plataforma GRAVAN.
+
+Após a retenção da taxa de plataforma da GRAVAN ({{plataforma_pct}}% sobre o valor bruto do buyout), o saldo remanescente de {{liquido_autores_pct}}% é distribuído entre os AUTORES na proporção de participação de cada um, conforme abaixo:
+
 {{split_lista}}
 
-Parágrafo Primeiro: A divisão é calculada automaticamente pela plataforma GRAVAN de forma igualitária e pró-rata — cada AUTOR recebe exatamente 1/N dos direitos, onde N é o número total de autores da obra — conforme o disposto nos arts. 5º, VIII, e 15 da Lei nº 9.610/1998.
+Parágrafo Primeiro: A distribuição acima é calculada automaticamente pela plataforma GRAVAN com base na participação registrada de cada AUTOR, aplicada sobre o saldo líquido após o fee de plataforma, conforme os arts. 5º, VIII, e 15 da Lei nº 9.610/1998.
 
-Parágrafo Segundo: Salvo acordo formal em contrário, devidamente registrado por escrito e assinado por todos os autores, prevalecerá a divisão igualitária pró-rata acima.
+Parágrafo Segundo: Salvo acordo formal em contrário, devidamente registrado por escrito e assinado por todos os autores, prevalecerá a divisão acima registrada.
 
-Parágrafo Terceiro: Todos os valores decorrentes de remuneração, royalties e quaisquer receitas relacionadas à obra — incluindo, sem limitação, os provenientes de execução pública (ECAD), sincronização, streaming, distribuição digital e o buyout desta transação — serão distribuídos entre os AUTORES em partes iguais, na proporção pró-rata acima.
+Parágrafo Terceiro: Todos os demais valores decorrentes de remuneração, royalties e receitas relacionadas à obra — incluindo execução pública (ECAD), sincronização, streaming e distribuição digital — serão igualmente distribuídos entre os AUTORES na proporção de participação de cada um conforme registrada na plataforma.
 
-Parágrafo Quarto: Cada autor declara estar ciente e de acordo com o presente critério de divisão igualitária, reconhecendo os demais como co-titulares em igual proporção pró-rata.
+Parágrafo Quarto: Cada autor declara estar ciente e de acordo com o presente critério de divisão, reconhecendo os demais como co-titulares nas proporções acima.
 
 CLÁUSULA 11 — DISPOSIÇÕES GERAIS
 
@@ -313,6 +316,21 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
         )
 
     info = _info_plano(titular)
+    liquido_pct = Decimal(str(info["liquido_autores_pct"])) / Decimal("100")
+
+    # Recalcula split_lista com valor efetivo após fee da Gravan
+    split_lista_final = []
+    for c in ordered:
+        p = por_id.get(c["perfil_id"], {})
+        nome = p.get("nome_completo") or p.get("nome") or "—"
+        share = Decimal(str(c["share_pct"]))
+        efetivo = (share * liquido_pct).quantize(Decimal("0.01"))
+        valor_autor = int(tx["valor_cents"] * float(efetivo) / 100)
+        split_lista_final.append(
+            f"- {nome}: {float(share):.2f}% de titularidade → "
+            f"{float(efetivo):.2f}% do buyout = {_moeda(valor_autor)}"
+        )
+
     conteudo = (TEMPLATE_LICENCIAMENTO
         .replace("{{autores_bloco}}",          "\n".join(autores_bloco_partes).strip())
         .replace("{{interprete_nome}}",        buyer.get("nome_completo") or buyer.get("nome") or "—")
@@ -325,7 +343,7 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
         .replace("{{autores_nomes_artisticos}}", ", ".join(autores_nomes_artisticos))
         .replace("{{isrc}}",                   obra.get("isrc") or "a definir após lançamento")
         .replace("{{iswc}}",                   obra.get("iswc") or "a definir após lançamento")
-        .replace("{{split_lista}}",            "\n".join(split_lista_partes))
+        .replace("{{split_lista}}",            "\n".join(split_lista_final))
         .replace("{{plataforma_pct}}",         str(info["plataforma_pct"]))
         .replace("{{plataforma_pct_extenso}}", info["plataforma_pct_extenso"])
         .replace("{{plano_titular_label}}",    info["plano_titular_label"])
