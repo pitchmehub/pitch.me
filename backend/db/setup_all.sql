@@ -350,6 +350,8 @@ alter table public.pagamentos_compositores add column if not exists perfil_id   
 alter table public.pagamentos_compositores add column if not exists valor_cents        integer not null default 0;
 alter table public.pagamentos_compositores add column if not exists status             text    not null default 'pendente';
 alter table public.pagamentos_compositores add column if not exists stripe_transfer_id text;
+alter table public.pagamentos_compositores add column if not exists share_pct          numeric(6,3);
+alter table public.pagamentos_compositores add column if not exists coautoria_id       uuid;
 alter table public.pagamentos_compositores add column if not exists created_at         timestamptz not null default now();
 alter table public.pagamentos_compositores add column if not exists updated_at         timestamptz not null default now();
 
@@ -369,6 +371,12 @@ begin
      and not exists (select 1 from pg_constraint where conname='pgto_status_check') then
     alter table public.pagamentos_compositores add constraint pgto_status_check
       check (status in ('pendente','enviado','pago','revertido'));
+  end if;
+  if not exists (select 1 from pg_constraint where conname='pgto_coautoria_fk')
+     and exists (select 1 from information_schema.tables
+                 where table_schema='public' and table_name='coautorias') then
+    alter table public.pagamentos_compositores add constraint pgto_coautoria_fk
+      foreign key (coautoria_id) references public.coautorias(id) on delete set null;
   end if;
 end $$;
 

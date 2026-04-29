@@ -87,10 +87,10 @@ def criar_checkout():
     if metodo not in METODO_TO_STRIPE:
         abort(422, description=f"Método inválido: {metodo}")
 
-    # Busca a obra (inclui publisher_id e gravan_editora_id para calcular split da editora)
+    # Busca a obra (apenas campos necessários)
     obra_resp = (
         sb.table("obras")
-        .select("id, nome, preco_cents, status, titular_id, publisher_id, gravan_editora_id")
+        .select("id, nome, preco_cents, status, titular_id")
         .eq("id", obra_id)
         .single()
         .execute()
@@ -107,7 +107,7 @@ def criar_checkout():
     valor_unit = oferta["valor_cents"] if oferta else obra["preco_cents"]
 
     # Nome, plano e editora do compositor titular (fee depende do plano;
-    # 10% adicional vai para a editora vinculada, se existir)
+    # 10% adicional vai para a editora vinculada real, se existir via perfis.publisher_id)
     try:
         titular = sb.table("perfis").select(
             "nome, plano, status_assinatura, publisher_id"
@@ -119,10 +119,10 @@ def criar_checkout():
     titular_nome  = t_data.get("nome", "Gravan")
     plano_titular = t_data.get("plano", "STARTER")
     status_ass    = t_data.get("status_assinatura", "inativa")
-    # publisher_id: lê do perfil do titular; se nulo, usa o publisher da obra
-    # (compositores sem editora têm obras.publisher_id = Gravan, mas perfis.publisher_id = null)
-    publisher_id  = t_data.get("publisher_id") or \
-                    obra.get("publisher_id") or obra.get("gravan_editora_id")
+    # publisher_id: APENAS do perfil do titular — editoras parceiras reais.
+    # Gravan operacional NÃO recebe 10% de editora; obras.publisher_id aponta para
+    # Gravan em obras de compositores sem editora e não deve gerar split.
+    publisher_id  = t_data.get("publisher_id")
     # PRO efetivo apenas com assinatura em dia
     if plano_titular == "PRO" and status_ass not in ("ativa", "cancelada", "past_due"):
         plano_titular = "STARTER"

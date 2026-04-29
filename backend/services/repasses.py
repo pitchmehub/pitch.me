@@ -18,7 +18,6 @@ import stripe
 
 from db.supabase_client import get_supabase
 from services.finance import fee_rate_for_plano, EDITORA_RATE
-from services.gravan_editora import GRAVAN_EDITORA_UUID
 
 logger = logging.getLogger("gravan.repasses")
 
@@ -213,10 +212,11 @@ def creditar_wallets_por_transacao(
     status_ass = titular.get("status_assinatura", "inativa")
     if plano == "PRO" and status_ass not in ("ativa", "cancelada", "past_due"):
         plano = "STARTER"
-    # publisher_id: lê do perfil do titular; se nulo, usa o publisher da obra
-    # (compositores sem editora têm obras.publisher_id = Gravan, mas perfis.publisher_id = null)
-    publisher_id = publisher_id_override or titular.get("publisher_id") or \
-                   obra.get("publisher_id") or obra.get("gravan_editora_id")
+    # publisher_id: lê apenas do perfil do titular (editora parceira real).
+    # obras.publisher_id pode ser Gravan (para compositores sem editora), mas
+    # Gravan operacional NÃO recebe 10% como editora — somente editoras parceiras
+    # reais (perfis com role='publisher' e publisher_id setado no perfil do titular).
+    publisher_id = publisher_id_override or titular.get("publisher_id")
 
     coaut = sb.table("coautorias").select("perfil_id, share_pct").eq(
         "obra_id", t["obra_id"]
@@ -438,10 +438,9 @@ def gerar_repasses_para_transacao(transacao_id: str) -> dict:
     status_ass = titular.get("status_assinatura", "inativa")
     if plano == "PRO" and status_ass not in ("ativa", "cancelada", "past_due"):
         plano = "STARTER"
-    # publisher_id: lê do perfil do titular; se nulo, usa o publisher da obra
-    # (compositores sem editora têm obras.publisher_id = Gravan, mas perfis.publisher_id = null)
-    publisher_id = titular.get("publisher_id") or \
-                   obra.get("publisher_id") or obra.get("gravan_editora_id")
+    # publisher_id: lê apenas do perfil do titular (editora parceira real).
+    # Gravan operacional NÃO recebe 10% como editora — somente editoras parceiras.
+    publisher_id = titular.get("publisher_id")
 
     # Coautorias (com fallback 100% titular)
     coaut = sb.table("coautorias").select("perfil_id, share_pct").eq("obra_id", t["obra_id"]).execute()
@@ -449,84 +448,57 @@ def gerar_repasses_para_transacao(transacao_id: str) -> dict:
 
     split = _calcular_split_sobre_net(net, plano, coautorias, publisher_id=publisher_id)
 
-    # Editora: mesma lógica de "retido/enviado" dos coautores.
+    # Editora parceira (real): mesma lógica de "retido/enviado" dos coautores.
     enviados, retidos, falhas = 0, 0, 0
     edp = split.get("editora_payout")
     if edp and edp["valor_cents"] > 0:
-        # Caso especial: Gravan é a própria plataforma (editora operacional).
-        # O valor já fica retido na conta Stripe da plataforma — não há Transfer
-        # para conta Connect. Registra como "plataforma" para rastreabilidade.
-        if edp["perfil_id"] == GRAVAN_EDITORA_UUID:
-            ed_row = {
-                "transacao_id":  transacao_id,
-                "perfil_id":     edp["perfil_id"],
-                "valor_cents":   edp["valor_cents"],
-                "share_pct":     edp["share_pct"],
-                "status":        "plataforma",
-                "metadata":      {
-                    "net_cents_base": net,
-                    "plano_titular":  plano,
-                    "papel":          "editora_plataforma",
-                    "motivo":         "gravan_operacional_sem_transfer",
-                },
-            }
-            try:
-                sb.table("repasses").insert(ed_row).execute()
-            except Exception as _e:
-                logger.warning("Falha ao gravar repasse plataforma (editora Gravan): %s", _e)
-            logger.info(
-                "Repasse PLATAFORMA (Gravan editora): R$ %.2f para transação %s — "
-                "valor já na conta Stripe da plataforma, sem Transfer Connect.",
-                edp["valor_cents"] / 100, transacao_id,
-            )
+        ed_dest = sb.table("perfis").select(
+            "stripe_account_id, stripe_charges_enabled"
+        ).eq("id", edp["perfil_id"]).single().execute().data or {}
+        ed_acc = ed_dest.get("stripe_account_id")
+        ed_pode = ed_acc and ed_dest.get("stripe_charges_enabled")
+        ed_row = {
+            "transacao_id":      transacao_id,
+            "perfil_id":         edp["perfil_id"],
+            "valor_cents":       edp["valor_cents"],
+            "share_pct":         edp["share_pct"],
+            "stripe_account_id": ed_acc,
+            "status":            "retido" if not ed_pode else "pendente",
+            "metadata":          {
+                "net_cents_base": net,
+                "plano_titular":  plano,
+                "papel":          "editora",
+            },
+        }
+        if not ed_pode:
+            sb.table("repasses").insert(ed_row).execute()
+            retidos += 1
         else:
-            ed_dest = sb.table("perfis").select(
-                "stripe_account_id, stripe_charges_enabled"
-            ).eq("id", edp["perfil_id"]).single().execute().data or {}
-            ed_acc = ed_dest.get("stripe_account_id")
-            ed_pode = ed_acc and ed_dest.get("stripe_charges_enabled")
-            ed_row = {
-                "transacao_id":      transacao_id,
-                "perfil_id":         edp["perfil_id"],
-                "valor_cents":       edp["valor_cents"],
-                "share_pct":         edp["share_pct"],
-                "stripe_account_id": ed_acc,
-                "status":            "retido" if not ed_pode else "pendente",
-                "metadata":          {
-                    "net_cents_base": net,
-                    "plano_titular":  plano,
-                    "papel":          "editora",
-                },
-            }
-            if not ed_pode:
+            try:
+                tr = stripe.Transfer.create(
+                    amount=edp["valor_cents"],
+                    currency="brl",
+                    destination=ed_acc,
+                    transfer_group=f"OBRA_{t['obra_id']}_TRANS_{transacao_id}",
+                    metadata={
+                        "transacao_id": transacao_id,
+                        "perfil_id":    edp["perfil_id"],
+                        "obra_id":      t["obra_id"],
+                        "papel":        "editora",
+                    },
+                    idempotency_key=f"transfer_editora_{transacao_id}_{edp['perfil_id']}",
+                )
+                ed_row["stripe_transfer_id"] = tr.id
+                ed_row["status"] = "enviado"
+                ed_row["enviado_at"] = datetime.utcnow().isoformat() + "Z"
                 sb.table("repasses").insert(ed_row).execute()
-                retidos += 1
-            else:
-                try:
-                    tr = stripe.Transfer.create(
-                        amount=edp["valor_cents"],
-                        currency="brl",
-                        destination=ed_acc,
-                        transfer_group=f"OBRA_{t['obra_id']}_TRANS_{transacao_id}",
-                        metadata={
-                            "transacao_id": transacao_id,
-                            "perfil_id":    edp["perfil_id"],
-                            "obra_id":      t["obra_id"],
-                            "papel":        "editora",
-                        },
-                        idempotency_key=f"transfer_editora_{transacao_id}_{edp['perfil_id']}",
-                    )
-                    ed_row["stripe_transfer_id"] = tr.id
-                    ed_row["status"] = "enviado"
-                    ed_row["enviado_at"] = datetime.utcnow().isoformat() + "Z"
-                    sb.table("repasses").insert(ed_row).execute()
-                    enviados += 1
-                except stripe.StripeError as e:
-                    ed_row["status"]   = "falhou"
-                    ed_row["erro_msg"] = (e.user_message or str(e))[:500]
-                    sb.table("repasses").insert(ed_row).execute()
-                    falhas += 1
-                    logger.error("Falha no Transfer EDITORA para %s: %s", edp["perfil_id"], e)
+                enviados += 1
+            except stripe.StripeError as e:
+                ed_row["status"]   = "falhou"
+                ed_row["erro_msg"] = (e.user_message or str(e))[:500]
+                sb.table("repasses").insert(ed_row).execute()
+                falhas += 1
+                logger.error("Falha no Transfer EDITORA para %s: %s", edp["perfil_id"], e)
 
     # Cria registros + dispara transfers para coautores
     for p in split["payouts"]:
