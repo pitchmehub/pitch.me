@@ -28,7 +28,10 @@ contratos_lic_bp = Blueprint("contratos_lic", __name__)
 
 def _user_tem_acesso(sb, contract_id: str, user_id: str) -> dict | None:
     """Retorna o contrato se o usuário é parte (ou administrador); None caso contrário."""
-    c = sb.table("contracts").select("*").eq("id", contract_id).single().execute().data
+    try:
+        c = sb.table("contracts").select("*").eq("id", contract_id).maybe_single().execute().data
+    except Exception:
+        return None
     if not c:
         return None
     if c["seller_id"] == user_id or c["buyer_id"] == user_id:
@@ -76,7 +79,7 @@ def pendencias():
     Retorna quantos contratos aguardam assinatura do usuário autenticado.
     Consulta: contract_signers (licenciamento) + contracts_edicao (edição).
     """
-    user_id = g.user_id
+    user_id = g.user.id
     sb = get_supabase()
 
     # ── 1. Contratos de licenciamento ──────────────────────────
