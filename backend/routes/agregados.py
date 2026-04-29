@@ -581,6 +581,25 @@ def aceitar_convite(cid):
         "decided_at":                   agora,
     }).eq("id", cid).execute()
 
+    # ── Certificado de Assinaturas Digitais ─────────────────────────────────
+    # Gerado imediatamente quando o artista aceita o termo de agregação.
+    # Registra ambas as partes (editora = proponente, artista = aderente)
+    # e grava permanentemente no banco junto ao termo assinado.
+    try:
+        from services.certificado_assinaturas import gerar_certificado_agregacao
+        cert = gerar_certificado_agregacao(cid)
+        if not cert.get("ok"):
+            import logging as _lg
+            _lg.getLogger(__name__).error(
+                "Falha ao gerar certificado de agregação para convite %s: %s",
+                cid, cert.get("erro"),
+            )
+    except Exception as _ce:
+        import logging as _lg
+        _lg.getLogger(__name__).error(
+            "Exceção ao gerar certificado de agregação (convite=%s): %s", cid, _ce
+        )
+
     # Cancela quaisquer outros convites pendentes pra esse mesmo email/artista
     sb.table("agregado_convites").update({
         "status": "cancelado",

@@ -110,6 +110,25 @@ def assinar(cid):
 
     sb.table("contracts_edicao").update(update).eq("id", cid).execute()
 
+    # ── Certificado de Assinaturas Digitais ─────────────────────────────────
+    # Gerado imediatamente quando o contrato atinge status='assinado'
+    # (ambas as partes assinaram). Fica gravado permanentemente no banco.
+    if update.get("status") == "assinado":
+        try:
+            from services.certificado_assinaturas import gerar_certificado_edicao
+            cert = gerar_certificado_edicao(cid)
+            if not cert.get("ok"):
+                import logging as _lg
+                _lg.getLogger(__name__).error(
+                    "Falha ao gerar certificado de edição para contrato %s: %s",
+                    cid, cert.get("erro"),
+                )
+        except Exception as _ce:
+            import logging as _lg
+            _lg.getLogger(__name__).error(
+                "Exceção ao gerar certificado de edição (contrato=%s): %s", cid, _ce
+            )
+
     log_event("contrato.assinado", entity_type="contract_edicao", entity_id=cid,
               metadata={"parte": "autor" if g.user.id == c["autor_id"] else "publisher",
                         "status_final": update["status"]})
