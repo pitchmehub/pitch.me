@@ -680,10 +680,12 @@ def gerar_contrato_trilateral_agregado(
             "share_pct":   float(c["share_pct"]),
             "signed":      False,
         })
+    # A editora à qual o compositor é agregado É a Editora Detentora dos Direitos
+    # no contrato trilateral — não uma mera "agregadora". Gravan apenas intermedeia.
     signers.append({
         "contract_id": contract["id"],
         "user_id":     editora["id"],
-        "role":        "editora_agregadora",
+        "role":        "editora_detentora",
         "share_pct":   None,
         "signed":      False,
     })
@@ -699,8 +701,7 @@ def gerar_contrato_trilateral_agregado(
     })
     # INSERT resiliente: cada signer é inserido individualmente para que um
     # erro em uma linha (ex.: violação de CHECK) não derrube TODOS os signers
-    # do contrato — bug histórico que fazia editoras agregadoras ficarem sem
-    # acesso ao contrato trilateral.
+    # do contrato — bug histórico que fazia editoras ficarem sem acesso.
     for s in signers:
         try:
             sb.table("contract_signers").insert(s).execute()
@@ -1083,54 +1084,67 @@ def aceitar_contrato(
         pass
 
     # ── GUARDA DE ESCROW ────────────────────────────────────────────
-    # Antes de verificar todos_assinaram, garante que a Gravan (assinante
-    # automática) ESTÁ na tabela com signed=True. Se não estiver — porque
-    # o INSERT inicial falhou na CHECK constraint — insere agora.
-    # Sem esta linha, um contrato com apenas [Autor, Comprador] marcaria
-    # todos_assinaram=True assim que o Autor assinasse, liberando o escrow
-    # antes do tempo.
+    # Regra de negócio: o contrato SÓ pode ser concluído quando a
+    # "Editora Detentora dos Direitos" assinou:
+    #   • Bilateral (compositor sem editora): Gravan = editora_detentora
+    #     → assina automaticamente na criação; se o INSERT falhou, inserimos agora.
+    #   • Trilateral (compositor com editora parceira): a EDITORA PARCEIRA
+    #     = editora_detentora → deve assinar manualmente; Gravan NÃO é signatária.
     try:
-        gravan_row = sb.table("contract_signers").select("signed").eq(
-            "contract_id", contract_id
-        ).eq("user_id", GRAVAN_EDITORA_UUID).limit(1).execute().data
-        if not gravan_row:
-            _clt_log.warning(
-                "ESCROW GUARD: Gravan ausente em contract_signers (contrato=%s). "
-                "Inserindo agora antes de verificar todos_assinaram.",
-                contract_id,
-            )
-            _inserir_gravan_signer(
-                sb=sb,
-                contract_id=contract_id,
-                base_payload={
-                    "contract_id": contract_id,
-                    "user_id":     GRAVAN_EDITORA_UUID,
-                    "share_pct":   None,
-                    "signed":      True,
-                    "signed_at":   datetime.now(timezone.utc).isoformat(),
-                },
-            )
+        contrato_meta = sb.table("contracts").select("trilateral").eq(
+            "id", contract_id
+        ).maybe_single().execute()
+        is_trilateral = bool((contrato_meta.data or {}).get("trilateral"))
+    except Exception:
+        is_trilateral = False
+
+    try:
+        if not is_trilateral:
+            # BILATERAL: Gravan deve estar presente e assinada.
+            # Se o INSERT inicial falhou (CHECK constraint antiga), insere agora.
+            gravan_row = sb.table("contract_signers").select("signed").eq(
+                "contract_id", contract_id
+            ).eq("user_id", GRAVAN_EDITORA_UUID).limit(1).execute().data
+            if not gravan_row:
+                _clt_log.warning(
+                    "ESCROW GUARD bilateral: Gravan ausente em contract_signers "
+                    "(contrato=%s). Inserindo agora.",
+                    contract_id,
+                )
+                _inserir_gravan_signer(
+                    sb=sb,
+                    contract_id=contract_id,
+                    base_payload={
+                        "contract_id": contract_id,
+                        "user_id":     GRAVAN_EDITORA_UUID,
+                        "share_pct":   None,
+                        "signed":      True,
+                        "signed_at":   datetime.now(timezone.utc).isoformat(),
+                    },
+                )
     except Exception as _ge:
-        _clt_log.error("Falha na guarda de escrow Gravan (contrato=%s): %s", contract_id, _ge)
+        _clt_log.error("Falha na guarda de escrow bilateral (contrato=%s): %s",
+                       contract_id, _ge)
 
     # Todos assinaram?
-    signers_full = sb.table("contract_signers").select("signed, user_id").eq(
-        "contract_id", contract_id
-    ).execute().data or []
+    signers_full = sb.table("contract_signers").select(
+        "signed, user_id, role"
+    ).eq("contract_id", contract_id).execute().data or []
     signers = signers_full
     todos = signers and all(s.get("signed") for s in signers)
 
-    # Verificação extra: Gravan deve estar presente e assinada para concluir
-    # o contrato (impede falso-positivo se insert acima também falhou)
-    gravan_ok = any(
-        s.get("user_id") == GRAVAN_EDITORA_UUID and s.get("signed")
+    # Verificação extra: a Editora Detentora dos Direitos deve estar presente
+    # e assinada (Gravan nos bilaterais; editora parceira nos trilaterais).
+    detentora_ok = any(
+        s.get("role") == "editora_detentora" and s.get("signed")
         for s in signers
     )
-    if todos and not gravan_ok:
+    if todos and not detentora_ok:
         _clt_log.error(
-            "ESCROW BLOQUEADO: todos os humanos assinaram mas Gravan NÃO está "
-            "assinada (contrato=%s). Wallets NÃO serão creditadas.",
-            contract_id,
+            "ESCROW BLOQUEADO: todos os signatários assinaram mas a "
+            "'editora_detentora' NÃO está assinada (contrato=%s, trilateral=%s). "
+            "Wallets NÃO serão creditadas.",
+            contract_id, is_trilateral,
         )
         todos = False
 
