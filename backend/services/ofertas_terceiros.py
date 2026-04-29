@@ -385,6 +385,19 @@ def on_contrato_concluido(contract_id: str) -> Optional[dict]:
                 sb.table("ofertas_licenciamento").update({
                     "transacao_id": transacao_id,
                 }).eq("id", of["id"]).execute()
+                # ESCROW: vincula a transação ao contrato (contracts.transacao_id)
+                # para que o guard em creditar_wallets_por_transacao consiga
+                # verificar que o contrato está 'concluído' antes de creditar.
+                if contract_id:
+                    try:
+                        sb.table("contracts").update({
+                            "transacao_id": transacao_id,
+                        }).eq("id", contract_id).is_("transacao_id", "null").execute()
+                    except Exception as _tle:
+                        log.warning(
+                            "Não foi possível vincular transacao_id ao contrato %s: %s",
+                            contract_id, _tle,
+                        )
     except Exception as e:
         log.exception("Falha ao criar transação para oferta %s: %s", of["id"], e)
 

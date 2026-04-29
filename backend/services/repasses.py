@@ -128,32 +128,56 @@ def creditar_wallets_por_transacao(
     sb = get_supabase()
 
     # ── GUARDA DE ESCROW ────────────────────────────────────────────────────
-    # Garante que o contrato está CONCLUÍDO antes de qualquer crédito.
-    # Bloqueia crediting prematuro independentemente de quem chamou a função.
+    # Garante que o contrato de licenciamento está CONCLUÍDO (todas as partes
+    # assinaram) antes de qualquer crédito de wallet.
+    # Bloqueia QUALQUER caminho de código — webhook antigo, trigger, chamada
+    # direta — que tente creditar antes da conclusão do contrato.
+    #
+    # Regras:
+    #   • Contrato encontrado com status != 'concluído' → BLOQUEIA
+    #   • Contrato NÃO encontrado                       → BLOQUEIA
+    #     (o contrato é vinculado por transacao_id em todos os fluxos legítimos
+    #      antes de creditar; ausência de contrato indica chamada prematura)
+    #   • Contrato encontrado com status = 'concluído'  → PERMITE
+    #   • Exceção ao consultar                          → BLOQUEIA (fail-safe)
     try:
         contract_row = sb.table("contracts").select("id, status").eq(
             "transacao_id", transacao_id
         ).limit(1).execute()
-        if contract_row.data:
-            contract_status = contract_row.data[0].get("status", "")
-            if contract_status not in ("concluído", "concluido"):
-                logger.error(
-                    "ESCROW BLOQUEADO: creditar_wallets_por_transacao chamada para "
-                    "transação %s mas contrato está '%s' (não 'concluído'). "
-                    "Wallets NÃO serão creditadas.",
-                    transacao_id,
-                    contract_status,
-                )
-                return {"status": "escrow_bloqueado", "contract_status": contract_status}
-        # Se não há contrato (fluxo de oferta trilateral sem contrato padrão),
-        # permite creditar — a guarda de escrow está no aceitar_contrato.
+
+        if not contract_row.data:
+            logger.error(
+                "ESCROW BLOQUEADO: creditar_wallets_por_transacao para transação %s "
+                "não encontrou contrato vinculado. Chamada prematura ou inválida. "
+                "Wallets NÃO serão creditadas.",
+                transacao_id,
+            )
+            return {"status": "escrow_bloqueado_sem_contrato"}
+
+        contract_status = contract_row.data[0].get("status", "")
+        if contract_status not in ("concluído", "concluido"):
+            logger.error(
+                "ESCROW BLOQUEADO: creditar_wallets_por_transacao para transação %s "
+                "mas contrato está '%s' (esperado: 'concluído'). "
+                "Wallets NÃO serão creditadas.",
+                transacao_id,
+                contract_status,
+            )
+            return {"status": "escrow_bloqueado", "contract_status": contract_status}
+
+        logger.info(
+            "ESCROW OK: contrato concluído para transação %s — prosseguindo com crédito.",
+            transacao_id,
+        )
+
     except Exception as _eg:
-        logger.warning(
-            "Não foi possível verificar status do contrato para transação %s: %s. "
-            "Continuando com cuidado.",
+        logger.error(
+            "ESCROW BLOQUEADO (exceção): falha ao verificar contrato para transação %s: %s. "
+            "Bloqueando por segurança.",
             transacao_id,
             _eg,
         )
+        return {"status": "escrow_bloqueado_excecao", "erro": str(_eg)}
 
     # Idempotência: se já tem registro de pagamento, ignora
     ja = sb.table("pagamentos_compositores").select("id").eq(
