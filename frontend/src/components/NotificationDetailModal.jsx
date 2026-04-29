@@ -34,6 +34,13 @@ function fmtCompleto(iso) {
 // Corrige links de notificações antigas que apontavam para rotas inexistentes
 function sanearLink(link, n) {
   if (!link) return null
+  // Notificações de contrato de edição (tipo="edicao" no payload) não têm
+  // página de detalhe individual — vão para /contratos (aba edição)
+  const payload = n?.payload || {}
+  if (payload.tipo === 'edicao') return '/contratos'
+  // /contratos/licenciamento/<uuid> com payload de edição → /contratos
+  const mLic = link.match(/^\/contratos\/licenciamento\/([0-9a-fA-F-]{8,})$/)
+  if (mLic && payload.contract_id && payload.tipo === 'edicao') return '/contratos'
   // /contratos/<uuid> (sem "licenciamento") → /contratos/licenciamento/<uuid>
   const m = link.match(/^\/contratos\/([0-9a-fA-F-]{8,})$/)
   if (m) return `/contratos/licenciamento/${m[1]}`
