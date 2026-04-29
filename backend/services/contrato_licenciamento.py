@@ -198,12 +198,15 @@ def _info_plano(titular: dict) -> dict:
     editora_extenso = {10: "dez por cento"}.get(editora_pct, f"{editora_pct} por cento")
     liquido_pct = 100 - plataforma_pct
     liquido_extenso_map = {
+        55: "cinquenta e cinco por cento",
+        60: "sessenta por cento",
         65: "sessenta e cinco por cento",
         70: "setenta por cento",
         75: "setenta e cinco por cento",
         80: "oitenta por cento",
         85: "oitenta e cinco por cento",
     }
+    trilateral_pct = 100 - plataforma_pct - editora_pct
     return {
         "plataforma_pct": plataforma_pct,
         "plataforma_pct_extenso": extenso,
@@ -212,7 +215,8 @@ def _info_plano(titular: dict) -> dict:
         "editora_pct_extenso": editora_extenso,
         "liquido_autores_pct": liquido_pct,
         "liquido_autores_pct_extenso": liquido_extenso_map.get(liquido_pct, f"{liquido_pct} por cento"),
-        "liquido_autores_pct_trilateral": 100 - plataforma_pct - editora_pct,
+        "liquido_autores_pct_trilateral": trilateral_pct,
+        "liquido_autores_pct_trilateral_extenso": liquido_extenso_map.get(trilateral_pct, f"{trilateral_pct} por cento"),
     }
 
 
@@ -499,10 +503,10 @@ def gerar_contrato_trilateral_agregado(
     # Cláusula adicional para o caso AGREGADO: reforça o vínculo de agregação
     # já refletido na Cláusula 3.1 (split do buyout).
     clausula_split_editora = (
-        "\n\nParágrafo Terceiro: O percentual de 10% (dez por cento) destinado à "
-        "EDITORA, conforme item 3.1 acima, decorre do contrato de agregação vigente "
-        "entre AUTOR(ES) e EDITORA, ficando a GRAVAN autorizada e obrigada a creditá-lo "
-        "automaticamente, em cada licenciamento desta obra, diretamente à EDITORA."
+        "\n\nParágrafo Segundo: O percentual de {{editora_pct}}% ({{editora_pct_extenso}}) destinado à "
+        "EDITORA DETENTORA DOS DIREITOS, conforme a CLÁUSULA 4.1 acima, decorre do contrato de edição "
+        "ou agregação vigente entre AUTOR(ES) e EDITORA, ficando a GRAVAN autorizada e obrigada a "
+        "creditá-lo automaticamente, em cada licenciamento desta obra, diretamente à EDITORA."
     )
 
     info = _info_plano(titular)
@@ -530,6 +534,7 @@ def gerar_contrato_trilateral_agregado(
         .replace("{{editora_pct}}",                  str(info["editora_pct"]))
         .replace("{{editora_pct_extenso}}",          info["editora_pct_extenso"])
         .replace("{{liquido_autores_pct_trilateral}}", str(info["liquido_autores_pct_trilateral"]))
+        .replace("{{liquido_autores_pct_trilateral_extenso}}", info["liquido_autores_pct_trilateral_extenso"])
         .replace("{{liquido_autores_pct}}",          str(info["liquido_autores_pct"]))
         .replace("{{liquido_autores_pct_extenso}}",  info["liquido_autores_pct_extenso"])
         .replace("{{clausula_split_editora}}",       clausula_split_editora)
@@ -709,7 +714,10 @@ O LICENCIADO pagará pelo licenciamento o valor bruto de {{valor_buyout_extenso}
 
 Sobre o valor bruto pago pelo LICENCIADO, a GRAVAN reterá {{plataforma_pct}}% ({{plataforma_pct_extenso}}) a título de taxa de plataforma, na qualidade de TERCEIRA BENEFICIÁRIA, conforme o plano de assinatura vigente do AUTOR PRINCIPAL na data deste licenciamento ({{plano_titular_label}}).
 
-O saldo remanescente de {{liquido_autores_pct}}% será integralmente repassado à EDITORA DETENTORA DOS DIREITOS, que é responsável pela distribuição entre si e o(s) AUTOR(ES) conforme os termos do contrato de edição vigente entre as partes — para o qual este instrumento não define nem interfere.
+O saldo remanescente de {{liquido_autores_pct}}% ({{liquido_autores_pct_extenso}}) é distribuído automaticamente pela plataforma GRAVAN via split, da seguinte forma:
+
+- EDITORA DETENTORA DOS DIREITOS: {{editora_pct}}% ({{editora_pct_extenso}}) do valor bruto do buyout;
+- AUTOR(ES): {{liquido_autores_pct_trilateral}}% ({{liquido_autores_pct_trilateral_extenso}}) do valor bruto do buyout, distribuídos entre si na proporção de participação registrada na CLÁUSULA 8.
 
 Parágrafo Único: A taxa de plataforma segue a tabela: 25% (vinte e cinco por cento) para titular no plano GRÁTIS e 20% (vinte por cento) para titular no plano PRO ativo na data da venda.{{clausula_split_editora}}
 
@@ -842,6 +850,9 @@ def gerar_contrato_trilateral(oferta_id: str) -> dict | None:
         .replace("{{editora_pct}}",            str(info["editora_pct"]))
         .replace("{{editora_pct_extenso}}",    info["editora_pct_extenso"])
         .replace("{{liquido_autores_pct_trilateral}}", str(info["liquido_autores_pct_trilateral"]))
+        .replace("{{liquido_autores_pct_trilateral_extenso}}", info["liquido_autores_pct_trilateral_extenso"])
+        .replace("{{liquido_autores_pct}}",    str(info["liquido_autores_pct"]))
+        .replace("{{liquido_autores_pct_extenso}}", info["liquido_autores_pct_extenso"])
         .replace("{{clausula_split_editora}}", "")
         .replace("{{data_emissao}}",           datetime.utcnow().strftime("%d/%m/%Y às %H:%M UTC"))
     )
