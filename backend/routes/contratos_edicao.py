@@ -110,6 +110,34 @@ def assinar(cid):
 
     sb.table("contracts_edicao").update(update).eq("id", cid).execute()
 
+    # ── Carimbo de Tempo RFC 3161 (TSA) — best-effort ────────────────────────
+    # O carimbo é obtido APÓS gravar a assinatura para garantir que o signing
+    # nunca falhe por indisponibilidade da TSA.
+    try:
+        from services.tsa import carimbar, montar_payload_edicao
+        role_str = "autor" if g.user.id == c["autor_id"] else "publisher"
+        tsa_payload = montar_payload_edicao(
+            contract_id=cid,
+            user_id=g.user.id,
+            role=role_str,
+            timestamp_utc=agora,
+            ip_hash=ip_hash or "",
+        )
+        tsa_result = carimbar(tsa_payload)
+        if tsa_result["ok"] and tsa_result["token_b64"]:
+            col_name = "tsa_token_autor" if role_str == "autor" else "tsa_token_publisher"
+            tsa_upd = {col_name: tsa_result["token_b64"]}
+            sb.table("contracts_edicao").update(tsa_upd).eq("id", cid).execute()
+        else:
+            import logging as _lg
+            _lg.getLogger(__name__).warning(
+                "TSA indisponível para contrato %s (%s): %s",
+                cid, role_str, tsa_result.get("erro"),
+            )
+    except Exception as _tsa_err:
+        import logging as _lg
+        _lg.getLogger(__name__).warning("TSA exception (contrato=%s): %s", cid, _tsa_err)
+
     # ── Certificado de Assinaturas Digitais ─────────────────────────────────
     # Gerado imediatamente quando o contrato atinge status='assinado'
     # (ambas as partes assinaram). Fica gravado permanentemente no banco.

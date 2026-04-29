@@ -85,9 +85,15 @@ def gerar_certificado_assinaturas(contract_id: str) -> dict:
         if not ctr:
             return {"ok": False, "erro": "Contrato não encontrado"}
 
-        signers_rows = sb.table("contract_signers").select(
-            "user_id, role, signed, signed_at, ip_hash, user_agent, share_pct"
-        ).eq("contract_id", contract_id).order("signed_at").execute().data or []
+        # Busca signatários com coluna TSA (best-effort — pode não existir ainda)
+        try:
+            signers_rows = sb.table("contract_signers").select(
+                "user_id, role, signed, signed_at, ip_hash, user_agent, share_pct, tsa_token"
+            ).eq("contract_id", contract_id).order("signed_at").execute().data or []
+        except Exception:
+            signers_rows = sb.table("contract_signers").select(
+                "user_id, role, signed, signed_at, ip_hash, user_agent, share_pct"
+            ).eq("contract_id", contract_id).order("signed_at").execute().data or []
 
         user_ids = [s["user_id"] for s in signers_rows if s.get("user_id")]
         perfis_map: dict[str, dict] = {}
@@ -137,6 +143,15 @@ def gerar_certificado_assinaturas(contract_id: str) -> dict:
 
             tipo_assina = "Assinatura eletrônica automática da plataforma" if is_gravan else "Assinatura eletrônica voluntária"
 
+            # TSA token (coluna pode não existir antes da migração)
+            from services.tsa import resumo_token as _tsa_resumo
+            tsa_tok = s.get("tsa_token") or None
+            tsa_line = (
+                f"      Carimbo TSA   : {_tsa_resumo(tsa_tok)} (RFC 3161 / FreeTSA.org)\n"
+                if tsa_tok else
+                "      Carimbo TSA   : Não disponível\n"
+            )
+
             linhas.append(
                 f"  [{idx}] {nome}\n"
                 f"      Identificação : {cpf_m}\n"
@@ -147,6 +162,7 @@ def gerar_certificado_assinaturas(contract_id: str) -> dict:
                 f"      Dispositivo   : {ua}\n"
                 f"      Tipo          : {tipo_assina}\n"
                 f"      Token         : {token}\n"
+                f"{tsa_line}"
             )
 
         obra_row = sb.table("obras").select("nome").eq(
@@ -297,13 +313,24 @@ def gerar_certificado_edicao(contract_edicao_id: str) -> dict:
     """
     sb = get_supabase()
     try:
-        c = sb.table("contracts_edicao").select(
-            "id, obra_id, autor_id, publisher_id, share_pct, "
-            "contract_text, contract_html, "
-            "signed_by_autor_at, autor_ip_hash, "
-            "signed_by_publisher_at, publisher_ip_hash, "
-            "completed_at, versao"
-        ).eq("id", contract_edicao_id).single().execute().data
+        # Lemos o contrato com as colunas TSA (best-effort — podem ainda não existir)
+        try:
+            c = sb.table("contracts_edicao").select(
+                "id, obra_id, autor_id, publisher_id, share_pct, "
+                "contract_text, contract_html, "
+                "signed_by_autor_at, autor_ip_hash, "
+                "signed_by_publisher_at, publisher_ip_hash, "
+                "completed_at, versao, "
+                "tsa_token_autor, tsa_token_publisher"
+            ).eq("id", contract_edicao_id).single().execute().data
+        except Exception:
+            c = sb.table("contracts_edicao").select(
+                "id, obra_id, autor_id, publisher_id, share_pct, "
+                "contract_text, contract_html, "
+                "signed_by_autor_at, autor_ip_hash, "
+                "signed_by_publisher_at, publisher_ip_hash, "
+                "completed_at, versao"
+            ).eq("id", contract_edicao_id).single().execute().data
         if not c:
             return {"ok": False, "erro": "Contrato de edição não encontrado"}
 
@@ -361,6 +388,11 @@ def gerar_certificado_edicao(contract_edicao_id: str) -> dict:
         pub_signed_fmt = _fmt(pub_signed_raw) if pub_signed_raw else "Automático (plataforma)"
         aut_signed_fmt = _fmt(aut_signed_raw)
 
+        # ── Tokens TSA (RFC 3161) ──
+        from services.tsa import resumo_token as _tsa_resumo
+        tsa_token_pub = c.get("tsa_token_publisher") or None
+        tsa_token_aut = c.get("tsa_token_autor") or None
+
         # ── Hash do documento ──
         doc_text = (c.get("contract_text") or "").strip()
         digest_input = f"{doc_text}\n{contract_edicao_id}\n{pub_token}:{aut_token}"
@@ -369,6 +401,16 @@ def gerar_certificado_edicao(contract_edicao_id: str) -> dict:
         separador = "═" * 70
 
         # ── Bloco texto ──
+        _tsa_line_pub = (
+            f"      Carimbo TSA   : {_tsa_resumo(tsa_token_pub)} (RFC 3161 / FreeTSA.org)\n"
+            if tsa_token_pub else
+            "      Carimbo TSA   : Não disponível\n"
+        )
+        _tsa_line_aut = (
+            f"      Carimbo TSA   : {_tsa_resumo(tsa_token_aut)} (RFC 3161 / FreeTSA.org)\n"
+            if tsa_token_aut else
+            "      Carimbo TSA   : Não disponível\n"
+        )
         cert_txt = (
             f"\n\n{separador}\n"
             f"  CERTIFICADO DE ASSINATURAS DIGITAIS — GRAVAN\n"
@@ -387,7 +429,8 @@ def gerar_certificado_edicao(contract_edicao_id: str) -> dict:
             f"      Data/Hora     : {pub_signed_fmt}\n"
             f"      IP (hash)     : {pub_ip}\n"
             f"      Tipo          : {'Assinatura eletrônica automática da plataforma' if is_gravan_pub else 'Assinatura eletrônica voluntária'}\n"
-            f"      Token         : {pub_token}\n\n"
+            f"      Token         : {pub_token}\n"
+            f"{_tsa_line_pub}\n"
             f"  [2] {aut_nome}\n"
             f"      Identificação : {aut_cpf}\n"
             f"      E-mail        : {aut_email}\n"
@@ -395,7 +438,8 @@ def gerar_certificado_edicao(contract_edicao_id: str) -> dict:
             f"      Data/Hora     : {aut_signed_fmt}\n"
             f"      IP (hash)     : {aut_ip}\n"
             f"      Tipo          : Assinatura eletrônica voluntária\n"
-            f"      Token         : {aut_token}\n\n"
+            f"      Token         : {aut_token}\n"
+            f"{_tsa_line_aut}\n"
             f"  INTEGRIDADE DO DOCUMENTO:\n"
             f"  Hash SHA-256   : {doc_hash}\n"
             f"  (Qualquer alteração posterior ao documento invalida este hash.)\n\n"
@@ -405,7 +449,14 @@ def gerar_certificado_edicao(contract_edicao_id: str) -> dict:
         )
 
         # ── Bloco HTML ──
-        def _signer_card(idx, nome, doc, email, papel, signed_fmt, ip_h, tipo, token):
+        def _signer_card(idx, nome, doc, email, papel, signed_fmt, ip_h, tipo, token,
+                         tsa_resumo=None):
+            tsa_html = (
+                f"<b>Carimbo TSA (RFC 3161):</b> "
+                f"<code style='font-size:10px;word-break:break-all;'>{tsa_resumo}</code>"
+                if tsa_resumo else
+                "<b>Carimbo TSA:</b> Não disponível"
+            )
             return (
                 f"<div style='background:#fff;border:1px solid #e0e0e0;"
                 f"border-radius:6px;padding:14px 18px;margin-bottom:12px;'>"
@@ -416,7 +467,8 @@ def gerar_certificado_edicao(contract_edicao_id: str) -> dict:
                 f"<b>Assinatura:</b> {tipo}<br>"
                 f"<b>Data/Hora:</b> {signed_fmt}<br>"
                 f"<b>IP (hash):</b> {ip_h}<br>"
-                f"<b>Token:</b> <code style='font-size:11px;'>{token}</code>"
+                f"<b>Token:</b> <code style='font-size:11px;'>{token}</code><br>"
+                f"{tsa_html}"
                 f"</span></div>"
             )
 
@@ -437,10 +489,12 @@ def gerar_certificado_edicao(contract_edicao_id: str) -> dict:
         pub_tipo = "Automática (plataforma)" if is_gravan_pub else "Voluntária (editora)"
         cert_html += _signer_card(1, pub_nome, pub_doc, pub_email,
                                   "Editora Parceira / Detentora dos Direitos",
-                                  pub_signed_fmt, pub_ip, pub_tipo, pub_token)
+                                  pub_signed_fmt, pub_ip, pub_tipo, pub_token,
+                                  tsa_resumo=_tsa_resumo(tsa_token_pub) if tsa_token_pub else None)
         cert_html += _signer_card(2, aut_nome, aut_cpf, aut_email,
                                   "Compositor(a) / Autor(a)",
-                                  aut_signed_fmt, aut_ip, "Voluntária (usuário)", aut_token)
+                                  aut_signed_fmt, aut_ip, "Voluntária (usuário)", aut_token,
+                                  tsa_resumo=_tsa_resumo(tsa_token_aut) if tsa_token_aut else None)
         cert_html += (
             "<hr style='margin:16px 0'>"
             f"<p style='font-size:12px;'><b>Hash SHA-256 do documento:</b><br>"

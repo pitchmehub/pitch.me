@@ -1174,14 +1174,44 @@ def aceitar_contrato(
 ) -> dict:
     """Marca o signer como assinado. Se todos assinaram → status=concluído."""
     sb = get_supabase()
+    signed_at_ts = datetime.now(timezone.utc).isoformat()
     upd = sb.table("contract_signers").update({
         "signed":     True,
-        "signed_at":  datetime.now(timezone.utc).isoformat(),
+        "signed_at":  signed_at_ts,
         "ip_hash":    ip_hash,
         "user_agent": (user_agent or "")[:500] or None,
     }).eq("contract_id", contract_id).eq("user_id", user_id).execute()
     if not upd.data:
         raise ValueError("Você não é uma das partes deste contrato.")
+
+    # ── Carimbo de Tempo RFC 3161 (TSA) — best-effort ────────────────────────
+    try:
+        from services.tsa import carimbar, montar_payload_licenciamento
+        signer_row = upd.data[0] if upd.data else {}
+        role_str = signer_row.get("role") or "signatario"
+        tsa_payload = montar_payload_licenciamento(
+            contract_id=contract_id,
+            user_id=user_id,
+            role=role_str,
+            timestamp_utc=signed_at_ts,
+            ip_hash=ip_hash or "",
+        )
+        tsa_result = carimbar(tsa_payload)
+        if tsa_result["ok"] and tsa_result["token_b64"]:
+            sb.table("contract_signers").update(
+                {"tsa_token": tsa_result["token_b64"]}
+            ).eq("contract_id", contract_id).eq("user_id", user_id).execute()
+        else:
+            import logging as _lg
+            _lg.getLogger(__name__).warning(
+                "TSA indisponível para licenciamento %s (user=%s): %s",
+                contract_id, user_id, tsa_result.get("erro"),
+            )
+    except Exception as _tsa_err:
+        import logging as _lg
+        _lg.getLogger(__name__).warning(
+            "TSA exception (licenciamento=%s, user=%s): %s", contract_id, user_id, _tsa_err
+        )
 
     # Log do evento
     try:
