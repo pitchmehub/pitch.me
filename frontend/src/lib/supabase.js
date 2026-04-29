@@ -4,7 +4,13 @@ const supabaseUrl  = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnon = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseAnon) {
-  throw new Error('Variáveis de ambiente Supabase não configuradas.')
+  console.error(
+    '[Gravan] VITE_SUPABASE_URL ou VITE_SUPABASE_ANON_KEY não configuradas. ' +
+    'Adicione essas variáveis de ambiente no painel da Vercel.'
+  )
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnon)
+export const supabase = createClient(
+  supabaseUrl  || 'https://placeholder.supabase.co',
+  supabaseAnon || 'placeholder-anon-key'
+)
