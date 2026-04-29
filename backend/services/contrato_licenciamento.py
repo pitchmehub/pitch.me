@@ -321,7 +321,12 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
     titular = sb.table("perfis").select("*").eq("id", obra["titular_id"]).single().execute().data or {}
     buyer   = sb.table("perfis").select("*").eq("id", tx["comprador_id"]).single().execute().data or {}
 
-    # 3.1 — Dispatcher: se titular é agregado de uma editora, gera trilateral
+    # 3.1 — Dispatcher: se titular é agregado de uma editora, gera TRILATERAL.
+    # IMPORTANTE: NÃO há fallback para bilateral quando publisher_id está definido.
+    # Se o trilateral falhar, retornamos None (sem contrato) para que o escrow guard
+    # em creditar_wallets_por_transacao bloqueie qualquer crédito de wallet.
+    # Criar um contrato bilateral nesse caso deixaria a editora sem assinatura e sem
+    # split, pois o compositor poderia assinar sozinho liberando o escrow.
     if titular.get("publisher_id"):
         try:
             return gerar_contrato_trilateral_agregado(
@@ -333,15 +338,27 @@ def gerar_contrato_licenciamento(transacao_id: str, ip_remote: str | None = None
                 ip_remote=ip_remote,
             )
         except Exception as e:
-            # Se o trilateral por agregação falhar, registra e cai para o bilateral.
+            import logging as _lg
+            _lg.getLogger(__name__).error(
+                "FALHA CRÍTICA: geração de contrato trilateral para transação %s "
+                "falhou. Nenhum contrato bilateral será criado como substituto — "
+                "o escrow permanece bloqueado até intervenção manual. Erro: %s",
+                transacao_id, e,
+            )
             try:
                 sb.table("contract_events").insert({
                     "contract_id": None,
-                    "event_type":  "trilateral_agregado_fallback",
-                    "payload":     {"erro": str(e), "transacao_id": transacao_id},
+                    "event_type":  "trilateral_agregado_erro",
+                    "payload":     {
+                        "erro":          str(e),
+                        "transacao_id":  transacao_id,
+                        "publisher_id":  titular.get("publisher_id"),
+                        "aviso":         "Contrato bilateral NÃO foi gerado como fallback.",
+                    },
                 }).execute()
             except Exception:
                 pass
+            return None
 
     coaut = sb.table("coautorias").select("perfil_id, share_pct").eq("obra_id", obra["id"]).execute().data or []
     if not coaut:
