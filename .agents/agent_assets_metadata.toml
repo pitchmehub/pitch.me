@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "WUh1GOGIF6doFQ0XDpiX_"
+uri = "file://artifacts/mockup-sandbox/public/images/calor-hero.png"
+type = "image"
+title = "brazilian music ambient warm"
+
+[[generated]]
+id = "p4jQQLAUKibo43VzUyUDK"
+uri = "file://artifacts/mockup-sandbox/public/images/studio-night-hero.png"
+type = "image"
+title = "Recording studio at night"
