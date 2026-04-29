@@ -4,7 +4,7 @@ import { api } from '../lib/api'
 import { useAuth } from '../contexts/AuthContext'
 import ContratosLicenciamentoLista from '../components/ContratosLicenciamentoLista'
 
-const GRAVAN_EDITORA_UUID = '00000000-0000-0000-0000-000000000001'
+const GRAVAN_EDITORA_UUID = 'e96bd8af-dfb8-4bf1-9ba5-7746207269cd'
 
 function fmtData(iso) {
  if (!iso) return null

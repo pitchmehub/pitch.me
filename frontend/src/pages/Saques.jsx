@@ -172,7 +172,7 @@ export default function Saques() {
  padding: 16, marginBottom: 16, borderRadius: 12, fontSize: 13,
  background: 'var(--success-bg)', color: 'var(--success)',
  }}>
- <strong>✓ Saques liberados a qualquer momento.</strong> Você pode sacar quantas vezes quiser, com qualquer valor, desde que tenha saldo disponível.
+ <strong>✓ Conta conectada.</strong> Você pode solicitar saques com qualquer valor disponível. Após a solicitação, confirme pelo código enviado ao seu e-mail (OTP) — o valor é liberado após uma janela de segurança de 24 horas.
  </div>
 
  <div className="card" style={{ marginBottom: 24 }}>

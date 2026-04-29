@@ -15,6 +15,7 @@ export default function PagamentoSucesso() {
  const [dados, setDados] = useState(null)
  const [erro, setErro] = useState('')
  const [contratoId, setContratoId] = useState(null)
+ const [contratoStatus, setContratoStatus] = useState(null)
  const [baixandoDossie, setBaixandoDossie] = useState(false)
 
  useEffect(() => {
@@ -31,7 +32,10 @@ export default function PagamentoSucesso() {
  if (tid) {
  try {
  const c = await api.get(`/contratos/licenciamento/by-transacao/${tid}`)
- if (c?.contract_id && c?.sou_comprador) setContratoId(c.contract_id)
+ if (c?.contract_id && c?.sou_comprador) {
+ setContratoId(c.contract_id)
+ setContratoStatus(c.status)
+}
  } catch (_) { /* silencioso — botão fica oculto */ }
  }
  } else {
@@ -126,22 +130,29 @@ export default function PagamentoSucesso() {
  boxShadow: '0 6px 24px rgba(8, 50, 87, 0.25)',
  }}>
  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, opacity: .8, textTransform: 'uppercase', marginBottom: 6 }}>
- Cortesia exclusiva
+ Dossiê de Licença
  </div>
- <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>Dossiê de Licença</div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>Pacote da Sua Licença</div>
  <div style={{ fontSize: 12, opacity: .85, lineHeight: 1.5, marginBottom: 12 }}>
- Pacote ZIP com a letra em PDF premium, o áudio MP3 da composição e a cópia do contrato assinado.
+ ZIP com a letra em PDF, o áudio MP3 e a cópia do contrato assinado por todas as partes.
  </div>
- <button
- data-testid="btn-baixar-dossie-licenca"
- onClick={baixarDossie}
- disabled={baixandoDossie}
- style={{
- background: '#fff', color: '#083257', border: 'none',
- padding: '10px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700,
- cursor: baixandoDossie ? 'wait' : 'pointer', opacity: baixandoDossie ? .7 : 1,
- }}
- >{baixandoDossie ? 'Preparando ZIP…' : '↓ Baixar Dossiê de Licença'}</button>
+ {contratoStatus === 'concluído' ? (
+   <button
+   data-testid="btn-baixar-dossie-licenca"
+   onClick={baixarDossie}
+   disabled={baixandoDossie}
+   style={{
+   background: '#fff', color: '#083257', border: 'none',
+   padding: '10px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700,
+   cursor: baixandoDossie ? 'wait' : 'pointer', opacity: baixandoDossie ? .7 : 1,
+   }}
+   >{baixandoDossie ? 'Preparando ZIP…' : '↓ Baixar Dossiê de Licença'}</button>
+ ) : (
+   <div style={{ fontSize: 12, opacity: .8, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+   <span>⏱</span>
+   <span>Disponível após todas as partes assinarem. Você receberá uma notificação.</span>
+   </div>
+ )}
  </div>
  )}
 
