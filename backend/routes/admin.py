@@ -640,17 +640,6 @@ def publisher_dashboard_admin(publisher_id):
     if perfil.data.get("role") != "publisher":
         abort(400, description="Perfil informado não é uma editora")
 
-    # Obras da editora
-    obras = []
-    try:
-        obras = sb.table("obras") \
-            .select("id, titulo, publicada, status, preco_cents, created_at, genero") \
-            .eq("publisher_id", publisher_id) \
-            .order("created_at", desc=True).execute().data or []
-    except Exception:
-        pass
-    obras_ids = [o["id"] for o in obras]
-
     # Agregados (compositores ligados à editora)
     agregados = []
     try:
@@ -660,6 +649,34 @@ def publisher_dashboard_admin(publisher_id):
             .order("created_at", desc=True).execute().data or []
     except Exception:
         pass
+    agregados_ids = [a["id"] for a in agregados]
+
+    # Obras da editora — diretamente vinculadas (publisher_id) + obras dos agregados
+    obras = []
+    try:
+        obras_diretas = sb.table("obras") \
+            .select("id, nome, publicada, status, preco_cents, created_at, genero, titular_id") \
+            .eq("publisher_id", publisher_id) \
+            .order("created_at", desc=True).execute().data or []
+    except Exception:
+        obras_diretas = []
+
+    obras_agregados = []
+    if agregados_ids:
+        try:
+            obras_agregados = sb.table("obras") \
+                .select("id, nome, publicada, status, preco_cents, created_at, genero, titular_id") \
+                .in_("titular_id", agregados_ids) \
+                .order("created_at", desc=True).execute().data or []
+        except Exception:
+            pass
+
+    # Merge sem duplicatas
+    obras_map = {o["id"]: o for o in obras_diretas}
+    for o in obras_agregados:
+        obras_map.setdefault(o["id"], o)
+    obras = sorted(obras_map.values(), key=lambda o: o.get("created_at") or "", reverse=True)
+    obras_ids = [o["id"] for o in obras]
 
     # Contratos de edição
     contratos = []
@@ -673,7 +690,7 @@ def publisher_dashboard_admin(publisher_id):
     contratos_assinados = [c for c in contratos if c.get("status") == "assinado"]
     contratos_pendentes = [c for c in contratos if c.get("status") in ("pendente", "assinado_parcial")]
 
-    # Faturamento — soma de transações pagas das obras da editora
+    # Transações pagas das obras da editora (faturamento total gerado)
     faturamento_cents = 0
     transacoes = []
     if obras_ids:
@@ -681,18 +698,38 @@ def publisher_dashboard_admin(publisher_id):
             tx = sb.table("transacoes") \
                 .select("id, valor_cents, status, created_at, obra_id") \
                 .in_("obra_id", obras_ids) \
+                .eq("status", "pago") \
                 .order("created_at", desc=True).limit(200).execute().data or []
             transacoes = tx
-            faturamento_cents = sum(t.get("valor_cents", 0) for t in tx if t.get("status") == "pago")
+            faturamento_cents = sum(t.get("valor_cents", 0) for t in tx)
         except Exception:
             pass
 
+    # Ganhos reais da editora — pagamentos creditados à editora nesta plataforma
+    ganhos_cents = 0
+    try:
+        pgtos = sb.table("pagamentos_compositores") \
+            .select("valor_cents") \
+            .eq("perfil_id", publisher_id).execute().data or []
+        ganhos_cents = sum(p.get("valor_cents", 0) for p in pgtos)
+    except Exception:
+        pass
+
+    # Saldo atual da carteira da editora
+    saldo_cents = 0
+    try:
+        wallet = sb.table("wallets").select("saldo_cents") \
+            .eq("perfil_id", publisher_id).maybe_single().execute()
+        saldo_cents = (wallet.data or {}).get("saldo_cents", 0) if wallet else 0
+    except Exception:
+        pass
+
     return jsonify({
-        "perfil":                perfil.data,
-        "obras":                 obras,
-        "agregados":             agregados,
-        "contratos":             contratos,
-        "transacoes":            transacoes[:50],
+        "perfil":    perfil.data,
+        "obras":     obras,
+        "agregados": agregados,
+        "contratos": contratos,
+        "transacoes": transacoes[:50],
         "totais": {
             "obras":               len(obras),
             "obras_publicadas":    len([o for o in obras if o.get("publicada") or o.get("status") == "publicada"]),
@@ -702,6 +739,8 @@ def publisher_dashboard_admin(publisher_id):
             "contratos_pendentes": len(contratos_pendentes),
             "faturamento_cents":   faturamento_cents,
             "fee_devido_cents":    int(faturamento_cents * 0.05),
+            "ganhos_cents":        ganhos_cents,
+            "saldo_cents":         saldo_cents,
         },
     }), 200
 

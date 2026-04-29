@@ -76,15 +76,17 @@ export default function AdminEditoraDetalhe() {
  </div>
  </div>
 
- <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, margin: '20px 0' }}>
+ <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, margin: '20px 0' }}>
  <Stat label="Obras" value={t.obras} />
  <Stat label="Obras publicadas" value={t.obras_publicadas} />
  <Stat label="Agregados" value={t.agregados} />
  <Stat label="Contratos" value={t.contratos} />
  <Stat label="Contratos assinados" value={t.contratos_assinados} />
  <Stat label="Contratos pendentes" value={t.contratos_pendentes} />
- <Stat label="Faturamento" value={fmt(t.faturamento_cents)} highlight />
+ <Stat label="Faturamento gerado" value={fmt(t.faturamento_cents)} />
  <Stat label="Fee plataforma (5%)" value={fmt(t.fee_devido_cents)} />
+ <Stat label="Ganhos da editora" value={fmt(t.ganhos_cents)} highlight />
+ <Stat label="Saldo em carteira" value={fmt(t.saldo_cents)} highlight />
  </div>
 
  <Section title={`Agregados (${data.agregados?.length || 0})`}>
@@ -103,7 +105,7 @@ export default function AdminEditoraDetalhe() {
  ? <Empty texto="Nenhuma obra cadastrada." />
  : (data.obras || []).map(o => (
  <Row key={o.id} onClick={() => navigate(`/comprar/${o.id}`)}>
- <strong>{o.titulo}</strong>
+ <strong>{o.nome || o.titulo || '—'}</strong>
  <span style={{ color: '#71717A' }}>{o.genero || '—'}</span>
  <span style={{ color: '#71717A', fontSize: 11 }}>{o.publicada ? 'Publicada' : (o.status || 'rascunho')}</span>
  <span style={{ color: '#0C447C', fontWeight: 700 }}>{fmt(o.preco_cents)}</span>
