@@ -5,215 +5,283 @@ export default function Termos() {
   return (
     <LegalLayout
       eyebrow="Termos de Uso"
-      title="A Gravan é um marketplace. As negociações são entre você e a outra parte."
-      lastUpdate="Abril de 2026"
+      title="Termos de Uso da Gravan"
+      lastUpdate="Versão 2026-04 — Abril de 2026"
       active="/termos"
     >
-      <p style={{ fontSize: 16, color: 'var(--text-secondary)', marginBottom: 24, lineHeight: 1.7 }}>
-        Estes Termos regulam o uso da plataforma <b>GRAVAN</b> (“Plataforma”),
-        operada pela GRAVAN TECNOLOGIA E MARKETPLACE LTDA. (“Gravan”, “nós”). Ao
-        criar conta, completar seu cadastro ou clicar em <i>“Li e concordo com
-        os Termos de Uso”</i>, você (“Usuário”) declara que leu, compreendeu e
-        aceita integralmente as condições abaixo.
-      </p>
-
       <div style={{
         background: '#FEF3C7', border: '1px solid #FBBF24', color: '#78350F',
         padding: '14px 16px', borderRadius: 12, fontSize: 13.5, lineHeight: 1.6,
         marginBottom: 32,
       }}>
-        <b>Resumo em uma frase:</b> a Gravan é um marketplace de tecnologia que
-        conecta partes e fornece a infraestrutura (cadastro, contratos
-        eletrônicos, processamento de pagamento via Stripe). <b>Não somos parte
-        dos contratos celebrados entre os Usuários</b>, não respondemos por
-        obrigações financeiras desses contratos e não temos legitimidade
-        passiva em disputas decorrentes deles.
+        <b>Resumo:</b> a GRAVAN é uma <b>intermediadora tecnológica</b> que conecta
+        usuários para licenciamento de obras musicais. Não somos editora,
+        gravadora ou proprietária das obras, e não somos parte dos contratos
+        celebrados entre os usuários.
       </div>
 
-      <Section n="1" title="Natureza jurídica: marketplace, não parte do contrato">
-        A GRAVAN é um <b>marketplace digital</b> que disponibiliza ferramentas
-        para que compositores, intérpretes, editoras e demais agentes do
-        mercado musical:
-        <ul style={{ marginTop: 10 }}>
-          <Bullet>Cadastrem obras musicais e seus respectivos titulares e coautores;</Bullet>
-          <Bullet>Negociem entre si licenciamentos, edições e demais relações jurídicas relativas a obras musicais;</Bullet>
-          <Bullet>Formalizem essas negociações em contratos eletrônicos celebrados <b>diretamente entre as partes</b>;</Bullet>
-          <Bullet>Recebam pagamentos por meio de processador terceirizado (Stripe).</Bullet>
-        </ul>
-        <p style={{ marginTop: 14 }}>
-          Em todos os contratos celebrados na Plataforma, as <b>partes
-          contratantes são exclusivamente os Usuários</b> envolvidos
-          (compositor, intérprete, editora, comprador, etc.). A Gravan
-          <b> não é parte</b> desses contratos, ainda que seu nome e logotipo
-          apareçam por questão de identidade visual ou de geração técnica do
-          documento. A Gravan figura apenas como <b>provedora da
-          infraestrutura</b> (intermediadora tecnológica), sem assumir
-          obrigações de natureza autoral, editorial, comercial ou financeira
-          decorrentes desses contratos.
+      <Section n="1" title="Aceitação dos termos">
+        Ao acessar ou utilizar a plataforma <b>GRAVAN</b> (“Plataforma”),
+        operada pela GRAVAN TECNOLOGIA E MARKETPLACE LTDA. (“Gravan”), o
+        usuário declara que <b>leu, compreendeu e concorda integralmente</b>{' '}
+        com estes Termos de Uso e com a Política de Privacidade da Plataforma.
+        <p style={{ marginTop: 12 }}>
+          O aceite ocorre no momento da conclusão do cadastro, mediante marcação
+          expressa em campo próprio (“Li e concordo com os Termos de Uso”), e
+          fica registrado na conta do usuário com data, hora UTC, IP de origem
+          e versão dos termos vigentes, para fins probatórios.
+        </p>
+        <p style={{ marginTop: 12 }}>
+          <b>Se você não concorda com estes Termos, não utilize a Plataforma.</b>
         </p>
       </Section>
 
-      <Section n="2" title="Cadastro, veracidade e responsabilidade pelos dados">
-        Para usar a Plataforma é necessário criar conta vinculada a um perfil
-        (compositor, intérprete, editora ou administrador). O Usuário declara,
+      <Section n="2" title="Definições">
+        Para os fins destes Termos:
+        <ul style={{ marginTop: 10 }}>
+          <Bullet><b>Plataforma</b>: o sistema digital operado pela Gravan, acessível pela web e demais canais oficiais.</Bullet>
+          <Bullet><b>Usuário</b>: qualquer pessoa física ou jurídica cadastrada na Plataforma — compositores, intérpretes, produtores, editoras, agregadores, compradores e licenciadores.</Bullet>
+          <Bullet><b>Obra</b>: conteúdo musical (letra, melodia, gravação, capa, metadados) cadastrado por um Usuário na Plataforma.</Bullet>
+          <Bullet><b>Licença</b>: autorização de uso da Obra concedida pelo titular ao comprador, sob as condições do contrato eletrônico celebrado na Plataforma.</Bullet>
+          <Bullet><b>Coautoria</b>: percentual de participação (<i>share_pct</i>) atribuído a cada autor/coautor de uma Obra, definido pelos próprios usuários no cadastro.</Bullet>
+          <Bullet><b>Stripe</b>: Stripe Payments do Brasil Instituição de Pagamento Ltda., processador externo responsável pelo fluxo financeiro e por Stripe Connect.</Bullet>
+        </ul>
+      </Section>
+
+      <Section n="3" title="Natureza do serviço (cláusula crítica)">
+        A GRAVAN atua <b>exclusivamente como intermediadora tecnológica</b>,
+        conectando Usuários para fins de licenciamento de obras musicais e
+        provendo a infraestrutura digital necessária (cadastro, contratos
+        eletrônicos, registro probatório de assinaturas, orquestração técnica
+        de pagamento via Stripe).
+        <p style={{ marginTop: 14 }}><b>A Gravan:</b></p>
+        <ul style={{ marginTop: 10 }}>
+          <Bullet><b>NÃO é proprietária</b> das obras cadastradas;</Bullet>
+          <Bullet><b>NÃO é editora, gravadora, agregadora nem produtora</b>;</Bullet>
+          <Bullet><b>NÃO participa da criação</b> das obras;</Bullet>
+          <Bullet><b>NÃO é parte</b> dos contratos celebrados entre os Usuários, ainda que sua marca apareça por questão de identidade visual ou geração técnica do documento;</Bullet>
+          <Bullet><b>NÃO é instituição financeira</b>, não atua como escrow nem retém valores em nome próprio.</Bullet>
+        </ul>
+      </Section>
+
+      <Section n="4" title="Cadastro e conta">
+        Para utilizar a Plataforma o Usuário deve criar uma conta vinculada a
+        um perfil (compositor, intérprete, editora ou administrador). O Usuário
+        compromete-se a:
+        <ul style={{ marginTop: 10 }}>
+          <Bullet>Fornecer <b>informações verdadeiras, completas e atualizadas</b> (nome, CPF/CNPJ, RG, endereço, dados bancários quando aplicável);</Bullet>
+          <Bullet>Manter seus dados sempre atualizados;</Bullet>
+          <Bullet>Ser o responsável <b>exclusivo</b> pela segurança das credenciais de acesso (e-mail e senha) e por todas as ações realizadas em sua conta;</Bullet>
+          <Bullet>Não compartilhar a conta com terceiros nem operá-la em nome de outra pessoa sem autorização formal.</Bullet>
+        </ul>
+        <p style={{ marginTop: 14 }}>
+          A Gravan poderá suspender ou encerrar contas em caso de fraude,
+          inveracidade nos dados, irregularidade ou violação destes Termos,
+          conforme a Cláusula 14.
+        </p>
+      </Section>
+
+      <Section n="5" title="Publicação de obras">
+        Ao enviar uma Obra à Plataforma, o Usuário <b>declara e garante</b>,
         sob as penas da lei, que:
         <ul style={{ marginTop: 10 }}>
-          <Bullet>Os dados informados (nome, CPF/CNPJ, RG, endereço, dados bancários, etc.) são verdadeiros, completos e atualizados;</Bullet>
-          <Bullet>Possui plena capacidade civil para contratar e operar na Plataforma;</Bullet>
-          <Bullet>É responsável exclusivo pela guarda das credenciais de acesso (e-mail e senha) e por todas as ações realizadas em sua conta;</Bullet>
-          <Bullet>Manterá a Plataforma indene em caso de fraude, omissão ou inveracidade nos dados que informou.</Bullet>
-        </ul>
-      </Section>
-
-      <Section n="3" title="Direitos autorais e legitimidade sobre as obras">
-        Ao cadastrar uma obra, o Usuário <b>declara e garante</b> que:
-        <ul style={{ marginTop: 10 }}>
-          <Bullet>É titular dos direitos autorais (letra, melodia, gravação, capa e demais materiais) ou possui autorização expressa de todos os titulares;</Bullet>
-          <Bullet>Tem autorização de todos os coautores, intérpretes e detentores de direitos conexos para disponibilizar a obra na Plataforma e celebrar contratos a respeito dela;</Bullet>
-          <Bullet>O conteúdo cadastrado não viola direitos de terceiros, marcas, patentes, segredos comerciais ou qualquer outra norma aplicável.</Bullet>
+          <Bullet>Possui <b>todos os direitos necessários</b> sobre a Obra (autorais, conexos, fonográficos, de imagem etc.) ou autorização expressa de quem os possui;</Bullet>
+          <Bullet>A Obra <b>não infringe direitos de terceiros</b>, marcas, patentes, segredos comerciais ou qualquer outra norma aplicável;</Bullet>
+          <Bullet>Possui <b>autorização de todos os envolvidos</b> (coautores, intérpretes, produtores, detentores de direitos conexos) para disponibilizar a Obra na Plataforma e celebrar contratos a respeito dela;</Bullet>
+          <Bullet>Os percentuais de coautoria (<i>share_pct</i>) cadastrados refletem acordo real entre as partes envolvidas.</Bullet>
         </ul>
         <p style={{ marginTop: 14 }}>
-          A Gravan <b>não verifica titularidade</b> nem realiza juízo
-          editorial sobre o conteúdo cadastrado. A responsabilidade por
-          eventuais conflitos de autoria, plágio, uso indevido ou qualquer
-          violação a direitos de terceiros é <b>exclusiva</b> do Usuário que
-          cadastrou ou utilizou a obra. A Plataforma poderá, a seu critério e
-          sem necessidade de notificação prévia, suspender obras ou contas
-          envolvidas em controvérsia até que a questão seja resolvida entre
-          as partes ou pelo Poder Judiciário.
+          O <b>Usuário é integralmente responsável pelo conteúdo publicado</b>.
+          A Gravan não verifica titularidade nem realiza juízo editorial sobre
+          o conteúdo cadastrado.
         </p>
       </Section>
 
-      <Section n="4" title="Contratos celebrados na Plataforma">
-        Os contratos eletrônicos gerados na Plataforma (licenciamento, edição
-        musical, agregação, contratos trilaterais com editoras, ofertas de
-        terceiros, etc.) são instrumentos particulares celebrados
-        <b> exclusivamente entre os Usuários signatários</b>. As assinaturas
-        eletrônicas são registradas com data, hora, IP e demais metadados
-        técnicos para fins probatórios, nos termos do art. 10, §2º, da MP
-        2.200-2/2001 e da Lei nº 14.063/2020.
+      <Section n="6" title="Licenciamento">
+        As Obras são disponibilizadas na Plataforma sob regime de{' '}
+        <b>licenciamento não-exclusivo</b>, salvo disposição específica em
+        contrário acordada entre as partes no respectivo contrato eletrônico.
         <p style={{ marginTop: 14 }}>
-          Cada parte é responsável pela leitura integral do contrato antes de
-          assiná-lo. <b>A Gravan não revisa, não chancela e não garante o
-          conteúdo, a exequibilidade ou os efeitos jurídicos</b> dos contratos
-          celebrados na Plataforma.
+          O comprador recebe <b>apenas o direito de uso</b> da Obra, conforme
+          o escopo, prazo, território e finalidades definidos na licença
+          adquirida (sincronização, execução pública, reprodução mecânica,
+          conforme o caso).
+        </p>
+        <p style={{ marginTop: 14 }}>
+          <b>A propriedade intelectual NÃO é transferida</b> em nenhuma
+          hipótese pela mera aquisição de licença na Plataforma. Cessões de
+          direitos, contratos de edição ou contratos trilaterais (autor +
+          editora + intérprete) seguem instrumentos próprios celebrados
+          eletronicamente entre as partes diretamente envolvidas.
         </p>
       </Section>
 
-      <Section n="5" title="Pagamentos e processamento financeiro">
+      <Section n="7" title="Pagamentos e repasses">
         Os pagamentos realizados na Plataforma são processados pela{' '}
-        <b>Stripe Payments do Brasil Instituição de Pagamento Ltda.</b>{' '}
-        (“Stripe”), nos termos dos próprios Termos de Serviço da Stripe, aos
-        quais o Usuário também adere ao operar na Plataforma.
+        <b>Stripe</b> (parceiro externo), nos termos dos próprios Termos de
+        Serviço da Stripe, aos quais o Usuário também adere ao operar na
+        Plataforma.
+        <p style={{ marginTop: 14 }}><b>Regras gerais:</b></p>
         <ul style={{ marginTop: 10 }}>
-          <Bullet>O <b>valor bruto</b> da venda é cobrado pela Stripe;</Bullet>
-          <Bullet>A <b>taxa Gravan</b> (25% sobre o bruto, plataforma única) é repassada à Gravan como remuneração pela infraestrutura;</Bullet>
-          <Bullet>A <b>taxa Stripe</b> (variável conforme método de pagamento) é absorvida proporcionalmente pela editora e pelos autores/coautores envolvidos na transação;</Bullet>
-          <Bullet>O <b>saldo restante</b> é distribuído entre editora (10%, quando houver) e autores/coautores conforme os percentuais (<i>share_pct</i>) cadastrados na obra.</Bullet>
+          <Bullet>A Gravan retém uma <b>comissão sobre cada transação</b>, conforme a Cláusula 8;</Bullet>
+          <Bullet>Os valores podem ficar em <b>período de retenção</b> definido pela Stripe (tipicamente entre 7 e 30 dias) para fins de antifraude e <i>chargeback</i>;</Bullet>
+          <Bullet>Após a liberação pela Stripe, o saldo é creditado na carteira interna do Usuário e fica disponível para saque;</Bullet>
+          <Bullet>O <b>saque</b> requer conta <b>Stripe Connect</b> ativa e verificada em nome do titular do perfil; o crédito final na conta bancária depende exclusivamente do banco/PSP do Usuário e da Stripe;</Bullet>
+          <Bullet>Cada saque exige <b>confirmação por código de 6 dígitos</b> enviado ao e-mail cadastrado;</Bullet>
+          <Bullet>Há <b>janela de segurança de 24 h</b> em que o saque pode ser cancelado pelo próprio Usuário antes de ser processado pela Stripe.</Bullet>
+        </ul>
+      </Section>
+
+      <Section n="8" title="Taxas e comissões">
+        A Gravan cobra:
+        <ul style={{ marginTop: 10 }}>
+          <Bullet><b>Comissão de plataforma de 25% sobre o valor bruto</b> de cada transação realizada na Plataforma, aplicada a todos os planos. Esta comissão é <b>intacta</b> — a Gravan não absorve nenhuma parte da taxa Stripe.</Bullet>
+          <Bullet><b>Taxa Stripe</b> (variável conforme método de pagamento), absorvida proporcionalmente pela editora vinculada (quando houver) e pelos autores/coautores envolvidos na transação.</Bullet>
+          <Bullet><b>Plano PRO</b>: assinatura mensal de <b>R$ 49,90</b>, com acesso a propostas de licenciamento direto, precificação até R$ 10.000, painel de analytics e benefícios adicionais descritos na página de Planos.</Bullet>
+          <Bullet><b>Plano STARTER</b>: gratuito, sem assinatura mensal, com a mesma comissão de 25% sobre as transações.</Bullet>
+          <Bullet>Eventuais <b>taxas de serviços adicionais</b> serão sempre comunicadas previamente ao Usuário e exigirão aceite expresso para serem cobradas.</Bullet>
         </ul>
         <p style={{ marginTop: 14 }}>
-          A Gravan <b>não é instituição financeira</b>, não atua como
-          escrow/depositário e não retém valores em nome próprio. O fluxo
-          financeiro é executado pela Stripe diretamente entre as contas dos
-          Usuários (Stripe Connect). A Gravan apenas <b>orquestra
-          tecnicamente</b> a divisão (split) conforme as regras acima.
-        </p>
-      </Section>
-
-      <Section n="6" title="Saldo, saques e Stripe Connect">
-        Cada venda gera saldo na carteira do compositor (e da editora vinculada,
-        quando aplicável).
-        <ul style={{ marginTop: 10 }}>
-          <Bullet>O saque exige conta <b>Stripe Connect</b> ativa e verificada em nome do titular do perfil. A relação entre Usuário e Stripe é direta;</Bullet>
-          <Bullet>O Usuário pode solicitar quantos saques quiser, com qualquer valor, desde que tenha saldo disponível;</Bullet>
-          <Bullet>Cada saque exige confirmação por código de 6 dígitos enviado ao e-mail cadastrado;</Bullet>
-          <Bullet>Há janela de segurança de 24 h em que o saque pode ser cancelado pelo próprio Usuário. Após esse prazo, o valor é processado pela Stripe;</Bullet>
-          <Bullet>O tempo de crédito final na conta bancária depende exclusivamente do banco/PSP do Usuário e da Stripe.</Bullet>
-        </ul>
-      </Section>
-
-      <Section n="7" title="Disputas entre Usuários — Gravan não é parte">
-        Toda e qualquer controvérsia decorrente de contratos celebrados na
-        Plataforma — incluindo, sem limitação, inadimplência, divergência de
-        autoria, falha de entrega, vício de obra, rescisão, indenização,
-        cobrança de royalties ou de saldos — deve ser tratada{' '}
-        <b>diretamente entre as partes contratantes</b>.
-        <ul style={{ marginTop: 10 }}>
-          <Bullet>A Gravan <b>não tem legitimidade passiva</b> para responder por obrigações assumidas pelas partes em contratos celebrados na Plataforma;</Bullet>
-          <Bullet>A Gravan <b>não responde, em qualquer hipótese</b>, por descumprimento contratual, tributos, encargos, danos materiais, morais, lucros cessantes ou qualquer outra obrigação financeira oriunda dos contratos entre Usuários;</Bullet>
-          <Bullet>Em eventual demanda judicial ou administrativa em que a Gravan venha a ser indevidamente incluída, o Usuário responsável compromete-se desde já a requerer sua imediata exclusão do polo passivo e a arcar com os custos correspondentes;</Bullet>
-          <Bullet>A Gravan poderá, a pedido fundamentado e mediante apresentação de ordem judicial, fornecer registros eletrônicos das assinaturas (data, hora, IP, metadados) para fins probatórios.</Bullet>
-        </ul>
-      </Section>
-
-      <Section n="8" title="Limitação de responsabilidade">
-        Na máxima extensão permitida pela legislação aplicável:
-        <ul style={{ marginTop: 10 }}>
-          <Bullet>A Plataforma é fornecida “como está” (<i>as is</i>), sem garantias de resultado comercial, sucesso de vendas, valorização de obras ou continuidade de qualquer funcionalidade específica;</Bullet>
-          <Bullet>A Gravan <b>não responde</b> por indisponibilidades pontuais de provedores terceiros (Stripe, e-mail, hospedagem, redes de internet, autoridades certificadoras, etc.);</Bullet>
-          <Bullet>A Gravan <b>não responde</b> por perda, vazamento ou indisponibilidade de dados causados por força maior, caso fortuito, ataque cibernético externo, falha de provedor terceirizado ou ato de terceiros;</Bullet>
-          <Bullet>O Usuário é responsável por manter <b>cópias próprias</b> de suas obras e contratos. As exportações disponíveis na Plataforma (PDF, dossiê) são fornecidas como conveniência, não como obrigação contratual;</Bullet>
-          <Bullet>Em qualquer hipótese, a responsabilidade total da Gravan perante o Usuário fica limitada ao valor que o Usuário tenha efetivamente pago à Gravan a título de assinatura ou taxa de plataforma nos 12 meses anteriores ao evento que originou o pleito.</Bullet>
-        </ul>
-      </Section>
-
-      <Section n="9" title="Planos e taxas de serviço">
-        A Gravan oferece dois planos:
-        <ul style={{ marginTop: 10 }}>
-          <Bullet><b>STARTER</b> — gratuito, com taxa de <b>25% sobre o valor bruto</b> de cada transação realizada na Plataforma.</Bullet>
-          <Bullet><b>PRO</b> — assinatura mensal de <b>R$ 49,90</b>, com acesso a propostas de licenciamento direto, precificação até R$ 10.000, painel de analytics e benefícios adicionais descritos na página de Planos. A taxa de plataforma é de <b>25%</b> para todos os planos.</Bullet>
-        </ul>
-        <p style={{ marginTop: 14 }}>
-          O plano PRO é renovado automaticamente pela Stripe a cada ciclo
-          mensal. O Usuário pode cancelar a renovação a qualquer momento pela
-          página de Planos: os benefícios PRO permanecem ativos até o final do
-          ciclo já pago. <b>Não há reembolso proporcional</b> de assinaturas já
+          Os valores e regras de cobrança podem ser atualizados pela Gravan{' '}
+          <b>mediante aviso prévio</b> de no mínimo 30 dias, comunicado pela
+          Plataforma ou por e-mail. O plano PRO é renovado automaticamente
+          pela Stripe a cada ciclo mensal e pode ser cancelado a qualquer
+          momento; <b>não há reembolso proporcional</b> de assinaturas já
           cobradas.
         </p>
       </Section>
 
-      <Section n="10" title="Conduta proibida">
-        É expressamente proibido:
+      <Section n="9" title="Sistema de split">
+        A divisão de receitas entre múltiplos Usuários (autores, coautores e
+        editora vinculada) opera da seguinte forma a cada venda:
         <ul style={{ marginTop: 10 }}>
-          <Bullet>Enviar conteúdo ilegal, ofensivo, discriminatório ou de terceiros sem autorização;</Bullet>
-          <Bullet>Burlar o sistema de pagamento, intermediação ou taxação (ex.: combinar a venda dentro da Plataforma e fechar fora dela);</Bullet>
-          <Bullet>Utilizar a Plataforma para fraude, lavagem de dinheiro, financiamento ilícito ou qualquer atividade contrária à legislação aplicável;</Bullet>
-          <Bullet>Tentar acessar dados, contas ou áreas restritas de outros Usuários ou da própria Plataforma;</Bullet>
-          <Bullet>Fazer engenharia reversa, raspagem em larga escala (<i>scraping</i>) ou exploração comercial não autorizada da Plataforma.</Bullet>
+          <Bullet><b>Gravan</b>: 25% do valor bruto;</Bullet>
+          <Bullet><b>Editora</b> (quando o titular é agregado a uma editora): 10/75 do pool restante (mantendo a proporção histórica de 10% editora : 65% autores);</Bullet>
+          <Bullet><b>Autores e coautores</b>: o restante do pool, distribuído conforme os percentuais (<i>share_pct</i>) cadastrados na Obra.</Bullet>
         </ul>
         <p style={{ marginTop: 14 }}>
-          Violações poderão resultar em suspensão ou encerramento imediato da
-          conta, sem prejuízo das medidas judiciais cabíveis.
+          Os percentuais de coautoria (<i>share_pct</i>) são <b>definidos
+          pelos próprios Usuários</b> no momento do cadastro da Obra e devem
+          refletir <b>acordos reais</b> celebrados entre as partes envolvidas.
+        </p>
+        <p style={{ marginTop: 14 }}>
+          <b>A Gravan NÃO se responsabiliza por disputas internas de divisão
+          entre coautores, intérpretes ou editoras</b>, nem por percentuais
+          incorretos cadastrados pelos próprios Usuários. A Plataforma
+          executa a divisão estritamente conforme os percentuais informados
+          pelo titular no cadastro.
         </p>
       </Section>
 
-      <Section n="11" title="Encerramento de conta">
-        Contas podem ser suspensas ou encerradas a qualquer tempo em caso de
-        violação destes Termos. O Usuário também pode solicitar o
-        encerramento da própria conta a qualquer momento. Saldo eventualmente
-        disponível pode ser sacado antes do encerramento, observada a conexão
-        ativa com a Stripe Connect. Contratos já celebrados <b>permanecem
-        válidos entre as partes</b> mesmo após o encerramento da conta de
-        qualquer dos signatários.
+      <Section n="10" title="Conteúdo proibido">
+        É expressamente proibido publicar, enviar ou veicular na Plataforma:
+        <ul style={{ marginTop: 10 }}>
+          <Bullet>Conteúdo com <b>direitos de terceiros sem autorização</b> (plágio, sample não autorizado, capa/letra/melodia de terceiros);</Bullet>
+          <Bullet>Material <b>ilegal, ofensivo, discriminatório, fraudulento</b> ou que viole a legislação aplicável;</Bullet>
+          <Bullet>Tentativas de <b>manipular pagamentos, comissões, split ou qualquer mecanismo da Plataforma</b> (incluindo combinar a venda dentro da Plataforma e fechar fora dela para burlar a comissão);</Bullet>
+          <Bullet>Conteúdo que incite ódio, violência, atos ilícitos ou que viole direitos de personalidade de terceiros;</Bullet>
+          <Bullet>Engenharia reversa, raspagem em larga escala (<i>scraping</i>) ou exploração comercial não autorizada da Plataforma.</Bullet>
+        </ul>
       </Section>
 
-      <Section n="12" title="Privacidade e proteção de dados (LGPD)">
-        O tratamento de dados pessoais segue a{' '}
-        <a href="/privacidade">Política de Privacidade</a> da Plataforma e a
-        Lei nº 13.709/2018 (LGPD). Dados sensíveis (CPF, RG, dados bancários)
-        são armazenados de forma criptografada e usados apenas para finalidades
-        operacionais (geração de contratos, KYC da Stripe, prevenção a fraude
-        e cumprimento de obrigações legais).
+      <Section n="11" title="Remoção de conteúdo">
+        A Gravan poderá <b>remover, despublicar ou suspender</b> Obras e
+        demais conteúdos que:
+        <ul style={{ marginTop: 10 }}>
+          <Bullet>Infrinjam direitos autorais, conexos ou de propriedade intelectual de terceiros;</Bullet>
+          <Bullet>Recebam denúncias válidas, conforme a Cláusula 12;</Bullet>
+          <Bullet>Violem estes Termos ou a legislação aplicável;</Bullet>
+          <Bullet>Estejam envolvidos em controvérsia documentada entre Usuários, até resolução pela própria parte ou pelo Poder Judiciário.</Bullet>
+        </ul>
+        <p style={{ marginTop: 14 }}>
+          A remoção pode ser <b>preventiva</b>, sem necessidade de notificação
+          prévia, especialmente em casos de risco de dano grave a terceiros
+          ou à própria Plataforma.
+        </p>
       </Section>
 
-      <Section n="13" title="Alterações e foro">
-        A Gravan poderá atualizar estes Termos a qualquer momento. Mudanças
-        relevantes serão comunicadas pela Plataforma ou por e-mail e o uso
-        continuado após a comunicação implica aceitação da nova versão. Fica
-        eleito o foro da Comarca de São Paulo/SP para dirimir qualquer
-        controvérsia entre o Usuário e a Gravan oriunda da relação de uso da
-        Plataforma, com expressa renúncia a qualquer outro, por mais
-        privilegiado que seja.
+      <Section n="12" title="Denúncias e copyright">
+        A Plataforma disponibiliza mecanismos de denúncia em fluxo análogo ao
+        utilizado por grandes plataformas (ex.: YouTube), incluindo formulário
+        próprio para reclamações de violação de direitos autorais.
+        <p style={{ marginTop: 14 }}><b>Após uma denúncia válida:</b></p>
+        <ul style={{ marginTop: 10 }}>
+          <Bullet>O conteúdo poderá ser <b>removido preventivamente</b> enquanto a denúncia é analisada;</Bullet>
+          <Bullet>O Usuário denunciado poderá ser notificado e ter a oportunidade de apresentar contranotificação;</Bullet>
+          <Bullet>Em caso de reincidência ou denúncia comprovadamente procedente, o Usuário poderá ser <b>suspenso ou banido</b>;</Bullet>
+          <Bullet>A Gravan poderá, mediante apresentação de ordem judicial, fornecer registros eletrônicos (data, hora, IP, metadados de assinatura) para fins probatórios.</Bullet>
+        </ul>
+      </Section>
+
+      <Section n="13" title="Limitação de responsabilidade (essencial)">
+        Na máxima extensão permitida pela legislação aplicável,{' '}
+        <b>a Gravan NÃO se responsabiliza por</b>:
+        <ul style={{ marginTop: 10 }}>
+          <Bullet><b>Conteúdos enviados pelos Usuários</b> (titularidade, qualidade, legalidade, exequibilidade);</Bullet>
+          <Bullet><b>Disputas de direitos autorais</b>, conexos, fonográficos, de imagem ou de personalidade entre Usuários ou entre Usuários e terceiros;</Bullet>
+          <Bullet><b>Acordos celebrados entre Usuários</b> na Plataforma — a Gravan não tem legitimidade passiva para responder por obrigações assumidas nesses contratos (incluindo inadimplência, falha de entrega, vício, rescisão, indenizações, royalties ou cobrança de saldos);</Bullet>
+          <Bullet><b>Perdas indiretas, lucros cessantes</b>, danos morais reflexos ou perda de oportunidade comercial;</Bullet>
+          <Bullet>Indisponibilidades pontuais de provedores terceiros (Stripe, e-mail, hospedagem, redes de internet, autoridades certificadoras);</Bullet>
+          <Bullet>Eventos de força maior, caso fortuito, ataque cibernético externo ou ato de terceiros.</Bullet>
+        </ul>
+        <p style={{ marginTop: 14 }}>
+          Em qualquer hipótese, a responsabilidade total da Gravan perante o
+          Usuário fica limitada ao valor que o Usuário tenha efetivamente pago
+          à Gravan a título de assinatura ou taxa de plataforma nos <b>12
+          meses anteriores</b> ao evento que originou o pleito.
+        </p>
+        <p style={{ marginTop: 14 }}>
+          O Usuário é responsável por manter <b>cópias próprias</b> de suas
+          obras e contratos. As exportações disponíveis na Plataforma (PDF,
+          dossiê) são fornecidas como conveniência, não como obrigação
+          contratual.
+        </p>
+      </Section>
+
+      <Section n="14" title="Suspensão e banimento">
+        A Gravan poderá <b>suspender ou encerrar</b> contas, total ou
+        parcialmente, em caso de:
+        <ul style={{ marginTop: 10 }}>
+          <Bullet><b>Violação destes Termos</b> ou da legislação aplicável;</Bullet>
+          <Bullet><b>Fraude</b>, inveracidade nos dados ou tentativa de burlar comissões/split;</Bullet>
+          <Bullet><b>Atividades suspeitas</b> ou indícios de uso para lavagem de dinheiro, financiamento ilícito ou qualquer atividade contrária à legislação aplicável;</Bullet>
+          <Bullet>Reincidência em denúncias válidas (Cláusula 12);</Bullet>
+          <Bullet>Uso da Plataforma de forma incompatível com sua finalidade.</Bullet>
+        </ul>
+        <p style={{ marginTop: 14 }}>
+          Contratos já celebrados <b>permanecem válidos entre as partes</b>{' '}
+          mesmo após o encerramento da conta de qualquer dos signatários.
+          Saldo eventualmente disponível pode ser sacado antes do encerramento,
+          observada a conexão ativa com a Stripe Connect.
+        </p>
+      </Section>
+
+      <Section n="15" title="Alterações nos termos">
+        Estes Termos poderão ser <b>atualizados a qualquer momento</b> pela
+        Gravan. Mudanças relevantes serão comunicadas pela Plataforma e/ou
+        por e-mail com no mínimo 30 dias de antecedência da entrada em vigor,
+        exceto em casos de adequação a determinação legal ou regulatória,
+        quando o prazo poderá ser menor.
+        <p style={{ marginTop: 14 }}>
+          O <b>uso contínuo</b> da Plataforma após a entrada em vigor da nova
+          versão implica aceitação das alterações. O usuário poderá, a
+          qualquer momento, encerrar sua conta caso não concorde com a nova
+          redação.
+        </p>
+      </Section>
+
+      <Section n="16" title="Legislação e foro">
+        Estes Termos são regidos pela <b>legislação brasileira</b>, em
+        especial pelo Código Civil, Lei de Direitos Autorais (Lei nº
+        9.610/1998), Marco Civil da Internet (Lei nº 12.965/2014), Lei Geral
+        de Proteção de Dados (Lei nº 13.709/2018) e Lei das Assinaturas
+        Eletrônicas (Lei nº 14.063/2020 e MP 2.200-2/2001).
+        <p style={{ marginTop: 14 }}>
+          Fica eleito o <b>foro da Comarca de São Paulo/SP</b> — cidade de
+          operação da Gravan — para dirimir qualquer controvérsia entre o
+          Usuário e a Gravan oriunda da relação de uso da Plataforma, com
+          expressa renúncia a qualquer outro, por mais privilegiado que seja.
+        </p>
       </Section>
 
       <p style={{
@@ -224,8 +292,8 @@ export default function Termos() {
         lineHeight: 1.6,
       }}>
         Ao concluir o cadastro na Plataforma você confirma ter lido e aceito
-        integralmente estes Termos de Uso. A versão vigente fica registrada na
-        sua conta com data, hora e IP, para fins probatórios.
+        integralmente estes Termos de Uso. A versão vigente fica registrada
+        na sua conta com data, hora UTC e IP, para fins probatórios.
       </p>
     </LegalLayout>
   )
