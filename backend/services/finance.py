@@ -6,12 +6,19 @@ Todos os cálculos são realizados EXCLUSIVAMENTE aqui, no servidor.
 Estrutura de receita (taxa ÚNICA de plataforma, independente do plano):
   25% plataforma | 75% compositores
 
+REGRA DE TAXA STRIPE (atualizada):
+  A taxa cobrada pela Stripe pelo processamento do pagamento é
+  ABSORVIDA PROPORCIONALMENTE PELA EDITORA E PELOS AUTORES, e nunca
+  pela Gravan. A fatia de 25% da plataforma é calculada sobre o BRUTO
+  da venda e é repassada integralmente — Gravan não absorve nenhum
+  centavo da taxa Stripe. Veja `services.repasses._calcular_split_sobre_net`
+  para a aplicação prática (que recebe gross + net e roda a regra).
+
 Quando a obra possui editora vinculada (titular agregado a uma editora,
 ou seja, perfis.publisher_id preenchido), 10% do valor é destinado à
-editora antes da distribuição entre coautores. A parte da plataforma
-incide sobre o valor bruto da venda; os 10% da editora são deduzidos do
-restante e o saldo final é dividido entre os coautores conforme suas
-percentuais (share_pct).
+editora. A função `calcular_split` abaixo é usada principalmente em
+PREVIEWS (sem taxa Stripe envolvida); para o split real após o
+pagamento veja `repasses._calcular_split_sobre_net`.
 """
 from decimal import Decimal, ROUND_DOWN
 from dataclasses import dataclass, field

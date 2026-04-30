@@ -196,36 +196,58 @@ def _net_cents_do_charge(payment_intent_id: str) -> Optional[int]:
 
 
 def _calcular_split_sobre_net(
+    gross_cents: int,
     net_cents: int,
     plano_titular: str,
     coautorias: list,
     publisher_id: str | None = None,
 ) -> dict:
     """
-    Calcula:
-      - plataforma_cents (taxa da Gravan sobre o NET)
-      - editora_payout (10% para editora vinculada, se aplicável)
-      - distribuição por coautor (com share_pct), sobre o que sobrar
+    REGRA DE SPLIT (atualizada):
+
+      • A taxa da plataforma Gravan (25%) é calculada sobre o BRUTO da venda
+        e é INTACTA — Gravan não absorve nenhuma parte da taxa Stripe.
+      • A taxa Stripe é absorvida proporcionalmente pela editora (quando há)
+        e pelos autores/coautores. O pool restante é:
+            pool = net_cents - plataforma
+                 = gross_cents - plataforma - taxa_stripe
+      • Editora (se houver) recebe 10/75 do pool (mantém a proporção
+        histórica de 10% editora : 65% autores). Autores recebem o resto,
+        distribuído conforme `share_pct`.
+      • Truncamento ROUND_DOWN; o último coautor recebe a sobra para
+        fechar a conta sem perder centavos.
     """
-    if net_cents <= 0:
-        return {"plataforma_cents": 0, "editora_payout": None, "payouts": []}
+    if gross_cents <= 0 or net_cents <= 0:
+        return {
+            "plataforma_cents":      0,
+            "editora_cents":         0,
+            "editora_payout":        None,
+            "liquido_autores_cents": 0,
+            "payouts":               [],
+        }
 
     rate = fee_rate_for_plano(plano_titular)
-    net = Decimal(str(net_cents))
-    plataforma = (net * rate).to_integral_value(ROUND_DOWN)
+    bruto = Decimal(str(gross_cents))
+    plataforma = (bruto * rate).to_integral_value(ROUND_DOWN)
 
-    # Editora (10%) — calculada sobre o NET bruto.
+    # Pool a ser dividido entre editora + autores (já líquido de taxa Stripe).
+    pool = Decimal(str(net_cents)) - plataforma
+    if pool < 0:
+        pool = Decimal("0")
+
+    # Editora (se aplicável): 10/75 do pool restante.
     editora_cents = Decimal("0")
     editora_payout = None
     if publisher_id:
-        editora_cents = (net * EDITORA_RATE).to_integral_value(ROUND_DOWN)
+        editora_share = EDITORA_RATE / (Decimal("1") - rate)  # 0.10 / 0.75
+        editora_cents = (pool * editora_share).to_integral_value(ROUND_DOWN)
         editora_payout = {
             "perfil_id":   publisher_id,
             "valor_cents": int(editora_cents),
             "share_pct":   float(EDITORA_RATE * Decimal("100")),
         }
 
-    liquido_autores = net - plataforma - editora_cents
+    liquido_autores = pool - editora_cents
 
     payouts = []
     distribuido = Decimal("0")
@@ -367,7 +389,7 @@ def creditar_wallets_por_transacao(
         "SPLIT CALC: transacao=%s, net=%d, plano=%s, publisher_id=%s, coautorias=%d",
         transacao_id, net, plano, publisher_id, len(coautorias),
     )
-    split = _calcular_split_sobre_net(net, plano, coautorias, publisher_id=publisher_id)
+    split = _calcular_split_sobre_net(t["valor_cents"], net, plano, coautorias, publisher_id=publisher_id)
     logger.info(
         "SPLIT RESULT: plataforma=%d, editora=%d, liquido_autores=%d, payouts=%s",
         split["plataforma_cents"], split.get("editora_cents", 0),
@@ -654,7 +676,7 @@ def gerar_repasses_para_transacao(transacao_id: str) -> dict:
     coaut = sb.table("coautorias").select("perfil_id, share_pct").eq("obra_id", t["obra_id"]).execute()
     coautorias = coaut.data or [{"perfil_id": titular_id, "share_pct": 100}]
 
-    split = _calcular_split_sobre_net(net, plano, coautorias, publisher_id=publisher_id)
+    split = _calcular_split_sobre_net(t["valor_cents"], net, plano, coautorias, publisher_id=publisher_id)
 
     # Editora parceira (real): mesma lógica de "retido/enviado" dos coautores.
     enviados, retidos, falhas = 0, 0, 0

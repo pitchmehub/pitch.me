@@ -64,6 +64,14 @@ def completar_cadastro():
     cpf_encrypted = encrypt_pii(cpf)
     rg_encrypted = encrypt_pii(rg)
     
+    # Aceite obrigatório dos Termos de Uso (versão vigente)
+    termos_aceitos = bool(data.get("termos_aceitos"))
+    if not termos_aceitos:
+        abort(422, description="É necessário ler e aceitar os Termos de Uso para concluir o cadastro.")
+
+    from datetime import datetime as _dt
+    termos_versao = (data.get("termos_versao") or "2026-04").strip()[:32]
+
     fields = {
         "nome_completo":   nome_completo,
         "cpf":             cpf_encrypted,  # ENCRYPTED
@@ -76,6 +84,10 @@ def completar_cadastro():
         "endereco_uf":     (data.get("endereco_uf")     or "").strip().upper()[:2],
         "endereco_cep":    endereco_cep or None,
         "cadastro_completo": True,
+        "termos_aceitos":     True,
+        "termos_aceitos_em":  _dt.utcnow().isoformat() + "Z",
+        "termos_versao":      termos_versao,
+        "termos_aceitos_ip":  (request.headers.get("X-Forwarded-For", request.remote_addr) or "").split(",")[0].strip()[:64],
     }
 
     # Valida endereço mínimo

@@ -46,6 +46,10 @@ function validarRG(v) {
  return /^\d+$/.test(semFinalX)
 }
 
+// Versão atual dos Termos de Uso registrada no aceite do usuário.
+// Atualize ao lançar uma nova versão dos termos.
+const TERMOS_VERSAO_ATUAL = '2026-04'
+
 export default function CompletarCadastro() {
  const { perfil, refreshPerfil } = useAuth()
  const navigate = useNavigate()
@@ -63,6 +67,7 @@ export default function CompletarCadastro() {
   endereco_uf: perfil?.endereco_uf ?? '',
   endereco_cep: perfil?.endereco_cep ?? '',
  })
+ const [aceitouTermos, setAceitouTermos] = useState(false)
  const [salvando, setSalvando] = useState(false)
  const [erro, setErro] = useState('')
 
@@ -92,10 +97,18 @@ export default function CompletarCadastro() {
    setErro('RG inválido. Use apenas números (e o dígito X se houver), entre 5 e 14 caracteres.')
    return
   }
+  if (!aceitouTermos) {
+   setErro('Você precisa ler e aceitar os Termos de Uso para concluir o cadastro.')
+   return
+  }
 
   setSalvando(true)
   try {
-   await api.post('/perfis/me/completar', form)
+   await api.post('/perfis/me/completar', {
+    ...form,
+    termos_aceitos: true,
+    termos_versao:  TERMOS_VERSAO_ATUAL,
+   })
    await refreshPerfil()
    navigate('/descoberta')
   } catch (err) {
@@ -258,13 +271,45 @@ export default function CompletarCadastro() {
       </div>
      </div>
 
+     <div
+      className="card"
+      style={{
+       background: 'var(--surface-2, #F8FAFC)',
+       border: '1px solid var(--border, #E5E7EB)',
+       padding: 14,
+       marginBottom: 16,
+      }}
+     >
+      <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', fontSize: 14, lineHeight: 1.55 }}>
+       <input
+        type="checkbox"
+        checked={aceitouTermos}
+        onChange={(e) => setAceitouTermos(e.target.checked)}
+        style={{ marginTop: 3, width: 16, height: 16, flex: '0 0 16px', cursor: 'pointer' }}
+       />
+       <span style={{ color: 'var(--text-primary)' }}>
+        Li e concordo com os{' '}
+        <a
+         href="/termos"
+         target="_blank"
+         rel="noopener noreferrer"
+         style={{ color: 'var(--primary, #2563EB)', fontWeight: 600, textDecoration: 'underline' }}
+        >
+         Termos de Uso
+        </a>{' '}
+        da Gravan, ciente de que ela atua como marketplace e <b>não é parte</b> dos
+        contratos celebrados entre os usuários.
+       </span>
+      </label>
+     </div>
+
      {erro && (
       <div className="card" style={{ background: 'var(--error-bg)', border: '1px solid var(--error)', marginBottom: 16 }}>
        <p style={{ color: 'var(--error)', fontSize: 14 }}>{erro}</p>
       </div>
      )}
 
-     <button type="submit" className="btn btn-primary" disabled={salvando} style={{ width: '100%', fontSize: 15, padding: '12px 20px' }}>
+     <button type="submit" className="btn btn-primary" disabled={salvando || !aceitouTermos} style={{ width: '100%', fontSize: 15, padding: '12px 20px' }}>
       {salvando ? 'Salvando…' : '✓ Concluir cadastro'}
      </button>
     </form>
