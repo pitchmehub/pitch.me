@@ -21,7 +21,7 @@
   width: 42%;
   background:
     linear-gradient(180deg, rgba(9,9,11,0.55) 0%, rgba(9,9,11,0.75) 100%),
-    url('https://images.pexels.com/photos/32725048/pexels-photo-32725048.jpeg?auto=compress&cs=tinysrgb&w=1200') center / cover;
+    url('/hero-default.jpg') center / cover;
   border-right: 1px solid var(--border);
   pointer-events: none;
 }
