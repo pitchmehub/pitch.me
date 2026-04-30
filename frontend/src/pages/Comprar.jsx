@@ -232,8 +232,10 @@ export default function Comprar() {
  Gravação e Exploração de Obra Musical</b>, autorizando o licenciamento da
  obra <b>{obra.nome}</b> nas condições apresentadas
  ({eExclusiva ? 'exclusivo' : 'não exclusivo'}, vigência 5 anos
- {eExclusiva ? ' de exclusividade' : ' com renovação automática'},
- royalties ECAD 85/10/5, território Brasil, foro Rio de Janeiro/RJ).
+ {eExclusiva
+ ? ' de exclusividade (renovação somente por novo acordo escrito)'
+ : ' com renovação automática (rescisão por e-mail com 30 dias de antecedência ao fim do período)'},
+ royalties ECAD 85/10/5, território mundial, foro Rio de Janeiro/RJ).
  Ao clicar em "Pagar", minha assinatura eletrônica será registrada
  (MP 2.200-2/2001 e Lei 14.063/2020).
  </span>
