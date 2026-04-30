@@ -59,7 +59,8 @@ def recibo_mensal_json():
         abort(422, description=str(ve))
     except Exception as e:
         logger.exception("recibo-mensal: erro %s", e)
-        abort(500, description="Erro ao gerar recibo.")
+        # Inclui o tipo do erro pra acelerar diagnóstico no painel admin/logs.
+        abort(500, description=f"Erro ao gerar recibo ({type(e).__name__}: {str(e)[:160]}).")
     return jsonify(dados)
 
 
@@ -74,7 +75,7 @@ def recibo_mensal_pdf():
         abort(422, description=str(ve))
     except Exception as e:
         logger.exception("recibo-mensal/pdf: erro %s", e)
-        abort(500, description="Erro ao gerar PDF do recibo.")
+        abort(500, description=f"Erro ao gerar PDF do recibo ({type(e).__name__}: {str(e)[:160]}).")
 
     filename = f"recibo-gravan-{ano:04d}-{mes:02d}.pdf"
     return send_file(

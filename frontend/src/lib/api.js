@@ -22,15 +22,21 @@ async function request(method, path, { body, isFormData = false } = {}) {
   if (!isFormData && body !== undefined) headers['Content-Type'] = 'application/json'
 
   let res
+  const fullUrl = `${BASE}${path}`
   try {
-    res = await fetch(`${BASE}${path}`, {
+    res = await fetch(fullUrl, {
       method,
       headers,
       body: isFormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
       credentials: 'omit', // Não enviamos cookies — usamos JWT apenas
     })
   } catch (e) {
-    throw new Error('Servidor inacessível. Verifique se o backend está rodando.')
+    // Loga o detalhe técnico no console pra facilitar diagnóstico
+    // (CSP bloqueando, CORS, DNS, certificado, etc).
+    // eslint-disable-next-line no-console
+    console.error('[api] fetch falhou', { url: fullUrl, base: BASE, motivo: e?.message, erro: e })
+    const detalhe = e?.message ? ` (${e.message})` : ''
+    throw new Error(`Servidor inacessível${detalhe}. Verifique conexão, CSP do navegador e o backend.`)
   }
 
   // Sessão expirada: força logout e redirect
