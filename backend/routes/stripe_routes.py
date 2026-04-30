@@ -256,7 +256,8 @@ def webhook():
             event = stripe.Webhook.construct_event(payload, signature, WEBHOOK_SECRET)
             event_type = event["type"]
             obj = event["data"]["object"]
-            logger.info(f"Webhook validado: {event_type}")
+            event_id = event.get("id") if isinstance(event, dict) else getattr(event, "id", None)
+            logger.info(f"Webhook validado: {event_type} (id={event_id})")
             
         elif is_dev:
             # Dev sem secret: valida origem local APENAS
@@ -267,6 +268,7 @@ def webhook():
             event = json.loads(payload)
             event_type = event.get("type", "")
             obj = event.get("data", {}).get("object", {})
+            event_id = event.get("id")
             logger.warning(f"Webhook DEV sem validação HMAC: {event_type}")
         else:
             abort(500, description="Configuração de webhook inválida.")
@@ -282,6 +284,27 @@ def webhook():
         abort(400, description="Erro ao processar webhook.")
 
     sb = get_supabase()
+
+    # ════════════════════════════════════════════════════════════════
+    # IDEMPOTÊNCIA FORTE — Regra 7 do Ledger
+    # Tenta INSERIR o event_id na tabela stripe_events_processados.
+    # Se já existir (PRIMARY KEY violation), descarta sem processar.
+    # Garante que webhook chegando 2× nunca duplica crédito.
+    # ════════════════════════════════════════════════════════════════
+    if event_id:
+        try:
+            sb.table("stripe_events_processados").insert({
+                "event_id": event_id,
+                "type":     event_type,
+                "status":   "recebido",
+            }).execute()
+        except Exception as e:
+            # PostgREST devolve 409 quando viola PRIMARY KEY → já processado
+            msg = str(e).lower()
+            if "duplicate" in msg or "23505" in msg or "conflict" in msg or "already exists" in msg:
+                logger.info("Webhook duplicado ignorado: %s (%s)", event_id, event_type)
+                return jsonify({"received": True, "duplicate": True}), 200
+            logger.warning("Falha ao registrar event_id %s (segue mesmo assim): %s", event_id, e)
 
     # Processa eventos
     if event_type == "checkout.session.completed":

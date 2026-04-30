@@ -20,6 +20,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Mascara o Server header injetado pelo gunicorn (defesa contra fingerprinting).
+# Precisa ser feito ANTES do gunicorn iniciar a serializar respostas.
+try:
+    import gunicorn  # type: ignore
+    gunicorn.SERVER_SOFTWARE = "Gravan"
+except Exception:
+    pass
+
 _sentry_dsn = os.getenv("SENTRY_DSN_BACKEND")
 if _sentry_dsn:
     sentry_sdk.init(
@@ -161,22 +169,40 @@ def create_app() -> Flask:
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
             "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net",
-            "img-src 'self' data: blob: https:",
+            "img-src 'self' data: blob: https://*.supabase.co https://*.stripe.com",
             "media-src 'self' blob: https://*.supabase.co",
-            "connect-src 'self' https://*.supabase.co https://api.stripe.com",
+            "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com",
             "frame-src 'self' https://js.stripe.com",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",
             "frame-ancestors 'none'",
             "upgrade-insecure-requests",
+            "report-uri /api/csp-report",
         ]
         response.headers["Content-Security-Policy"] = "; ".join(csp_directives)
+        response.headers["Reporting-Endpoints"] = 'csp-endpoint="/api/csp-report"'
 
-        response.headers.pop("Server", None)
+        # Remove fingerprinting headers expostos pela infra (gunicorn/Render/Vercel)
+        for h in ("Server", "X-Powered-By", "X-Render-Origin-Server", "X-Vercel-Id", "Via"):
+            response.headers.pop(h, None)
         response.headers["Server"] = "Gravan"
 
         return response
+
+    # ═══════════════════════════════════════════════════════════
+    # CSP report-uri (recebe violations do navegador, loga e descarta)
+    # ═══════════════════════════════════════════════════════════
+    @app.route("/api/csp-report", methods=["POST"])
+    @csrf.exempt
+    @limiter.limit("60 per minute")
+    def csp_report():
+        try:
+            payload = request.get_json(silent=True, force=True) or {}
+            app.logger.warning("CSP-VIOLATION %s", payload)
+        except Exception:
+            pass
+        return ("", 204)
 
     # ═══════════════════════════════════════════════════════════
     # BLUEPRINTS

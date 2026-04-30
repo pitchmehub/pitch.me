@@ -51,11 +51,13 @@ def _user_tem_acesso(sb, contract_id: str, user_id: str) -> dict | None:
 
 
 @contratos_lic_bp.route("/templates", methods=["GET"])
+@limiter.limit("60 per hour")
 def templates():
     """Público — devolve os textos integrais dos templates de contrato
     realmente usados na geração final. Permite que telas de pré-visualização
     (Comprar, Aceitar Oferta, Modal de Edição) exibam o contrato completo
-    antes da assinatura."""
+    antes da assinatura. Os templates são modelos públicos e não contêm
+    dados sensíveis. Rate-limit aplicado para evitar scraping em massa."""
     sb = get_supabase()
     edicao = ""
     try:

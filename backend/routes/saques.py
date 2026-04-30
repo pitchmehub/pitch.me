@@ -192,18 +192,22 @@ def cancelar_app(saque_id):
 
 # ──────────────────────────────────────────────────────────
 # 5. Cancelamento via link público "Não fui eu"
+#    Rate-limit forte por IP — endpoint público sem auth
 # ──────────────────────────────────────────────────────────
 @saques_bp.route("/cancelar-por-token", methods=["POST"])
+@limiter.limit("10 per minute; 60 per hour")
 def cancelar_token():
     data = request.get_json(silent=True) or {}
     token  = (data.get("token") or "").strip()
     motivo = (data.get("motivo") or "Não fui eu (cancelado via link no e-mail)")[:300]
+    if not token or len(token) < 16 or len(token) > 256:
+        abort(422, description="Token inválido.")
     try:
         r = cancelar_por_token(token, motivo)
     except ValueError as e:
         abort(422, description=str(e))
     log_event("saque.cancelado", entity_type="saque", entity_id=r["saque_id"],
-              metadata={"motivo": motivo, "via": "token_email"},
+              metadata={"motivo": motivo, "via": "token_email", "ip": _ip()},
               user_id=None)
     return jsonify(r), 200
 
