@@ -6,9 +6,10 @@ Rotas para perfil EDITORA (role='publisher').
 - GET  /api/publishers/dashboard          agregado: obras, contratos, faturamento
 - GET  /api/publishers/lookup-by-email    verifica se um e-mail é editora cadastrada
 """
+import io
 import logging
 
-from flask import Blueprint, request, jsonify, g, abort
+from flask import Blueprint, request, jsonify, g, abort, send_file
 
 from middleware.auth import require_auth
 from db.supabase_client import get_supabase
@@ -481,3 +482,80 @@ def obras_gerenciadas():
         })
 
     return jsonify(resultado)
+
+
+# ════════════════════════════════════════════════════════════════════
+# BULK UPLOAD DE OBRAS PELA EDITORA
+# ════════════════════════════════════════════════════════════════════
+@publishers_bp.get("/bulk-upload/template")
+@require_auth
+def bulk_upload_template():
+    """Baixa o template CSV de bulk upload (UTF-8 com BOM)."""
+    sb = get_supabase()
+    me = sb.table("perfis").select("role").eq("id", g.user.id).single().execute()
+    if not me.data or me.data.get("role") != "publisher":
+        abort(403, description="Apenas editoras.")
+
+    from services.bulk_obras import gerar_csv_template
+    csv_bytes = gerar_csv_template()
+    return send_file(
+        io.BytesIO(csv_bytes),
+        mimetype="text/csv; charset=utf-8",
+        as_attachment=True,
+        download_name="gravan-bulk-obras-template.csv",
+    )
+
+
+@publishers_bp.post("/bulk-upload")
+@require_auth
+def bulk_upload():
+    """
+    Recebe um .zip (multipart, campo 'arquivo') contendo CSV + .mp3s
+    e processa cadastrando as obras em nome dos titulares agregados.
+    Retorna o relatório com criadas[] e erros[].
+    """
+    sb = get_supabase()
+    me = (sb.table("perfis")
+            .select("role, cadastro_completo")
+            .eq("id", g.user.id)
+            .single()
+            .execute()).data
+    if not me or me.get("role") != "publisher":
+        abort(403, description="Apenas editoras podem usar o upload em massa.")
+    if not me.get("cadastro_completo"):
+        abort(422, description="Complete o cadastro da editora antes de usar o upload em massa.")
+
+    if "arquivo" not in request.files:
+        abort(422, description="Campo 'arquivo' (.zip) é obrigatório.")
+    f = request.files["arquivo"]
+    nome = (f.filename or "").lower()
+    if not nome.endswith(".zip"):
+        abort(422, description="Envie um arquivo .zip contendo o CSV e os MP3s.")
+
+    zip_bytes = f.read()
+
+    from services.bulk_obras import processar_zip
+    try:
+        relatorio = processar_zip(str(g.user.id), zip_bytes)
+    except ValueError as ve:
+        abort(422, description=str(ve))
+    except Exception as e:
+        logger.exception("bulk-upload: erro inesperado %s", e)
+        abort(500, description="Erro ao processar o upload em massa.")
+
+    try:
+        log_event(
+            action="publisher.bulk_upload",
+            entity_type="publisher",
+            entity_id=str(g.user.id),
+            metadata={
+                "criadas": len(relatorio.get("criadas") or []),
+                "erros": len(relatorio.get("erros") or []),
+                "total_csv": relatorio.get("total_csv"),
+            },
+            user_id=str(g.user.id),
+        )
+    except Exception:
+        pass
+
+    return jsonify(relatorio)

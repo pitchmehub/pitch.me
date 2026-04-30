@@ -540,6 +540,8 @@ export default function PublisherDashboard() {
  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
  <Link to="/agregados" className="btn btn-primary">Gerir agregados</Link>
  <Link to="/obras/nova" className="btn btn-ghost">Cadastrar nova obra</Link>
+ <Link to="/editora/bulk-upload" className="btn btn-ghost">Upload em massa</Link>
+ <Link to="/financeiro" className="btn btn-ghost">Recibos fiscais</Link>
  <Link to="/contratos" className="btn btn-ghost">Ver contratos</Link>
  </div>
  </div>

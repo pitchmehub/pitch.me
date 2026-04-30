@@ -233,6 +233,8 @@ def create_app() -> Flask:
     app.register_blueprint(contratos_lic_module.contratos_lic_bp, url_prefix="/api/contratos/licenciamento")
     app.register_blueprint(publishers_bp)
     app.register_blueprint(agregados_bp)
+    from routes.financeiro import financeiro_bp
+    app.register_blueprint(financeiro_bp)
     app.register_blueprint(contratos_edicao_bp)
     app.register_blueprint(notificacoes_bp, url_prefix="/api/notificacoes")
     from routes.push import push_bp

@@ -189,6 +189,13 @@ export const IconDownload = ({ size }) => (
   </svg>
 )
 
+export const IconUpload = ({ size }) => (
+  <svg {...base(size)}>
+    <path d="M12 20V8M7 13l5-5 5 5" />
+    <path d="M5 4h14" />
+  </svg>
+)
+
 export const IconLock = ({ size }) => (
   <svg {...base(size)}>
     <rect x="5" y="11" width="14" height="10" rx="1.6" />

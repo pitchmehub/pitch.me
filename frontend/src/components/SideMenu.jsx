@@ -7,7 +7,7 @@ import {
   IconCompass, IconGrid, IconMusic, IconPlus, IconChart, IconDocument,
   IconWallet, IconTag, IconStar, IconBag, IconShield, IconEdit,
   IconFolder, IconBuilding, IconLayers, IconUser, IconLogout,
-  IconChevronUp, IconChevronDown, IconMore, IconBell,
+  IconChevronUp, IconChevronDown, IconMore, IconBell, IconUpload,
 } from './Icons'
 import './SideMenu.css'
 
@@ -21,6 +21,7 @@ const NAV_ITEMS = {
  { to: '/contratos', Icon: IconDocument, label: 'Meus contratos' },
  { to: '/vendas', Icon: IconBag, label: 'Vendas' },
  { to: '/saques', Icon: IconWallet, label: 'Saques' },
+ { to: '/financeiro', Icon: IconDocument, label: 'Recibos fiscais' },
  { to: '/ofertas', Icon: IconTag, label: 'Ofertas' },
  { to: '/notificacoes', Icon: IconBell, label: 'Notificações' },
  { to: '/planos', Icon: IconStar, label: 'Planos' },
@@ -50,11 +51,13 @@ const NAV_ITEMS = {
  { to: '/editora/dashboard', Icon: IconGrid, label: 'Dashboard' },
  { to: '/agregados', Icon: IconLayers, label: 'Agregados' },
  { to: '/obras/nova', Icon: IconPlus, label: 'Nova obra' },
+ { to: '/editora/bulk-upload', Icon: IconUpload, label: 'Upload em massa' },
  { to: '/obras', Icon: IconMusic, label: 'Obras' },
  { to: '/contratos', Icon: IconDocument, label: 'Contratos' },
  { to: '/ofertas', Icon: IconTag, label: 'Ofertas' },
  { to: '/vendas', Icon: IconBag, label: 'Vendas' },
  { to: '/saques', Icon: IconWallet, label: 'Saques' },
+ { to: '/financeiro', Icon: IconDocument, label: 'Recibos fiscais' },
  { to: '/notificacoes', Icon: IconBell, label: 'Notificações' },
  { to: '/descoberta', Icon: IconCompass, label: 'Descoberta' },
  ],

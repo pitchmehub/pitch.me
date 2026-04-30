@@ -33,6 +33,8 @@ import AdminLanding  from './pages/AdminLanding'
 import AdminVerComo  from './pages/AdminVerComo'
 import CadastroEditora    from './pages/CadastroEditora'
 import PublisherDashboard from './pages/PublisherDashboard'
+import BulkUploadObras    from './pages/BulkUploadObras'
+import Financeiro         from './pages/Financeiro'
 import Agregados          from './pages/Agregados'
 import Convites           from './pages/Convites'
 import Notificacoes       from './pages/Notificacoes'
@@ -195,8 +197,10 @@ function AppRoutes() {
       {/* Editora */}
       <Route path="/editora/cadastro"  element={<PrivateRoute><AppShell><CadastroEditora /></AppShell></PrivateRoute>} />
       <Route path="/editora/dashboard" element={<PrivateRoute roles={['publisher','administrador']}><AppShell><PublisherDashboard /></AppShell></PrivateRoute>} />
+      <Route path="/editora/bulk-upload" element={<PrivateRoute roles={['publisher','administrador']}><AppShell><BulkUploadObras /></AppShell></PrivateRoute>} />
       <Route path="/editora/aceitar-oferta/:token" element={<AceitarOferta />} />
       <Route path="/agregados"         element={<PrivateRoute roles={['publisher','administrador']}><AppShell><Agregados /></AppShell></PrivateRoute>} />
+      <Route path="/financeiro"        element={<PrivateRoute roles={['compositor','publisher','administrador']}><AppShell><Financeiro /></AppShell></PrivateRoute>} />
       <Route path="/convites"          element={<PrivateRoute><AppShell><Convites /></AppShell></PrivateRoute>} />
       <Route path="/notificacoes"      element={<PrivateRoute><AppShell><Notificacoes /></AppShell></PrivateRoute>} />
 

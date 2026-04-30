@@ -1,5 +1,44 @@
 # Gravan — Marketplace de Obras Musicais
 
+### Recibo Fiscal Mensal + Bulk Upload da Editora (abr/2026)
+- **Recibo fiscal mensal** para compositores e editoras: novo serviço
+  `backend/services/recibo_fiscal.py` agrega `pagamentos_compositores`
+  por mês (mesma fonte canônica usada pelo dashboard) e gera tanto JSON
+  quanto PDF (ReportLab, mesmo padrão de `contrato_pdf.py`). Os
+  totais incluem bruto creditado no mês, fees informativos (25%
+  plataforma + 5% exploração comercial) e o acumulado YTD. O documento
+  é informativo — a apuração tributária e a emissão de NFS-e ficam
+  com o beneficiário.
+- **Rotas**: `backend/routes/financeiro.py` registrado em `app.py`:
+  `GET /api/financeiro/recibos-mensais` lista meses com renda > 0;
+  `GET /api/financeiro/recibo-mensal?ano&mes` retorna JSON;
+  `GET /api/financeiro/recibo-mensal/pdf?ano&mes` faz download do PDF.
+- **Frontend**: nova página `frontend/src/pages/Financeiro.jsx` em
+  `/financeiro` (compositor, publisher, administrador) com lista de
+  meses + visualização do recibo + botão "Baixar PDF". Link adicionado
+  no `SideMenu` (compositor e publisher) e no `PublisherDashboard`.
+- **Bulk upload de obras pela editora**: novo serviço
+  `backend/services/bulk_obras.py` que aceita um `.zip` contendo um
+  CSV (UTF-8 com BOM) + arquivos `.mp3`. Para cada linha do CSV,
+  reusa `services.obras.ObraService.criar_obra` em nome do titular
+  (que precisa ser agregado da editora — match por CPF/email),
+  vincula `publisher_id` e dispara `services.contrato_publisher.
+  gerar_contrato_edicao` (autor↔editora). Limites: 200 MB / 200 obras
+  por upload. Erros são reportados linha-a-linha e não derrubam o
+  processamento das demais.
+- **Rotas**: adicionadas em `backend/routes/publishers.py`:
+  `GET /api/publishers/bulk-upload/template` baixa CSV exemplo;
+  `POST /api/publishers/bulk-upload` recebe ZIP (multipart `arquivo`)
+  e devolve `{criadas[], erros[], total_csv}`.
+- **Frontend**: nova página `frontend/src/pages/BulkUploadObras.jsx`
+  em `/editora/bulk-upload` (publisher, administrador) com instruções,
+  download do template, drag&drop do .zip e tabela de resultados.
+  Link em `SideMenu` (publisher) e botão no `PublisherDashboard`.
+- **Testes**: `backend/tests/test_bulk_obras_parsers.py` (16 testes)
+  cobre os parsers puros (preço, coautores, CPF, resolução de
+  titular) e validações de ZIP. Os 10 testes anti-regressão de
+  contrato continuam verdes.
+
 ### Escrow Real — Assinatura Manual + Bug do Split da Editora (abr/2026)
 - **Modelo de assinatura mudou para MANUAL REAL**: autores, coautores e editora-mãe
   agora são inseridos em `contract_signers` com `signed=False, signed_at=None`. Cada
@@ -203,4 +242,6 @@ Todos os blueprints registrados com prefixo `/api/*`:
 - `/api/assinatura` — Assinaturas
 - `/api/favoritos` — Favoritos
 - `/api/ai` — Transcrição (Whisper) e geração de capas (Pollinations.ai)
+- `/api/financeiro` — Recibo fiscal mensal (JSON e PDF) p/ compositor e editora
+- `/api/publishers/bulk-upload` — Upload em massa de obras pela editora (ZIP)
 - `/api/health` — Health check
