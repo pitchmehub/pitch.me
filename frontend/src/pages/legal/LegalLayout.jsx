@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
 
 const Section = ({ n, title, children }) => (
   <section style={{ marginBottom: 32 }}>
@@ -20,6 +21,25 @@ const Bullet = ({ children }) => (
 )
 
 export function LegalLayout({ eyebrow, title, lastUpdate, children, active }) {
+  const { user } = useAuth()
+
+  // Onde "Voltar" deve levar o usuário:
+  // - Logado: tenta a última rota visitada (ex.: /perfil/completar) ou cai em /descoberta.
+  // - Deslogado: volta para a Landing (/).
+  let voltarTo = '/'
+  let voltarLabel = '← Voltar ao site'
+  if (user) {
+    voltarTo = '/descoberta'
+    voltarLabel = '← Voltar ao app'
+    try {
+      const ultima = localStorage.getItem('gravan_last_route')
+      const base = (ultima || '').split('?')[0]
+      const ignorar = ['/', '/login', '/termos', '/privacidade', '/direitos-autorais', '/redefinir-senha']
+      if (ultima && !ignorar.includes(base)) voltarTo = ultima
+    } catch { /* noop */ }
+  }
+  const logoTo = user ? '/descoberta' : '/'
+
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <nav style={{
@@ -30,14 +50,14 @@ export function LegalLayout({ eyebrow, title, lastUpdate, children, active }) {
           maxWidth: 1080, margin: '0 auto', padding: '18px 32px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          <Link to="/" style={{
+          <Link to={logoTo} style={{
             fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700,
             fontSize: 18, color: 'var(--text-primary)', textDecoration: 'none',
             letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 10,
           }}>
             <span style={{ color: 'var(--brand)', fontSize: 10 }}>●</span> Gravan
           </Link>
-          <Link to="/" className="btn btn-ghost" style={{ fontSize: 12 }}>← Voltar ao site</Link>
+          <Link to={voltarTo} className="btn btn-ghost" style={{ fontSize: 12 }}>{voltarLabel}</Link>
         </div>
       </nav>
 
