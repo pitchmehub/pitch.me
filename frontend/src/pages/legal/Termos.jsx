@@ -6,7 +6,7 @@ export default function Termos() {
     <LegalLayout
       eyebrow="Termos de Uso"
       title="Termos de Uso da Gravan"
-      lastUpdate="Versão 2026-04 — Abril de 2026"
+      lastUpdate="Versão 2026-04.2 — Abril de 2026"
       active="/termos"
     >
       <div style={{
@@ -128,13 +128,28 @@ export default function Termos() {
         <ul style={{ marginTop: 10 }}>
           <Bullet>Possui <b>todos os direitos necessários</b> sobre a Obra (autorais, conexos, fonográficos, de imagem etc.) ou autorização expressa de quem os possui;</Bullet>
           <Bullet>A Obra <b>não infringe direitos de terceiros</b>, marcas, patentes, segredos comerciais ou qualquer outra norma aplicável;</Bullet>
-          <Bullet>Possui <b>autorização de todos os envolvidos</b> (coautores, intérpretes, produtores, detentores de direitos conexos) para disponibilizar a Obra na Plataforma e celebrar contratos a respeito dela;</Bullet>
-          <Bullet>Os percentuais de coautoria (<i>share_pct</i>) cadastrados refletem acordo real entre as partes envolvidas.</Bullet>
+          <Bullet>Possui <b>autorização de todos os envolvidos</b> (coautores, intérpretes, produtores, detentores de direitos conexos) para que a Obra seja disponibilizada na Plataforma e licenciada a terceiros;</Bullet>
+          <Bullet>A relação de <b>coautores informada no cadastro</b> é verdadeira, completa e reflete fielmente todos os autores da Obra, sem omissão de qualquer participante.</Bullet>
         </ul>
+        <p style={{ marginTop: 14, padding: '12px 14px',
+          background: 'var(--surface-2, #F8FAFC)',
+          border: '1px solid var(--border, #E5E7EB)', borderRadius: 8,
+          fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+          <b>Split automático e pró rata:</b> a Plataforma <b>não permite</b>{' '}
+          que o Usuário defina percentuais individuais de coautoria. A divisão
+          da fatia destinada aos autores é feita <b>automaticamente, em partes
+          iguais (pró rata)</b> entre todos os coautores cadastrados na Obra,
+          como forma de <b>valorizar igualmente cada autor</b> e prevenir
+          desigualdades, conflitos internos e práticas abusivas. Ao publicar
+          a Obra, o Usuário declara estar ciente e de acordo com essa regra,
+          que se aplica a todas as Obras da Plataforma sem exceção. Detalhes
+          do cálculo estão na Cláusula 9.
+        </p>
         <p style={{ marginTop: 14 }}>
-          O <b>Usuário é integralmente responsável pelo conteúdo publicado</b>.
-          A Gravan não verifica titularidade nem realiza juízo editorial sobre
-          o conteúdo cadastrado.
+          O <b>Usuário é integralmente responsável pelo conteúdo publicado</b>{' '}
+          e pela exatidão da relação de coautores. A Gravan não verifica
+          titularidade nem realiza juízo editorial sobre o conteúdo
+          cadastrado.
         </p>
       </Section>
 
@@ -192,25 +207,58 @@ export default function Termos() {
         </p>
       </Section>
 
-      <Section n="9" title="Sistema de split">
-        A divisão de receitas entre múltiplos Usuários (autores, coautores e
-        editora vinculada) opera da seguinte forma a cada venda:
+      <Section n="9" title="Sistema de split (automático e pró rata)">
+        A divisão de receitas a cada venda é executada de forma{' '}
+        <b>integralmente automatizada</b> pela Plataforma, em três etapas, na
+        seguinte ordem:
         <ul style={{ marginTop: 10 }}>
-          <Bullet><b>Gravan</b> (na qualidade de Plataforma — Cláusula 3.1): 25% do valor bruto;</Bullet>
-          <Bullet><b>Editora</b> (quando o titular é agregado a uma editora): 10/75 do pool restante. A posição de editora pode ser ocupada por uma <b>editora terceira</b> ou pela <b>Gravan Editora</b> (Cláusula 3.2), conforme identificado no contrato editorial da Obra;</Bullet>
-          <Bullet><b>Autores e coautores</b>: o restante do pool, distribuído conforme os percentuais (<i>share_pct</i>) cadastrados na Obra.</Bullet>
+          <Bullet><b>1ª etapa — Gravan (Plataforma):</b> 25% do valor bruto da transação, conforme a Cláusula 8 e a Cláusula 3.1.</Bullet>
+          <Bullet><b>2ª etapa — Editora vinculada (quando houver):</b> 10/75 do pool restante (equivalente a 10% do valor bruto). A posição de editora pode ser ocupada por uma <b>editora terceira</b> ou pela <b>Gravan Editora</b> (Cláusula 3.2), conforme identificado no contrato editorial da Obra. Quando não há editora vinculada, esta etapa não se aplica e o pool segue integralmente para a etapa seguinte.</Bullet>
+          <Bullet><b>3ª etapa — Autores e coautores (pró rata obrigatório):</b> o saldo remanescente é dividido <b>automaticamente em partes iguais</b> entre todos os coautores cadastrados na Obra, sem exceção.</Bullet>
         </ul>
-        <p style={{ marginTop: 14 }}>
-          Os percentuais de coautoria (<i>share_pct</i>) são <b>definidos
-          pelos próprios Usuários</b> no momento do cadastro da Obra e devem
-          refletir <b>acordos reais</b> celebrados entre as partes envolvidas.
+
+        <p style={{ marginTop: 16, padding: '12px 14px',
+          background: 'var(--surface-2, #F8FAFC)',
+          border: '1px solid var(--border, #E5E7EB)', borderRadius: 8,
+          fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+          <b>Regra do pró rata (cláusula essencial):</b> a divisão entre
+          autores é <b>obrigatoriamente igualitária</b> e <b>não pode ser
+          alterada</b> pelo titular, pelos coautores ou por qualquer outro
+          Usuário. A Plataforma <b>não disponibiliza</b> mecanismo para
+          atribuir percentuais individuais distintos. Essa regra existe para{' '}
+          <b>valorizar de forma equânime cada autor</b> da Obra, prevenir
+          conflitos internos sobre divisão e impedir práticas que
+          desequilibrem a remuneração entre coautores. A regra se aplica a{' '}
+          <b>todas as Obras da Plataforma</b>, em ambos os planos
+          (STARTER e PRO), sem possibilidade de personalização ou negociação.
         </p>
+
         <p style={{ marginTop: 14 }}>
-          <b>A Gravan NÃO se responsabiliza por disputas internas de divisão
-          entre coautores, intérpretes ou editoras</b>, nem por percentuais
-          incorretos cadastrados pelos próprios Usuários. A Plataforma
-          executa a divisão estritamente conforme os percentuais informados
-          pelo titular no cadastro.
+          <b>Exemplo prático:</b> em uma venda de R$ 1.000,00 com 4 coautores
+          e sem editora vinculada — a Gravan retém R$ 250,00 (25%) e os R$
+          750,00 restantes são divididos em partes iguais entre os 4
+          coautores, totalizando <b>R$ 187,50 para cada</b>. Se houver
+          editora vinculada, a editora recebe R$ 100,00 (10/75 do pool
+          restante) e os R$ 650,00 são divididos em R$ 162,50 para cada
+          coautor.
+        </p>
+
+        <p style={{ marginTop: 14 }}>
+          <b>Inclusão e remoção de coautores:</b> a alteração da relação de
+          coautores de uma Obra após o cadastro inicial requer o aceite de{' '}
+          <b>todos os coautores envolvidos</b> via fluxo eletrônico próprio
+          da Plataforma (registro probatório com data, hora UTC, IP e
+          versão dos termos), e <b>não retroage</b> a vendas já realizadas.
+        </p>
+
+        <p style={{ marginTop: 14 }}>
+          <b>A Gravan NÃO se responsabiliza por disputas internas</b>{' '}
+          referentes à composição de coautoria informada pelos próprios
+          Usuários (ex.: inclusão indevida ou omissão de coautor), nem por
+          divergências sobre a contribuição relativa de cada autor à Obra.
+          A Plataforma executa a divisão estritamente conforme a regra
+          pró rata acima, com base na lista de coautores cadastrada e
+          aceita por todos os envolvidos.
         </p>
       </Section>
 
