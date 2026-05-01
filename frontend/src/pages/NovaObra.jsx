@@ -25,6 +25,7 @@ export default function NovaObra() {
  const [letra, setLetra] = useState('')
  const [genero, setGenero] = useState('')
  const [preco, setPreco] = useState('')
+ const [tipoGravacao, setTipoGravacao] = useState('')
  const [audioFile, setAudioFile] = useState(null)
  const [audioError, setAudioError] = useState('')
 
@@ -195,6 +196,7 @@ export default function NovaObra() {
  if (!editoraTEmail.trim()) { setError('Informe o e-mail da editora terceira.'); return }
  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(editoraTEmail.trim())) { setError('E-mail da editora terceira inválido.'); return }
  }
+ if (!tipoGravacao) { setError('Selecione o tipo de gravação da composição.'); return }
  if (!termosAceitos) { setError('Você precisa aceitar os Termos de Uso.'); return }
  if (obraEditada === false && !contratoAceito) { setError('Você precisa assinar o Contrato de Edição.'); return }
 
@@ -222,6 +224,7 @@ export default function NovaObra() {
  form.append('editora_terceira_email', editoraTEmail.trim().toLowerCase())
  form.append('editora_terceira_telefone', editoraTTelefone.trim())
  }
+ if (tipoGravacao) form.append('tipo_gravacao', tipoGravacao)
  form.append('coautorias', JSON.stringify(coautorias))
 
  await api.upload('/obras/', form)
@@ -291,6 +294,44 @@ export default function NovaObra() {
  Transcrição local pode levar de 30 segundos a 2 minutos. Você poderá editar o texto depois.
  </small>
  )}
+ </div>
+
+ {/* Tipo de gravação */}
+ <div className="form-group" style={{ marginBottom: 16 }}>
+  <label className="form-label">Tipo de gravação *</label>
+  <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
+   {[
+    { value: 'voz_violao', label: '🎸 Voz e Violão' },
+    { value: 'demo_guia',  label: '🎵 Demo (Guia)' },
+   ].map(op => (
+    <button
+     key={op.value}
+     type="button"
+     onClick={() => setTipoGravacao(op.value)}
+     style={{
+      flex: 1,
+      padding: '10px 14px',
+      borderRadius: 10,
+      border: tipoGravacao === op.value
+       ? '2px solid var(--brand)'
+       : '2px solid var(--border)',
+      background: tipoGravacao === op.value
+       ? 'var(--brand-light, #EFF6FF)'
+       : 'var(--surface)',
+      color: tipoGravacao === op.value ? 'var(--brand)' : 'var(--text-secondary)',
+      fontWeight: tipoGravacao === op.value ? 700 : 500,
+      fontSize: 14,
+      cursor: 'pointer',
+      transition: 'all .15s',
+     }}
+    >
+     {op.label}
+    </button>
+   ))}
+  </div>
+  <small style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 4, display: 'block' }}>
+   Indica ao comprador o formato da gravação enviada.
+  </small>
  </div>
 
  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>

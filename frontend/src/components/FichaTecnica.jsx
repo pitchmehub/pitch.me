@@ -103,11 +103,21 @@ export default function FichaTecnica({ obra, onClose }) {
         </div>
 
         <div className="ft-titulo">
-          <div className="dc-modal-genre">
+          <div className="dc-modal-genre" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
             {obra.genero || 'Composição'}
+            {obra.tipo_gravacao && (
+              <span style={{
+                padding: '2px 9px', borderRadius: 99,
+                background: obra.tipo_gravacao === 'voz_violao' ? '#0C447C' : '#1D6A3E',
+                color: '#fff', fontSize: 11, fontWeight: 700,
+                letterSpacing: 0.4,
+              }}>
+                {obra.tipo_gravacao === 'voz_violao' ? '🎸 Voz e Violão' : '🎵 Demo (Guia)'}
+              </span>
+            )}
             {isExclusiva && (
               <span style={{
-                marginLeft: 8, padding: '2px 8px', borderRadius: 99,
+                padding: '2px 8px', borderRadius: 99,
                 background: '#7c3aed', color: '#fff', fontSize: 11, fontWeight: 700,
                 letterSpacing: 0.4, textTransform: 'uppercase',
               }}>

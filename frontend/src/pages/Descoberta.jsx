@@ -80,6 +80,16 @@ function ObraCard({ obra, onPlay, onShowFicha, onExpand, isPlaying, isActive, on
  <div style={{ minWidth: 0, flex: 1 }}>
  <div className="dc-card-nome">{obra.nome}</div>
  <div className="dc-card-autor">{obra.titular_nome}{obra.genero ? ` · ${obra.genero}` : ''}</div>
+ {obra.tipo_gravacao && (
+  <span style={{
+   display: 'inline-block', marginTop: 4,
+   padding: '1px 7px', borderRadius: 99, fontSize: 10, fontWeight: 700,
+   background: obra.tipo_gravacao === 'voz_violao' ? '#DBEAFE' : '#D1FAE5',
+   color:      obra.tipo_gravacao === 'voz_violao' ? '#1D4ED8' : '#065F46',
+  }}>
+   {obra.tipo_gravacao === 'voz_violao' ? '🎸 Voz e Violão' : '🎵 Demo (Guia)'}
+  </span>
+ )}
  </div>
  <div onClick={e => e.stopPropagation()}>
  <BotaoCurtir obraId={obra.id} size={16} />

@@ -36,12 +36,13 @@ class ObraService:
         preco_cents: int,
         audio_bytes: bytes,
         coautorias: list,
-        termos_aceitos: bool = False,  # [{perfil_id, share_pct}]
+        termos_aceitos: bool = False,
         obra_editada_terceiros: bool = False,
         editora_terceira_nome: str | None = None,
         editora_terceira_email: str | None = None,
         editora_terceira_telefone: str | None = None,
         editora_terceira_id: str | None = None,
+        tipo_gravacao: str | None = None,
     ) -> dict:
         """
         Fluxo completo de cadastro:
@@ -104,6 +105,7 @@ class ObraService:
                 "editora_terceira_email":    (editora_terceira_email or "").lower() if obra_editada_terceiros else None,
                 "editora_terceira_telefone": editora_terceira_telefone if obra_editada_terceiros else None,
                 "editora_terceira_id":       editora_terceira_id if obra_editada_terceiros else None,
+                "tipo_gravacao":             tipo_gravacao or None,
             })
             .execute()
         )

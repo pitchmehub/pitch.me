@@ -138,6 +138,11 @@ def criar_obra():
     if not obra_editada and not contrato_aceito:
         abort(422, description="Você precisa assinar o Contrato de Edição para prosseguir.")
 
+    TIPOS_GRAVACAO_VALIDOS = {"voz_violao", "demo_guia"}
+    tipo_gravacao = (request.form.get("tipo_gravacao") or "").strip() or None
+    if tipo_gravacao and tipo_gravacao not in TIPOS_GRAVACAO_VALIDOS:
+        tipo_gravacao = None
+
     service = ObraService()
     obra = service.criar_obra(
         titular_id=g.user.id,
@@ -151,6 +156,7 @@ def criar_obra():
         editora_terceira_email=editora_terceira_email,
         editora_terceira_telefone=editora_terceira_telefone,
         editora_terceira_id=editora_terceira_id,
+        tipo_gravacao=tipo_gravacao,
     )
 
     # IA grátis: gera capa via Pollinations.ai (apenas URL, sem download)
