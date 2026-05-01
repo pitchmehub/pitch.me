@@ -1223,3 +1223,82 @@ def listar_contratos_admin():
         "em_vigor":  em_vigor,
         "pendentes": pendentes,
     }), 200
+
+
+@admin_bp.route("/test-email", methods=["POST"])
+def test_email():
+    """
+    Dispara um e-mail de teste para validar a configuração SMTP.
+    Body JSON: { "to": "destino@exemplo.com" }
+    Retorna: configuração SMTP (mascarada) + resultado do envio.
+    """
+    import os
+    from services.email_service import send_email, _smtp_configured, _wrap_html
+
+    data = request.get_json(silent=True) or {}
+    to = (data.get("to") or "").strip()
+    if not to:
+        return jsonify({"ok": False, "erro": "Campo 'to' é obrigatório."}), 400
+
+    smtp_host = os.environ.get("SMTP_HOST", "")
+    smtp_port = os.environ.get("SMTP_PORT", "587")
+    smtp_from = os.environ.get("SMTP_FROM", "")
+    smtp_user = os.environ.get("SMTP_USER", "")
+    smtp_pass = os.environ.get("SMTP_PASS", "")
+    smtp_ssl  = os.environ.get("SMTP_USE_SSL", "")
+
+    def _mask(v):
+        if not v:
+            return "(não configurado)"
+        if len(v) <= 6:
+            return "***"
+        return v[:3] + "***" + v[-3:]
+
+    configuracao = {
+        "SMTP_HOST":    smtp_host or "(não configurado)",
+        "SMTP_PORT":    smtp_port,
+        "SMTP_FROM":    smtp_from or "(não configurado)",
+        "SMTP_USER":    _mask(smtp_user),
+        "SMTP_PASS":    _mask(smtp_pass),
+        "SMTP_USE_SSL": smtp_ssl or "0",
+        "configurado":  _smtp_configured(),
+    }
+
+    html = _wrap_html(
+        "Teste de e-mail — Gravan",
+        """
+<h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+  Teste de e-mail Gravan
+</h2>
+<p style="margin:0 0 16px;font-size:14px;color:#52525B;line-height:1.6;">
+  Este é um e-mail de teste disparado pelo painel administrativo da Gravan
+  para validar a configuração SMTP do servidor de produção.
+</p>
+<p style="margin:0;font-size:13px;color:#52525B;">
+  Se você recebeu esta mensagem, o envio de e-mails automáticos está
+  <strong style="color:#16a34a;">funcionando corretamente</strong>.
+</p>
+        """,
+        accent="#16a34a",
+    )
+
+    import logging, traceback
+    log = logging.getLogger("gravan.admin.test_email")
+    ok = False
+    erro = None
+    try:
+        ok = send_email(to=to, subject="[Teste] E-mail automático Gravan", html=html,
+                        text="Teste de e-mail Gravan. Se recebeu, o SMTP está funcionando.")
+        if not ok:
+            erro = "send_email retornou False (SMTP pode estar configurado mas falhou silenciosamente)."
+    except Exception as e:
+        erro = traceback.format_exc()
+        log.error("Falha no test-email: %s", e)
+
+    return jsonify({
+        "ok":          ok,
+        "simulado":    not _smtp_configured(),
+        "enviado_para": to,
+        "configuracao": configuracao,
+        "erro":        erro,
+    }), (200 if ok else 500)

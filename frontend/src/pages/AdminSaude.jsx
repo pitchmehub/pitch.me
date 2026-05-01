@@ -60,6 +60,24 @@ export default function AdminSaude() {
   const [auto, setAuto] = useState(true)
   const [ultimoCheck, setUltimoCheck] = useState(null)
 
+  const [emailDest, setEmailDest] = useState('')
+  const [emailEnviando, setEmailEnviando] = useState(false)
+  const [emailResult, setEmailResult] = useState(null)
+
+  async function testarEmail() {
+    if (!emailDest.trim()) return
+    setEmailEnviando(true)
+    setEmailResult(null)
+    try {
+      const r = await api.post('/admin/test-email', { to: emailDest.trim() })
+      setEmailResult({ ok: true, data: r })
+    } catch (e) {
+      let data = null
+      try { data = JSON.parse(e.message) } catch {}
+      setEmailResult({ ok: false, msg: e.message, data })
+    } finally { setEmailEnviando(false) }
+  }
+
   const carregar = useCallback(async () => {
     try {
       const r = await api.get('/admin/saude')
@@ -150,6 +168,88 @@ export default function AdminSaude() {
       <Card titulo="Cache / Rate limiter (Redis)" status={redis.status}>
         {redis.latencia_ms != null && <Linha label="Latência" valor={`${redis.latencia_ms} ms`} />}
         {redis.mensagem && <Linha label="Mensagem" valor={redis.mensagem} />}
+      </Card>
+
+      {/* Teste de e-mail */}
+      <Card titulo="Teste de e-mail (SMTP)">
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
+          Dispara um e-mail de teste para validar a configuração SMTP do servidor de produção.
+          Se o campo SMTP_HOST não estiver configurado, o envio será <strong>simulado</strong> (aparece no log do servidor, não chega à caixa de entrada).
+        </p>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+          <input
+            className="input"
+            type="email"
+            placeholder="Destinatário (ex: voce@email.com)"
+            value={emailDest}
+            onChange={e => { setEmailDest(e.target.value); setEmailResult(null) }}
+            onKeyDown={e => { if (e.key === 'Enter') testarEmail() }}
+            style={{ flex: 1, fontSize: 13 }}
+          />
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={testarEmail}
+            disabled={emailEnviando || !emailDest.trim()}
+          >
+            {emailEnviando ? 'Enviando…' : 'Enviar teste'}
+          </button>
+        </div>
+
+        {emailResult && (() => {
+          const cfg = emailResult.data?.configuracao || {}
+          const simulado = emailResult.data?.simulado
+          return (
+            <div style={{
+              padding: 14, borderRadius: 10, fontSize: 12,
+              background: emailResult.ok
+                ? (simulado ? 'rgba(245,158,11,.08)' : 'rgba(34,197,94,.08)')
+                : 'rgba(239,68,68,.08)',
+              border: `1px solid ${emailResult.ok
+                ? (simulado ? 'rgba(245,158,11,.4)' : 'rgba(34,197,94,.4)')
+                : 'rgba(239,68,68,.4)'}`,
+            }}>
+              <div style={{
+                fontWeight: 700, fontSize: 13, marginBottom: 10,
+                color: emailResult.ok
+                  ? (simulado ? '#d97706' : '#16a34a')
+                  : '#dc2626',
+              }}>
+                {emailResult.ok
+                  ? (simulado
+                      ? 'Simulado — SMTP não configurado. Verifique o log do servidor.'
+                      : `E-mail enviado com sucesso para ${emailResult.data?.enviado_para}`)
+                  : 'Falha no envio'}
+              </div>
+
+              {Object.keys(cfg).length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: emailResult.data?.erro ? 10 : 0 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>
+                    Configuração SMTP detectada
+                  </div>
+                  {Object.entries(cfg).filter(([k]) => k !== 'configurado').map(([k, v]) => (
+                    <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 8px', background: 'var(--surface-2)', borderRadius: 6 }}>
+                      <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 11, color: 'var(--text-muted)' }}>{k}</span>
+                      <span style={{ fontWeight: 600, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 11 }}>{String(v)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {emailResult.data?.erro && (
+                <pre style={{
+                  marginTop: 10, padding: 10, borderRadius: 8,
+                  background: 'rgba(239,68,68,.08)', border: '1px solid rgba(239,68,68,.2)',
+                  fontSize: 11, color: '#dc2626', whiteSpace: 'pre-wrap', wordBreak: 'break-all',
+                  maxHeight: 200, overflowY: 'auto',
+                }}>{emailResult.data.erro}</pre>
+              )}
+
+              {!emailResult.ok && !emailResult.data && (
+                <p style={{ color: 'var(--error)', marginTop: 6 }}>{emailResult.msg}</p>
+              )}
+            </div>
+          )
+        })()}
       </Card>
 
       {/* Variáveis de ambiente */}
