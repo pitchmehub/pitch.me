@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "WUh1GOGIF6doFQ0XDpiX_"
@@ -12,3 +11,9 @@ id = "p4jQQLAUKibo43VzUyUDK"
 uri = "file://artifacts/mockup-sandbox/public/images/studio-night-hero.png"
 type = "image"
 title = "Recording studio at night"
+
+[[outputs]]
+id = "0OIH89c710YjjllCXeQvH"
+uri = "file://backend/email_templates_supabase/gravan_templates_supabase.zip"
+type = "unspecified"
+title = "Templates Supabase — Gravan (5 arquivos HTML)"
