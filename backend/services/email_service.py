@@ -140,11 +140,26 @@ def _wrap_html(title: str, body_html: str, accent: str = "#BE123C") -> str:
                 </tr>
                 <tr>
                   <td align="center" style="padding:28px 32px 20px;">
-                    <img src="https://www.gravan.com.br/gravan-logo-email.png"
+                    <!--[if mso]>
+                    <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+                    <td style="vertical-align:middle;padding-right:10px;border:0;">
+                      <table role="presentation" cellpadding="0" cellspacing="0">
+                        <tr><td style="width:42px;height:42px;border-top:5px solid #0E2A55;border-left:5px solid #0E2A55;border-bottom:5px solid #0E2A55;border-right:0;border-radius:42px;font-size:0;line-height:0;">&nbsp;</td></tr>
+                      </table>
+                    </td>
+                    <td style="vertical-align:middle;">
+                      <span style="font-family:Georgia,serif;font-size:34px;font-weight:500;color:#111111;letter-spacing:-1px;line-height:1;">ravan</span>
+                    </td>
+                    </tr></table>
+                    <![endif]-->
+                    <!--[if !mso]><!-->
+                    <img src="https://www.gravan.com.br/gravan-logo-email.svg"
                          alt="Gravan"
-                         width="160"
-                         style="display:block;height:auto;border:0;max-width:160px;">
-                    <p style="margin:10px 0 0;font-size:11px;color:#A1A1AA;letter-spacing:0.12em;text-transform:uppercase;">
+                         width="204"
+                         height="62"
+                         style="display:block;height:auto;border:0;max-width:204px;">
+                    <!--<![endif]-->
+                    <p style="margin:12px 0 0;font-size:11px;color:#A1A1AA;letter-spacing:0.12em;text-transform:uppercase;">
                       Licenciamento de Obras Musicais
                     </p>
                   </td>
