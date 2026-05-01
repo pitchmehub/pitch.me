@@ -6,7 +6,7 @@ Usa SMTP genérico configurado por variáveis de ambiente:
   SMTP_PORT       (587 STARTTLS, 465 SSL)
   SMTP_USER       (usuário/api-key)
   SMTP_PASS       (senha/api-secret)
-  SMTP_FROM       (ex.: 'Gravan <noreply@gravan>')
+  SMTP_FROM       (ex.: 'Gravan <noreply@gravan.com.br>')
   SMTP_USE_SSL    ('1' para 465, vazio/0 para STARTTLS)
 
 Fallback: se SMTP_HOST não estiver configurado, loga o e-mail e devolve True.
@@ -104,41 +104,197 @@ def send_email(
         return False
 
 
-# ─────────── Helpers de templates ───────────
+# ─────────── Base do template ───────────
 
-def _wrap_html(title: str, body_html: str) -> str:
+def _wrap_html(title: str, body_html: str, accent: str = "#BE123C") -> str:
+    """
+    Wrapper HTML completo para todos os e-mails da Gravan.
+    accent: cor da barra superior — use variações para identificar o tipo de e-mail:
+      #BE123C  vermelho  → padrão / ações importantes
+      #16a34a  verde     → sucesso / confirmação
+      #d97706  âmbar     → atenção / prazo
+      #1d4ed8  azul      → informativo
+    """
     return f"""<!doctype html>
-<html><head><meta charset="utf-8"><title>{title}</title></head>
-<body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#f6f6f7;margin:0;padding:24px;color:#111">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:14px;padding:32px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
-    <div style="font-weight:800;font-size:18px;color:#BE123C;margin-bottom:24px">Gravan</div>
-    {body_html}
-    <hr style="border:none;border-top:1px solid #eee;margin:28px 0">
-    <p style="font-size:11px;color:#888;line-height:1.5">
-      Este é um e-mail automático. Se você não solicitou, ignore esta mensagem.<br>
-      Gravan &middot; Marketplace de composições musicais
-    </p>
-  </div>
-</body></html>"""
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
+</head>
+<body style="margin:0;padding:0;background-color:#F4F4F5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
 
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:#F4F4F5;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:580px;">
+
+          <!-- HEADER -->
+          <tr>
+            <td align="center" style="padding-bottom:20px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+                     style="background-color:#09090B;border-radius:14px 14px 0 0;overflow:hidden;">
+                <tr>
+                  <td style="height:4px;background-color:{accent};font-size:0;line-height:0;">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td style="padding:24px 32px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td>
+                          <span style="font-size:20px;font-weight:800;color:#FFFFFF;letter-spacing:-0.5px;">
+                            &#9679;&nbsp;gravan
+                          </span>
+                        </td>
+                        <td align="right">
+                          <span style="font-size:11px;color:#71717A;letter-spacing:0.08em;text-transform:uppercase;">
+                            Marketplace musical
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- BODY -->
+          <tr>
+            <td style="padding-bottom:20px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+                     style="background-color:#FFFFFF;border-radius:0 0 14px 14px;overflow:hidden;">
+                <tr>
+                  <td style="padding:32px 32px 24px;">
+                    {body_html}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td align="center" style="padding-bottom:32px;">
+              <p style="margin:0 0 8px;font-size:12px;color:#71717A;text-align:center;">
+                Este é um e-mail automático enviado pela Gravan.
+              </p>
+              <p style="margin:0 0 8px;font-size:12px;color:#71717A;text-align:center;">
+                <a href="https://www.gravan.com.br" style="color:#BE123C;text-decoration:none;">www.gravan.com.br</a>
+                &nbsp;&middot;&nbsp;
+                <a href="mailto:contato@gravan.com.br" style="color:#BE123C;text-decoration:none;">contato@gravan.com.br</a>
+              </p>
+              <p style="margin:0;font-size:11px;color:#A1A1AA;text-align:center;">
+                &copy; 2025 Gravan &middot; Marketplace de composições musicais
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>"""
+
+
+def _btn(label: str, url: str, color: str = "#BE123C") -> str:
+    """Botão CTA padrão para e-mails."""
+    return f"""
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto;">
+  <tr>
+    <td align="center" style="background-color:{color};border-radius:10px;">
+      <a href="{url}"
+         style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:700;
+                color:#FFFFFF;text-decoration:none;letter-spacing:0.02em;">
+        {label}
+      </a>
+    </td>
+  </tr>
+</table>"""
+
+
+def _divider() -> str:
+    return '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:20px 0;"><tr><td style="border-top:1px solid #E4E4E7;font-size:0;line-height:0;">&nbsp;</td></tr></table>'
+
+
+def _info_row(label: str, value: str) -> str:
+    return f"""
+<tr>
+  <td style="padding:10px 14px;font-size:12px;color:#71717A;background-color:#FAFAFA;
+             border:1px solid #E4E4E7;border-bottom:none;white-space:nowrap;width:40%;">{label}</td>
+  <td style="padding:10px 14px;font-size:13px;font-weight:600;color:#09090B;
+             background-color:#FAFAFA;border:1px solid #E4E4E7;border-bottom:none;">{value}</td>
+</tr>"""
+
+
+def _info_table(*rows_html: str) -> str:
+    rows = "".join(rows_html)
+    last = rows.rfind('border-bottom:none;')
+    fixed = rows[:last] + rows[last:].replace('border-bottom:none;', '', 1)
+    return f'<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:20px 0;border-collapse:collapse;">{fixed}</table>'
+
+
+def _alert(text: str, color: str = "#FEF3C7", border: str = "#D97706", txt: str = "#78350F") -> str:
+    return f"""
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+       style="margin:16px 0;background-color:{color};border-left:4px solid {border};border-radius:0 8px 8px 0;">
+  <tr>
+    <td style="padding:12px 16px;font-size:13px;color:{txt};line-height:1.5;">
+      {text}
+    </td>
+  </tr>
+</table>"""
+
+
+# ─────────── Templates ───────────
 
 def render_otp_email(nome: str, codigo: str, valor_brl: str, ip: str) -> tuple[str, str]:
-    """Retorna (html, text) para o e-mail de código OTP de saque."""
+    """E-mail de código OTP para confirmação de saque."""
     body = f"""
-    <h2 style="margin:0 0 8px">Confirme sua solicitação de saque</h2>
-    <p style="color:#444;font-size:14px">
-      Olá {nome or 'compositor'}, recebemos um pedido de saque de
-      <strong>{valor_brl}</strong> da sua wallet Gravan.
-    </p>
-    <p style="color:#444;font-size:14px">Use o código abaixo para confirmar — ele expira em <strong>10 minutos</strong>:</p>
-    <div style="text-align:center;margin:24px 0;padding:18px;background:#FAFAFA;border:1px dashed #BE123C;border-radius:10px">
-      <div style="font-size:36px;font-weight:800;letter-spacing:8px;color:#BE123C;font-family:'Courier New',monospace">{codigo}</div>
-    </div>
-    <p style="color:#666;font-size:12px">
-      Solicitado a partir do IP <code>{ip}</code>.<br>
-      <strong>Não foi você?</strong> Ignore este e-mail e troque sua senha imediatamente.
-    </p>
-    """
+<h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+  Confirme seu saque
+</h2>
+<p style="margin:0 0 20px;font-size:14px;color:#52525B;line-height:1.6;">
+  Olá, <strong>{nome or 'compositor'}</strong>. Recebemos uma solicitação de saque de
+  <strong style="color:#09090B;">{valor_brl}</strong> da sua carteira Gravan.
+</p>
+
+<p style="margin:0 0 8px;font-size:13px;color:#52525B;">
+  Use o código abaixo para confirmar. Ele expira em <strong>10 minutos</strong>:
+</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+       style="margin:20px 0;background-color:#09090B;border-radius:12px;">
+  <tr>
+    <td align="center" style="padding:28px 20px;">
+      <span style="font-size:42px;font-weight:900;letter-spacing:12px;color:#FFFFFF;
+                   font-family:'Courier New',Courier,monospace;">{codigo}</span>
+      <br>
+      <span style="font-size:11px;color:#71717A;letter-spacing:0.08em;text-transform:uppercase;margin-top:8px;display:block;">
+        Código de confirmação &middot; válido por 10 minutos
+      </span>
+    </td>
+  </tr>
+</table>
+
+{_info_table(
+    _info_row("Valor do saque", valor_brl),
+    _info_row("IP da solicitação", ip),
+)}
+
+{_alert(
+    "<strong>Não foi você?</strong> Ignore este e-mail e troque sua senha imediatamente em Configurações.",
+    "#FEF2F2", "#BE123C", "#7F1D1D"
+)}
+
+<p style="margin:16px 0 0;font-size:12px;color:#A1A1AA;line-height:1.5;">
+  Por segurança, nunca compartilhe este código com ninguém. A Gravan jamais solicitará
+  seu código por telefone ou chat.
+</p>
+"""
     text = (
         f"Gravan — Confirmação de saque\n\n"
         f"Valor: {valor_brl}\n"
@@ -146,54 +302,120 @@ def render_otp_email(nome: str, codigo: str, valor_brl: str, ip: str) -> tuple[s
         f"IP da solicitação: {ip}\n"
         f"Se não foi você, ignore este e-mail e troque sua senha."
     )
-    return _wrap_html("Confirme seu saque", body), text
+    return _wrap_html("Confirme seu saque — Gravan", body, accent="#BE123C"), text
 
 
 def render_saque_agendado_email(nome: str, valor_brl: str, libera_em: str,
                                 cancel_url: str) -> tuple[str, str]:
     body = f"""
-    <h2 style="margin:0 0 8px">Saque agendado para {libera_em}</h2>
-    <p style="color:#444;font-size:14px">
-      Olá {nome or 'compositor'}, seu saque de <strong>{valor_brl}</strong> foi
-      <strong>confirmado</strong> e está agendado para liberação em
-      <strong>{libera_em}</strong> (24 h de janela de segurança).
-    </p>
-    <p style="color:#444;font-size:14px">
-      Se foi você, não precisa fazer nada — o dinheiro cai automaticamente na sua conta Stripe.
-    </p>
-    <div style="text-align:center;margin:28px 0">
-      <a href="{cancel_url}" style="display:inline-block;padding:14px 28px;
-         background:#fff;color:#BE123C;text-decoration:none;
-         border:2px solid #BE123C;border-radius:10px;font-weight:700">
-        🚫 Não fui eu — cancelar este saque
-      </a>
-    </div>
-    <p style="color:#666;font-size:12px">
-      O link acima é único, válido até a liberação. Cancelando, o valor volta integralmente para sua wallet.
-    </p>
-    """
+<h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+  Saque agendado ✓
+</h2>
+<p style="margin:0 0 20px;font-size:14px;color:#52525B;line-height:1.6;">
+  Olá, <strong>{nome or 'compositor'}</strong>. Seu saque foi confirmado e está
+  na janela de segurança de 24 horas antes de ser processado.
+</p>
+
+{_info_table(
+    _info_row("Valor", valor_brl),
+    _info_row("Liberação prevista", libera_em),
+    _info_row("Status", "Aguardando janela de 24h"),
+)}
+
+<p style="margin:20px 0 8px;font-size:14px;color:#52525B;line-height:1.6;">
+  Se foi você quem solicitou, <strong>não precisa fazer nada</strong> — o valor
+  será transferido automaticamente para sua conta Stripe na data acima.
+</p>
+
+{_divider()}
+
+<p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#7F1D1D;">
+  Não reconhece esse saque?
+</p>
+<p style="margin:0 0 16px;font-size:13px;color:#52525B;line-height:1.5;">
+  Cancele imediatamente. O valor volta integralmente para sua carteira.
+</p>
+
+{_btn("Cancelar este saque", cancel_url, "#BE123C")}
+
+<p style="margin:0;font-size:11px;color:#A1A1AA;text-align:center;line-height:1.5;">
+  Este link de cancelamento é de uso único e expira na data de liberação.
+</p>
+"""
     text = (
         f"Gravan — Saque agendado\n\n"
         f"Valor: {valor_brl}\n"
         f"Liberação: {libera_em}\n\n"
         f"Se NÃO foi você, cancele agora:\n{cancel_url}\n"
     )
-    return _wrap_html("Saque agendado", body), text
+    return _wrap_html("Saque agendado — Gravan", body, accent="#d97706"), text
 
 
 def render_saque_pago_email(nome: str, valor_brl: str, transfer_id: str) -> tuple[str, str]:
     body = f"""
-    <h2 style="margin:0 0 8px">✅ Saque enviado</h2>
-    <p style="color:#444;font-size:14px">
-      Olá {nome or 'compositor'}, seu saque de <strong>{valor_brl}</strong> foi
-      enviado para sua conta Stripe.
-    </p>
-    <p style="color:#666;font-size:12px">
-      Identificador Stripe: <code>{transfer_id}</code><br>
-      O prazo de compensação bancária depende do seu banco (geralmente 1-3 dias úteis).
-    </p>
-    """
-    return _wrap_html("Saque enviado", body), f"Saque {valor_brl} enviado. Stripe: {transfer_id}"
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+       style="margin:0 0 20px;">
+  <tr>
+    <td align="center">
+      <div style="width:56px;height:56px;background-color:#DCFCE7;border-radius:50%;
+                  line-height:56px;text-align:center;font-size:26px;margin:0 auto 12px;">✅</div>
+      <h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+        Saque enviado com sucesso
+      </h2>
+      <p style="margin:0;font-size:14px;color:#52525B;">
+        Olá, <strong>{nome or 'compositor'}</strong>. Seu saque foi processado e está a caminho.
+      </p>
+    </td>
+  </tr>
+</table>
+
+{_info_table(
+    _info_row("Valor transferido", valor_brl),
+    _info_row("ID Stripe", transfer_id),
+    _info_row("Prazo de compensação", "1 a 3 dias úteis (depende do banco)"),
+)}
+
+{_alert(
+    "O dinheiro aparecerá na sua conta bancária vinculada ao Stripe dentro do prazo acima.",
+    "#F0FDF4", "#16a34a", "#14532D"
+)}
+"""
+    text = (
+        f"Gravan — Saque enviado\n\n"
+        f"Valor: {valor_brl}\n"
+        f"ID Stripe: {transfer_id}\n"
+        f"Prazo de compensação: 1 a 3 dias úteis."
+    )
+    return _wrap_html("Saque enviado — Gravan", body, accent="#16a34a"), text
+
+
+def render_saque_cancelado_email(nome: str, valor_brl: str, motivo: str) -> tuple[str, str]:
+    _alerta = (
+        "<strong>N\u00e3o reconhece esse cancelamento?</strong> Isso pode indicar acesso n\u00e3o autorizado. Recomendamos:<br>"
+        "&bull; Trocar sua senha imediatamente<br>"
+        "&bull; Verificar os dispositivos conectados \u00e0 sua conta<br>"
+        '&bull; Entrar em contato: <a href="mailto:contato@gravan.com.br" style="color:#7F1D1D;">contato@gravan.com.br</a>'
+    )
+    _tabela = _info_table(_info_row("Valor estornado", valor_brl), _info_row("Motivo", motivo))
+    _aviso  = _alert(_alerta, "#FEF2F2", "#BE123C", "#7F1D1D")
+    body = f"""
+<h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+  Saque cancelado
+</h2>
+<p style="margin:0 0 20px;font-size:14px;color:#52525B;line-height:1.6;">
+  Ol\u00e1, <strong>{nome or 'compositor'}</strong>. Seu saque foi cancelado e o valor
+  foi devolvido integralmente \u00e0 sua carteira Gravan.
+</p>
+{_tabela}
+{_aviso}
+"""
+    text = (
+        f"Gravan — Saque cancelado\n\n"
+        f"Valor estornado: {valor_brl}\n"
+        f"Motivo: {motivo}\n\n"
+        f"Se não reconhece, troque sua senha e entre em contato: contato@gravan.com.br"
+    )
+    return _wrap_html("Saque cancelado — Gravan", body, accent="#BE123C"), text
 
 
 def render_oferta_editora_email(
@@ -201,39 +423,40 @@ def render_oferta_editora_email(
     nome_comprador: str, deadline_str: str, link: str,
 ) -> tuple[str, str]:
     body = f"""
-    <h2 style="margin:0 0 8px">Pedido de licenciamento de \"{nome_obra}\"</h2>
-    <p style="color:#444;font-size:14px">
-      Olá, equipe da <strong>{nome_editora}</strong>. Recebemos uma oferta de
-      <strong>{valor_brl}</strong> de <strong>{nome_comprador}</strong> para licenciar a
-      composição <strong>"{nome_obra}"</strong>, hoje sob seu contrato de edição.
-    </p>
-    <p style="color:#444;font-size:14px">
-      O valor está retido em escrow pela Gravan. Para liberar a transação,
-      vocês precisam <strong>cadastrar a editora</strong> na plataforma e assinar
-      eletronicamente o contrato trilateral até:
-    </p>
-    <p style="text-align:center;font-size:16px;font-weight:700;margin:18px 0;color:#BE123C">
-      ⏰ {deadline_str}
-    </p>
-    <div style="text-align:center;margin:24px 0">
-      <a href="{link}" style="display:inline-block;padding:14px 28px;
-         background:#BE123C;color:#fff;text-decoration:none;
-         border-radius:10px;font-weight:700">
-        Cadastrar editora e responder
-      </a>
-    </div>
-    <p style="color:#666;font-size:12px">
-      O prazo conta apenas horas úteis (segunda a sexta, 10h–18h, horário de
-      Brasília, excluindo feriados nacionais). Caso o prazo expire sem resposta,
-      o valor será integralmente estornado ao comprador.
-    </p>
-    """
+<h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+  Nova oferta de licenciamento
+</h2>
+<p style="margin:0 0 20px;font-size:14px;color:#52525B;line-height:1.6;">
+  Olá, equipe da <strong>{nome_editora}</strong>! Vocês receberam uma oferta de
+  licenciamento para uma obra do catálogo.
+</p>
+
+{_info_table(
+    _info_row("Obra", nome_obra),
+    _info_row("Valor ofertado", valor_brl),
+    _info_row("Comprador", nome_comprador),
+    _info_row("Prazo para resposta", deadline_str),
+)}
+
+<p style="margin:20px 0 8px;font-size:14px;color:#52525B;line-height:1.6;">
+  O valor está retido em <em>escrow</em> pela Gravan. Para liberar a transação,
+  a editora precisa <strong>cadastrar-se na plataforma</strong> e assinar
+  eletronicamente o contrato trilateral antes do prazo.
+</p>
+
+{_alert(
+    f"<strong>Atenção:</strong> o prazo conta apenas em horas úteis (seg–sex, 10h–18h, horário de Brasília, excluindo feriados nacionais). Se o prazo expirar sem resposta, o valor é estornado integralmente ao comprador.",
+    "#FEF3C7", "#D97706", "#78350F"
+)}
+
+{_btn("Cadastrar editora e responder", link, "#BE123C")}
+"""
     text = (
         f"Gravan — Pedido de licenciamento\n\n"
         f"Obra: {nome_obra}\nValor ofertado: {valor_brl}\nComprador: {nome_comprador}\n"
         f"Prazo: {deadline_str}\n\nResponda em: {link}\n"
     )
-    return _wrap_html(f"Pedido de licenciamento — {nome_obra}", body), text
+    return _wrap_html(f"Nova oferta — {nome_obra} — Gravan", body, accent="#d97706"), text
 
 
 def render_oferta_reminder_email(
@@ -241,98 +464,129 @@ def render_oferta_reminder_email(
     horas_restantes: int, link: str,
 ) -> tuple[str, str]:
     body = f"""
-    <h2 style="margin:0 0 8px">Faltam ~{horas_restantes}h úteis</h2>
-    <p style="color:#444;font-size:14px">
-      A oferta de <strong>{valor_brl}</strong> para a obra <strong>"{nome_obra}"</strong>
-      ainda aguarda resposta da <strong>{nome_editora}</strong>.
-    </p>
-    <p style="color:#B91C1C;font-size:14px">
-      Se o prazo expirar, o valor é estornado ao comprador automaticamente.
-    </p>
-    <div style="text-align:center;margin:24px 0">
-      <a href="{link}" style="display:inline-block;padding:14px 28px;
-         background:#BE123C;color:#fff;text-decoration:none;
-         border-radius:10px;font-weight:700">
-        Responder agora
-      </a>
-    </div>
-    """
+<h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+  Lembrete: oferta prestes a expirar
+</h2>
+<p style="margin:0 0 20px;font-size:14px;color:#52525B;line-height:1.6;">
+  Olá, <strong>{nome_editora}</strong>. A oferta de licenciamento da obra
+  <strong>"{nome_obra}"</strong> ainda aguarda resposta.
+</p>
+
+{_info_table(
+    _info_row("Obra", nome_obra),
+    _info_row("Valor", valor_brl),
+    _info_row("Horas restantes (úteis)", f"~{horas_restantes}h"),
+)}
+
+{_alert(
+    "<strong>Atenção:</strong> se o prazo expirar sem resposta, o valor será integralmente estornado ao comprador e a oferta será cancelada automaticamente.",
+    "#FEF2F2", "#BE123C", "#7F1D1D"
+)}
+
+{_btn("Responder agora", link, "#BE123C")}
+"""
     text = (
         f"Gravan — Lembrete de oferta\n\n"
         f"Obra: {nome_obra}\nValor: {valor_brl}\n"
         f"Faltam ~{horas_restantes}h úteis. Responda em: {link}\n"
     )
-    return _wrap_html(f"Lembrete: {nome_obra}", body), text
+    return _wrap_html(f"Lembrete: {nome_obra} — Gravan", body, accent="#BE123C"), text
 
 
 def render_oferta_expirada_comprador_email(
     nome_comprador: str, nome_obra: str, valor_brl: str,
 ) -> tuple[str, str]:
     body = f"""
-    <h2 style="margin:0 0 8px">Oferta expirada e valor estornado</h2>
-    <p style="color:#444;font-size:14px">
-      Olá {nome_comprador}, a editora detentora dos direitos de edição da obra
-      <strong>"{nome_obra}"</strong> não respondeu dentro do prazo de 72 horas úteis.
-    </p>
-    <p style="color:#444;font-size:14px">
-      O valor de <strong>{valor_brl}</strong> foi <strong>integralmente estornado</strong>
-      para o seu cartão. O prazo de compensação depende da operadora (geralmente 5 a 10 dias úteis).
-    </p>
-    """
-    return _wrap_html("Oferta expirada", body), \
-        f"Gravan — Oferta expirada\nObra: {nome_obra}\nValor estornado: {valor_brl}"
+<h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+  Oferta expirada — valor estornado
+</h2>
+<p style="margin:0 0 20px;font-size:14px;color:#52525B;line-height:1.6;">
+  Olá, <strong>{nome_comprador}</strong>. A editora detentora dos direitos de edição
+  da obra <strong>"{nome_obra}"</strong> não respondeu dentro do prazo de 72 horas úteis.
+</p>
+
+{_info_table(
+    _info_row("Obra", nome_obra),
+    _info_row("Valor estornado", valor_brl),
+    _info_row("Prazo de compensação", "5 a 10 dias úteis (depende da operadora)"),
+)}
+
+{_alert(
+    "O valor foi <strong>integralmente estornado</strong> para o seu cartão de crédito. "
+    "Você pode explorar outras obras disponíveis no catálogo da Gravan.",
+    "#F0FDF4", "#16a34a", "#14532D"
+)}
+
+{_btn("Explorar catálogo", "https://www.gravan.com.br/descoberta", "#09090B")}
+"""
+    text = (
+        f"Gravan — Oferta expirada\n\n"
+        f"Obra: {nome_obra}\nValor estornado: {valor_brl}\n"
+        f"Prazo de compensação: 5 a 10 dias úteis."
+    )
+    return _wrap_html("Oferta expirada — Gravan", body, accent="#d97706"), text
 
 
 def render_oferta_expirada_editora_email(nome_editora: str, nome_obra: str) -> tuple[str, str]:
     body = f"""
-    <h2 style="margin:0 0 8px">Prazo da oferta expirado</h2>
-    <p style="color:#444;font-size:14px">
-      A oferta para a obra <strong>"{nome_obra}"</strong> direcionada à
-      <strong>{nome_editora}</strong> não foi respondida dentro de 72 horas úteis e
-      foi cancelada. O valor foi estornado ao comprador.
-    </p>
-    <p style="color:#666;font-size:12px">
-      Se quiser receber novas ofertas pela Gravan, mantenha seu cadastro atualizado.
-    </p>
-    """
-    return _wrap_html("Prazo expirado", body), \
-        f"Gravan — Prazo da oferta para \"{nome_obra}\" expirou."
+<h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+  Prazo expirado
+</h2>
+<p style="margin:0 0 20px;font-size:14px;color:#52525B;line-height:1.6;">
+  Olá, <strong>{nome_editora}</strong>. A oferta de licenciamento da obra
+  <strong>"{nome_obra}"</strong> expirou sem resposta e foi automaticamente cancelada.
+</p>
+
+{_alert(
+    "O valor foi integralmente estornado ao comprador. Para continuar recebendo ofertas pela Gravan, mantenha seu cadastro atualizado e responda dentro dos prazos.",
+    "#FEF3C7", "#D97706", "#78350F"
+)}
+"""
+    text = (
+        f"Gravan — Prazo da oferta para \"{nome_obra}\" expirou.\n\n"
+        f"O valor foi estornado ao comprador. Mantenha seu cadastro atualizado."
+    )
+    return _wrap_html("Prazo expirado — Gravan", body, accent="#d97706"), text
 
 
 def render_oferta_concluida_email(nome_comprador: str, nome_obra: str, valor_brl: str) -> tuple[str, str]:
     body = f"""
-    <h2 style="margin:0 0 8px">✅ Licença concluída</h2>
-    <p style="color:#444;font-size:14px">
-      Olá {nome_comprador}, todas as partes assinaram o contrato trilateral
-      da obra <strong>"{nome_obra}"</strong>. O valor de <strong>{valor_brl}</strong>
-      foi capturado e a licença está formalmente ativa.
-    </p>
-    <p style="color:#666;font-size:12px">
-      Você pode acessar o contrato e o áudio na sua área de Compras na Gravan.
-    </p>
-    """
-    return _wrap_html("Licença concluída", body), \
-        f"Gravan — Licença de \"{nome_obra}\" concluída ({valor_brl})."
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+       style="margin:0 0 20px;">
+  <tr>
+    <td align="center">
+      <div style="width:56px;height:56px;background-color:#DCFCE7;border-radius:50%;
+                  line-height:56px;text-align:center;font-size:26px;margin:0 auto 12px;">🎵</div>
+      <h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+        Licença concluída!
+      </h2>
+      <p style="margin:0;font-size:14px;color:#52525B;">
+        Olá, <strong>{nome_comprador}</strong>. Todas as partes assinaram o contrato.
+        A licença está formalmente ativa.
+      </p>
+    </td>
+  </tr>
+</table>
 
+{_info_table(
+    _info_row("Obra licenciada", nome_obra),
+    _info_row("Valor pago", valor_brl),
+    _info_row("Status", "Contrato assinado e ativo"),
+)}
 
-def render_saque_cancelado_email(nome: str, valor_brl: str, motivo: str) -> tuple[str, str]:
-    body = f"""
-    <h2 style="margin:0 0 8px">Saque cancelado</h2>
-    <p style="color:#444;font-size:14px">
-      Olá {nome or 'compositor'}, o saque de <strong>{valor_brl}</strong> foi cancelado.
-      O valor voltou integralmente para sua wallet.
-    </p>
-    <p style="color:#666;font-size:13px"><strong>Motivo:</strong> {motivo}</p>
-    <p style="color:#B91C1C;font-size:13px">
-      Se você NÃO solicitou esse saque originalmente, recomendamos:
-    </p>
-    <ul style="color:#444;font-size:13px">
-      <li>Trocar sua senha imediatamente</li>
-      <li>Verificar dispositivos conectados na sua conta</li>
-      <li>Entrar em contato com nosso suporte</li>
-    </ul>
-    """
-    return _wrap_html("Saque cancelado", body), f"Saque {valor_brl} cancelado. Motivo: {motivo}"
+{_alert(
+    "Você pode acessar o contrato e fazer o download do áudio na sua área de <strong>Compras</strong> na Gravan.",
+    "#F0FDF4", "#16a34a", "#14532D"
+)}
+
+{_btn("Acessar minhas compras", "https://www.gravan.com.br/compras", "#16a34a")}
+"""
+    text = (
+        f"Gravan — Licença concluída\n\n"
+        f"Obra: {nome_obra}\nValor: {valor_brl}\n"
+        f"Acesse seus contratos em: https://www.gravan.com.br/compras"
+    )
+    return _wrap_html(f"Licença concluída — {nome_obra} — Gravan", body, accent="#16a34a"), text
 
 
 def render_licenciamento_concluido_email(
@@ -358,43 +612,33 @@ def render_licenciamento_concluido_email(
     link = f"{frontend_url.rstrip('/')}/contratos/licenciamento/{contract_id}"
 
     body = f"""
-    <h2 style="margin:0 0 8px">Contrato de licenciamento concluído</h2>
-    <p style="color:#444;font-size:14px">
-      Olá <strong>{nome or papel_label}</strong>, todas as partes assinaram o
-      <strong>Contrato de Autorização para Gravação e Exploração</strong> da obra
-      <strong>"{nome_obra}"</strong>.
-    </p>
-    <p style="color:#444;font-size:14px">
-      O contrato assinado está em anexo neste e-mail (PDF). Guarde este arquivo — ele é
-      sua prova legal da licença.
-    </p>
-    <table style="width:100%;margin:16px 0;border-collapse:collapse">
-      <tr>
-        <td style="padding:8px 12px;background:#F9FAFB;border:1px solid #E5E7EB;font-size:12px;color:#6B7280">Obra</td>
-        <td style="padding:8px 12px;background:#F9FAFB;border:1px solid #E5E7EB;font-size:13px;font-weight:700">{nome_obra}</td>
-      </tr>
-      <tr>
-        <td style="padding:8px 12px;border:1px solid #E5E7EB;font-size:12px;color:#6B7280">Valor do licenciamento</td>
-        <td style="padding:8px 12px;border:1px solid #E5E7EB;font-size:13px;font-weight:700;color:#BE123C">{valor_brl}</td>
-      </tr>
-      <tr>
-        <td style="padding:8px 12px;background:#F9FAFB;border:1px solid #E5E7EB;font-size:12px;color:#6B7280">Seu papel</td>
-        <td style="padding:8px 12px;background:#F9FAFB;border:1px solid #E5E7EB;font-size:13px">{papel_label.capitalize()}</td>
-      </tr>
-    </table>
-    <div style="text-align:center;margin:24px 0">
-      <a href="{link}" style="display:inline-block;padding:14px 28px;
-         background:#BE123C;color:#fff;text-decoration:none;
-         border-radius:10px;font-weight:700">
-        Ver contrato na plataforma
-      </a>
-    </div>
-    <p style="color:#888;font-size:11px">
-      Validade legal: este contrato foi assinado eletronicamente nos termos da
-      MP 2.200-2/2001 e da Lei 14.063/2020. O hash SHA-256 de integridade consta
-      no documento. Guarde o PDF para seus registros.
-    </p>
-    """
+<h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+  Contrato de licenciamento concluído
+</h2>
+<p style="margin:0 0 20px;font-size:14px;color:#52525B;line-height:1.6;">
+  Olá, <strong>{nome or papel_label}</strong>. Todas as partes assinaram o
+  <strong>Contrato de Autorização para Gravação e Exploração</strong> da obra abaixo.
+  O contrato assinado está em <strong>anexo neste e-mail (PDF)</strong>.
+</p>
+
+{_info_table(
+    _info_row("Obra", nome_obra),
+    _info_row("Valor do licenciamento", valor_brl),
+    _info_row("Seu papel", papel_label.capitalize()),
+    _info_row("ID do contrato", contract_id),
+)}
+
+{_alert(
+    "Guarde o PDF anexo — ele é sua prova legal da licença, assinado eletronicamente nos termos da MP 2.200-2/2001 e da Lei 14.063/2020.",
+    "#EFF6FF", "#1d4ed8", "#1e3a8a"
+)}
+
+{_btn("Ver contrato na plataforma", link, "#09090B")}
+
+<p style="margin:16px 0 0;font-size:11px;color:#A1A1AA;text-align:center;line-height:1.5;">
+  O hash SHA-256 de integridade do documento consta no próprio PDF.
+</p>
+"""
     text = (
         f"Gravan — Contrato de licenciamento concluído\n\n"
         f"Olá {nome or papel_label},\n\n"
@@ -403,7 +647,7 @@ def render_licenciamento_concluido_email(
         f"O contrato assinado está em anexo neste e-mail (PDF).\n\n"
         f"Acesse também em: {link}\n"
     )
-    return _wrap_html(f"Contrato concluído — {nome_obra}", body), text
+    return _wrap_html(f"Contrato concluído — {nome_obra} — Gravan", body, accent="#16a34a"), text
 
 
 def render_rescisao_exclusividade_email(
@@ -418,7 +662,7 @@ def render_rescisao_exclusividade_email(
     em razão de venda de exclusividade. Enviado ao compositor, coautores e à
     editora (agregada ou terceira).
 
-    `papel`: 'compositor' | 'coautor' | 'editora' — usado só pra personalizar o tom.
+    `papel`: 'compositor' | 'coautor' | 'editora'
     """
     saudacao = {
         "compositor": "compositor(a)",
@@ -427,40 +671,44 @@ def render_rescisao_exclusividade_email(
     }.get(papel, "parte interessada")
 
     body = f"""
-    <h2 style="margin:0 0 8px">Comunicação formal de rescisão</h2>
-    <p style="color:#444;font-size:14px">
-      Prezado(a) {nome_destinatario or saudacao},
-    </p>
-    <p style="color:#444;font-size:14px">
-      Comunicamos formalmente, na qualidade de plataforma intermediária dos
-      licenciamentos da obra <strong>"{nome_obra}"</strong>, a
-      <strong>rescisão</strong> de todos os contratos de licenciamento até então
-      vigentes referentes a esta obra.
-    </p>
-    <div style="margin:16px 0;padding:14px 16px;background:#FEF2F2;border-left:4px solid #BE123C;border-radius:6px">
-      <p style="margin:0;color:#7F1D1D;font-size:13px">
-        <strong>Motivo:</strong> venda da licença de <strong>EXCLUSIVIDADE</strong> da obra
-        a {nome_comprador or 'novo licenciado'}, formalizada em {data_venda_brt}
-        por meio da plataforma GRAVAN.
-      </p>
-    </div>
-    <p style="color:#444;font-size:14px">
-      Em conformidade com a CLÁUSULA 3 (bilateral) / CLÁUSULA 5 (trilateral) dos
-      contratos vigentes — Parágrafo Primeiro (Rescisão) — esta comunicação
-      observa o prazo de <strong>30 (trinta) dias</strong> de antecedência. As
-      explorações comerciais já realizadas, e aquelas realizadas até o término
-      desse prazo, permanecem válidas e definitivas.
-    </p>
-    <p style="color:#444;font-size:14px">
-      A partir desta data, a obra passa a constar como
-      <strong>indisponível para novos licenciamentos</strong> no catálogo da
-      GRAVAN, pelo período de exclusividade contratado (5 anos).
-    </p>
-    <p style="color:#666;font-size:12px;margin-top:24px">
-      Em caso de dúvidas, responda a este e-mail ou entre em contato com o
-      suporte da Gravan.
-    </p>
-    """
+<h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#09090B;">
+  Comunicação formal de rescisão
+</h2>
+<p style="margin:0 0 20px;font-size:14px;color:#52525B;line-height:1.6;">
+  Prezado(a) <strong>{nome_destinatario or saudacao}</strong>,
+</p>
+<p style="margin:0 0 20px;font-size:14px;color:#52525B;line-height:1.6;">
+  Comunicamos formalmente, na qualidade de plataforma intermediária, a
+  <strong>rescisão de todos os contratos de licenciamento</strong> vigentes
+  referentes à obra abaixo.
+</p>
+
+{_info_table(
+    _info_row("Obra", nome_obra),
+    _info_row("Motivo", "Venda de licença de exclusividade"),
+    _info_row("Novo licenciado exclusivo", nome_comprador or "—"),
+    _info_row("Data da venda", data_venda_brt),
+    _info_row("Período de exclusividade", "5 anos a partir da data da venda"),
+)}
+
+{_alert(
+    "<strong>Prazo de aviso:</strong> esta comunicação observa os 30 (trinta) dias de antecedência previstos na Cláusula 3 (bilateral) / Cláusula 5 (trilateral) — Parágrafo Primeiro dos contratos vigentes. "
+    "As explorações já realizadas e as realizadas até o término desse prazo permanecem <strong>válidas e definitivas</strong>.",
+    "#FEF3C7", "#D97706", "#78350F"
+)}
+
+<p style="margin:16px 0 0;font-size:13px;color:#52525B;line-height:1.6;">
+  A partir desta data, a obra consta como <strong>indisponível para novos licenciamentos</strong>
+  no catálogo da Gravan pelo período de exclusividade contratado.
+</p>
+
+{_divider()}
+
+<p style="margin:0;font-size:12px;color:#A1A1AA;line-height:1.5;">
+  Dúvidas? Responda este e-mail ou escreva para
+  <a href="mailto:contato@gravan.com.br" style="color:#BE123C;">contato@gravan.com.br</a>.
+</p>
+"""
     text = (
         f"Gravan — Comunicação formal de rescisão\n\n"
         f"Prezado(a) {nome_destinatario or saudacao},\n\n"
@@ -469,9 +717,9 @@ def render_rescisao_exclusividade_email(
         f"Motivo: venda da licença de EXCLUSIVIDADE a {nome_comprador or 'novo licenciado'}, "
         f"formalizada em {data_venda_brt} pela plataforma GRAVAN.\n\n"
         f"Esta comunicação observa o prazo de 30 dias de antecedência previsto na "
-        f"CLÁUSULA 3/5 — Parágrafo Primeiro dos contratos. As explorações já "
+        f"Cláusula 3/5 — Parágrafo Primeiro dos contratos. As explorações já "
         f"realizadas e as realizadas até o término desse prazo permanecem válidas.\n\n"
         f"A obra passa a constar como indisponível para novos licenciamentos pelo "
         f"período de exclusividade contratado (5 anos).\n"
     )
-    return _wrap_html(f"Rescisão — \"{nome_obra}\"", body), text
+    return _wrap_html(f"Rescisão — \"{nome_obra}\" — Gravan", body, accent="#BE123C"), text
