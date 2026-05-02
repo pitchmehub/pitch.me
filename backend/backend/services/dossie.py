@@ -185,10 +185,12 @@ class DossieService:
 
     def _buscar_contrato_assinado(self, obra_id: str, obra: dict) -> dict:
         """
-        Busca o contrato de edição assinado pelo titular.
-        Para obras com editora terceira (sem contrato Gravan), retorna
-        um contrato sintético baseado nos dados da própria obra.
+        Busca o contrato de edição da obra na seguinte ordem de prioridade:
+          1. contratos_edicao  — contrato Gravan assinado pelo compositor
+          2. contracts_edicao  — contrato entre compositor e editora interna
+          3. Contrato sintético — fallback quando nenhum existe
         """
+        # 1. Contrato Gravan
         r = (
             self.sb.table("contratos_edicao")
             .select("*")
@@ -207,26 +209,55 @@ class DossieService:
                 )
             return contrato
 
-        # Obras sem contrato Gravan (ex: editora terceira) — contrato sintético
-        editora_nome = (
-            obra.get("editora_terceira_nome")
-            or "Editora Independente"
-        )
+        # 2. Contrato editora interna (agregado)
+        try:
+            r2 = (
+                self.sb.table("contracts_edicao")
+                .select("*")
+                .eq("obra_id", obra_id)
+                .order("created_at", desc=True)
+                .limit(1)
+                .execute()
+            )
+        except Exception:
+            r2 = None
+
+        if r2 and r2.data:
+            c = r2.data[0]
+            assinado_em = (
+                c.get("completed_at")
+                or c.get("signed_by_autor_at")
+                or c.get("created_at", "")
+            )
+            return {
+                "id":            c["id"],
+                "obra_id":       obra_id,
+                "assinado_em":   assinado_em,
+                "created_at":    c.get("created_at", ""),
+                "conteudo":      c.get("contract_text") or c.get("contract_html") or "",
+                "dados_titular": {},
+                "interprete":    {},
+                "versao":        c.get("versao") or "v1.0",
+                "ip_assinatura": c.get("autor_ip_hash") or "",
+            }
+
+        # 3. Fallback sintético
+        editora_nome = obra.get("editora_terceira_nome") or "Editora Independente"
         return {
-            "id":           obra_id,
-            "obra_id":      obra_id,
-            "assinado_em":  obra.get("created_at", ""),
-            "created_at":   obra.get("created_at", ""),
+            "id":            obra_id,
+            "obra_id":       obra_id,
+            "assinado_em":   obra.get("created_at", ""),
+            "created_at":    obra.get("created_at", ""),
             "dados_titular": {},
-            "interprete":   {},
-            "conteudo":     (
+            "interprete":    {},
+            "conteudo":      (
                 f"DECLARAÇÃO DE REGISTRO\n\n"
                 f"O titular da obra declara que a mesma está sob gestão "
                 f"da editora: {editora_nome}.\n\n"
                 f"Este dossiê foi gerado pela plataforma Gravan como "
                 f"registro de autoria e integridade da obra."
             ),
-            "versao":       "v1.0",
+            "versao":        "v1.0",
         }
 
     def _buscar_autores(self, obra_id: str) -> list:
