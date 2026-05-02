@@ -24,9 +24,9 @@ stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 FRONTEND_URL   = os.environ.get("FRONTEND_URL", "http://localhost:5173")
 
-# Métodos Gravan -> Stripe (PIX exige ativação no Stripe BR; usamos card por padrão)
+# Métodos Gravan -> Stripe
 METODO_TO_STRIPE = {
-    "pix":     ["card"],   # fallback: card (PIX precisa ativação manual no painel Stripe)
+    "pix":     ["pix"],
     "credito": ["card"],
     "debito":  ["card"],
     "boleto":  ["boleto"],

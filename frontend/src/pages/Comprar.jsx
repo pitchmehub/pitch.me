@@ -8,9 +8,9 @@ function fmt(cents) {
 }
 
 const METODOS = [
- { id: 'pix', label: 'PIX', desc: 'Aprovação imediata · sem taxas extras' },
- { id: 'credito', label: 'Cartão de Crédito', desc: 'Visa, Mastercard, Elo, Amex' },
- { id: 'debito', label: 'Cartão de Débito', desc: 'Débito à vista' },
+ { id: 'pix',     label: 'PIX',              desc: 'QR Code gerado na hora · aprovação imediata · sem taxas extras', icon: '🏦' },
+ { id: 'credito', label: 'Cartão de Crédito', desc: 'Visa, Mastercard, Elo, Amex',                                    icon: '💳' },
+ { id: 'debito',  label: 'Cartão de Débito',  desc: 'Débito à vista',                                                 icon: '💳' },
 ]
 
 export default function Comprar() {
@@ -194,6 +194,7 @@ export default function Comprar() {
  onChange={() => setMetodo(m.id)}
  style={{ accentColor: 'var(--brand)', width: 16, height: 16 }}
  />
+ <span style={{ fontSize: 20 }}>{m.icon}</span>
  <div>
  <div style={{ fontWeight: 600, fontSize: 14 }}>{m.label}</div>
  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{m.desc}</div>
@@ -267,7 +268,7 @@ export default function Comprar() {
  data-testid="btn-pagar"
  title={!concordo ? 'Marque a concordância com o contrato para prosseguir.' : undefined}
  >
- {pagando ? 'Redirecionando…' : ` Pagar com Stripe · ${fmt(valorFinal)}`}
+ {pagando ? 'Redirecionando…' : metodo === 'pix' ? `🏦 Pagar com PIX · ${fmt(valorFinal)}` : `💳 Pagar com Cartão · ${fmt(valorFinal)}`}
  </button>
 
  <div style={{
