@@ -40,7 +40,6 @@ export default function GlobalPlayer() {
   } = usePlayer()
 
   const [showQueue,    setShowQueue]    = useState(false)
-  const [letraOpen,    setLetraOpen]    = useState(false)
   const [letra,        setLetra]        = useState(null)
   const [letraLoading, setLetraLoading] = useState(false)
   const [fichaOpen,    setFichaOpen]    = useState(false)
@@ -53,14 +52,28 @@ export default function GlobalPlayer() {
   const queueListRef  = useRef(null)
   const barRef        = useRef(null)
   const touchStart    = useRef(null)
-  const letraTouchY   = useRef(null)
 
   // Reset letra/ficha on obra change
   useEffect(() => {
     setLetra(null)
-    setLetraOpen(false)
     setFichaOpen(false)
   }, [obra?.id])
+
+  // Auto-load letra when player expands
+  useEffect(() => {
+    if (!expanded || !obra?.id) return
+    if (letra !== null || letraLoading) return
+    setLetraLoading(true)
+    supabase.from('obras').select('letra').eq('id', obra.id).maybeSingle()
+      .then(({ data }) => setLetra(data?.letra || ''))
+      .catch(() => setLetra(''))
+      .finally(() => setLetraLoading(false))
+  }, [expanded, obra?.id])
+
+  // Close queue when player collapses
+  useEffect(() => {
+    if (!expanded) setShowQueue(false)
+  }, [expanded])
 
   async function shareTrack() {
     if (!obra) return
@@ -80,19 +93,12 @@ export default function GlobalPlayer() {
     }
   }
 
-  // Quando colapsa do expandido no mobile, manter o mini player visível
-  // (acima do botão Descoberta) em vez de cair na barra de fundo.
   function colapsarParaMini() {
     setExpanded(false)
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setMinimized(true)
     }
   }
-
-  // Close queue view when player collapses
-  useEffect(() => {
-    if (!expanded) setShowQueue(false)
-  }, [expanded])
 
   if (!visible || !obra) return null
 
@@ -116,9 +122,9 @@ export default function GlobalPlayer() {
     window.addEventListener('mouseup', onUp)
   }
 
-  // ── Swipe geral no expanded ───────────────────────────────
+  // ── Swipe down no hero para colapsar ─────────────────────
   function handleExpandedTouchStart(e) {
-    if (e.target.closest('.gp-letra-sheet') || e.target.closest('.gp-q-grip') || e.target.closest('.gp-queue-list')) return
+    if (e.target.closest('.gp-exp-scroll') || e.target.closest('.gp-queue-sheet') || e.target.closest('.gp-q-grip')) return
     touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
   }
   function handleExpandedTouchEnd(e) {
@@ -131,26 +137,6 @@ export default function GlobalPlayer() {
       if (dx < -60 && Math.abs(dx) > Math.abs(dy) * 1.5) { nextTrack(); return }
       if (dx > 60  && Math.abs(dx) > Math.abs(dy) * 1.5) { prevTrack() }
     }
-  }
-
-  // ── Letra ─────────────────────────────────────────────────
-  function handleLetraTouchStart(e) { e.stopPropagation(); letraTouchY.current = e.touches[0].clientY }
-  function handleLetraTouchEnd(e) {
-    e.stopPropagation()
-    if (!letraTouchY.current) return
-    const dy = e.changedTouches[0].clientY - letraTouchY.current
-    letraTouchY.current = null
-    if (dy > 60) setLetraOpen(false)
-  }
-  async function abrirLetra() {
-    setLetraOpen(true)
-    if (letra !== null) return
-    setLetraLoading(true)
-    try {
-      const { data } = await supabase.from('obras').select('letra').eq('id', obra.id).maybeSingle()
-      setLetra(data?.letra || '')
-    } catch (_) { setLetra('') }
-    finally { setLetraLoading(false) }
   }
 
   // ── Drag-to-reorder (touch) ───────────────────────────────
@@ -188,193 +174,193 @@ export default function GlobalPlayer() {
   function handleDragEnd()         { setDragIdx(null); setDragOverIdx(null) }
 
   // ════════════════════════════════════════════════════════
-  // PLAYER EXPANDIDO
+  // PLAYER EXPANDIDO — novo design hero
   // ════════════════════════════════════════════════════════
   if (expanded) {
     return (
       <div
         className="gp-expanded"
-        style={{ background: obraGrad(obra) }}
         onTouchStart={handleExpandedTouchStart}
         onTouchEnd={handleExpandedTouchEnd}
       >
-        {/* ─── HEADER ─── */}
-        <div className="gp-exp-header">
-          <button className="gp-exp-btn" onClick={colapsarParaMini} aria-label="Fechar player">
-            <ChevronDownIcon />
-          </button>
-          <div className="gp-exp-title-center">
-            {nomeArtistico || 'Tocando agora'}
+        {/* ─── HERO: capa full-bleed ─── */}
+        <div className="gp-hero">
+          {obra.cover_url
+            ? <img src={obra.cover_url} alt="" className="gp-hero-img" />
+            : <div className="gp-hero-bg" style={{ background: obraGrad(obra) }}>
+                <span className="gp-hero-iniciais">{iniciais}</span>
+              </div>
+          }
+          <div className="gp-hero-grad" />
+
+          {/* Header sobreposto */}
+          <div className="gp-hero-header">
+            <button className="gp-hero-btn" onClick={colapsarParaMini} aria-label="Fechar player">
+              <ChevronDownIcon />
+            </button>
+            <span className="gp-hero-label">Tocando agora</span>
+            <button className="gp-hero-btn" onClick={() => setFichaOpen(true)} aria-label="Ficha técnica">
+              <DotsIcon />
+            </button>
           </div>
-          <button
-            className="gp-exp-btn"
-            onClick={() => {
-              if (showQueue) setShowQueue(false)
-              else setFichaOpen(true)
-            }}
-            aria-label={showQueue ? 'Voltar' : 'Ficha técnica'}
-            title={showQueue ? 'Tocando' : 'Ficha técnica'}
-          >
-            {showQueue ? <CloseIcon /> : <DotsIcon />}
-          </button>
+
+          {/* Título + artista + curtir na base da capa */}
+          <div className="gp-hero-info">
+            <div className="gp-hero-text">
+              <div className="gp-hero-nome">{obra.nome}</div>
+              <div className="gp-hero-autor">{nomeArtistico}</div>
+            </div>
+            <div className="gp-hero-like">
+              <BotaoCurtir obraId={obra.id} size={26} />
+            </div>
+          </div>
         </div>
 
-        {/* ── VIEW: TOCANDO ── */}
-        {!showQueue && (
-          <>
-            <div className="gp-exp-cover-wrap">
-              <div className="gp-exp-cover">
-                {obra.cover_url ? (
-                  <img src={obra.cover_url} alt="" className="gp-exp-cover-img" />
-                ) : (
-                  <span className="gp-exp-cover-iniciais">{iniciais}</span>
-                )}
+        {/* ─── CONTROLES (fixo, não rola) ─── */}
+        <div className="gp-exp-ctrl-section">
+          {/* Barra de progresso */}
+          <div className="gp-exp-progress-wrap">
+            <div
+              className="gp-exp-progress-bar"
+              ref={barRef}
+              onMouseDown={handleBarMouseDown}
+              onTouchStart={e => { e.stopPropagation(); seekFromEvent(e) }}
+              onTouchMove={e => { e.stopPropagation(); seekFromEvent(e) }}
+            >
+              <div className="gp-exp-progress-fill" style={{ width: `${pct}%` }}>
+                <div className="gp-exp-progress-thumb" />
               </div>
             </div>
-
-            {/* Linha: mini thumb + nome + autor + check (curtir) */}
-            <div className="gp-exp-track-row">
-              <div className="gp-exp-track-thumb" style={!obra.cover_url ? { background: miniColor(obra) } : undefined}>
-                {obra.cover_url ? (
-                  <img src={obra.cover_url} alt="" className="gp-exp-track-thumb-img" />
-                ) : (
-                  <span style={{ fontSize: 14, color: 'rgba(255,255,255,.85)', fontWeight: 700 }}>{iniciais}</span>
-                )}
-              </div>
-              <div className="gp-exp-track-meta">
-                <div className="gp-exp-nome">{obra.nome}</div>
-                <div className="gp-exp-autor">{nomeArtistico}</div>
-              </div>
-              <div className="gp-exp-track-check">
-                <BotaoCurtir obraId={obra.id} size={26} />
-              </div>
+            <div className="gp-exp-times">
+              <span>{fmt(currentTime)}</span>
+              <span>-{fmt(Math.max(0, duration - currentTime))}</span>
             </div>
-          </>
-        )}
+          </div>
 
-        {/* ── VIEW: FILA ── */}
+          {/* Transport */}
+          <div className="gp-exp-controls">
+            <button
+              className={`gp-exp-ctrl-btn gp-exp-ctrl-side ${shuffle ? 'gp-exp-ctrl-on' : ''}`}
+              onClick={toggleShuffle}
+              aria-label={shuffle ? 'Desativar aleatório' : 'Aleatório'}
+            >
+              <ShuffleIcon />
+            </button>
+            <button className="gp-exp-ctrl-btn" onClick={prevTrack} aria-label="Anterior"><PrevIcon size={30} /></button>
+            <button className="gp-exp-play-btn" onClick={togglePlay} aria-label={playing ? 'Pausar' : 'Tocar'}>
+              {loading ? <Spinner size={32} /> : playing ? <PauseIcon size={34} /> : <PlayIcon size={34} />}
+            </button>
+            <button className="gp-exp-ctrl-btn" onClick={nextTrack} aria-label="Próxima"><NextIcon size={30} /></button>
+            <button
+              className={`gp-exp-ctrl-btn gp-exp-ctrl-side ${repeat !== 'off' ? 'gp-exp-ctrl-on' : ''}`}
+              onClick={cycleRepeat}
+              aria-label={`Repetir: ${repeat}`}
+            >
+              <RepeatIcon />
+              {repeat === 'one' && <span className="gp-exp-ctrl-badge">1</span>}
+            </button>
+          </div>
+
+          {/* Ações: Ficha | Fila | Compartilhar */}
+          <div className="gp-exp-actions">
+            <button className="gp-exp-action-btn" onClick={() => setFichaOpen(true)} aria-label="Ficha técnica">
+              <BookIcon />
+              <span>Ficha</span>
+            </button>
+            <button
+              className={`gp-exp-action-btn ${showQueue ? 'gp-exp-action-on' : ''}`}
+              onClick={() => setShowQueue(q => !q)}
+              aria-label="Fila"
+            >
+              <QueueIcon />
+              <span>Fila</span>
+              {queue.length > 1 && <span className="gp-exp-action-badge">{queue.length}</span>}
+            </button>
+            <button className="gp-exp-action-btn" onClick={shareTrack} aria-label="Compartilhar">
+              <ShareIcon />
+              <span>Compartilhar</span>
+            </button>
+          </div>
+
+          <div className="gp-exp-divider" />
+        </div>
+
+        {/* ─── LETRA (rola como parte da página) ─── */}
+        <div
+          className="gp-exp-scroll"
+          onTouchStart={e => e.stopPropagation()}
+          onTouchMove={e => e.stopPropagation()}
+        >
+          <div className="gp-exp-lyrics-label">Letra</div>
+          {letraLoading
+            ? <div className="gp-letra-empty">Carregando letra…</div>
+            : (letra && letra.trim())
+              ? <pre className="gp-exp-lyrics-text">{letra}</pre>
+              : letra === ''
+                ? <div className="gp-letra-empty">Letra não disponível para esta obra.</div>
+                : null
+          }
+        </div>
+
+        {/* ─── FILA (bottom sheet) ─── */}
         {showQueue && (
-          <div
-            className="gp-queue-list"
-            ref={queueListRef}
-            onTouchMove={handleQueueTouchMove}
-            onTouchEnd={handleQueueTouchEnd}
-          >
-            {queue.map((item, i) => (
-              <div
-                key={item.id + i}
-                className={[
-                  'gp-q-item',
-                  i === index      ? 'gp-q-item-active'  : '',
-                  i === dragIdx    ? 'gp-q-item-dragging' : '',
-                  i === dragOverIdx && i !== dragIdx ? 'gp-q-item-over' : '',
-                ].join(' ')}
-                draggable
-                onDragStart={e => handleDragStart(e, i)}
-                onDragOver={e => handleDragOver(e, i)}
-                onDrop={e => handleDrop(e, i)}
-                onDragEnd={handleDragEnd}
-                onClick={() => { if (dragIdx === null) goToIndex(i) }}
-              >
-                <span className="gp-q-grip" onTouchStart={e => handleGripTouchStart(e, i)}><GripIcon /></span>
-                <div className="gp-q-mini-cover" style={!item.cover_url ? { background: miniColor(item) } : undefined}>
-                  {item.cover_url && <img src={item.cover_url} alt="" className="gp-q-mini-cover-img" />}
-                  {i === index && playing
-                    ? <span className="gp-q-playing-dot"><PlayIcon size={10} /></span>
-                    : (!item.cover_url && <span style={{ fontSize: 11, fontWeight: 700 }}>{(item.nome || '').charAt(0).toUpperCase()}</span>)
-                  }
+          <div className="gp-queue-sheet" onTouchStart={e => e.stopPropagation()}>
+            <div className="gp-queue-sheet-header">
+              <span className="gp-queue-sheet-title">Fila de reprodução</span>
+              <button className="gp-queue-sheet-close" onClick={() => setShowQueue(false)} aria-label="Fechar fila">
+                <CloseIcon />
+              </button>
+            </div>
+            <div
+              className="gp-queue-list"
+              ref={queueListRef}
+              onTouchMove={handleQueueTouchMove}
+              onTouchEnd={handleQueueTouchEnd}
+            >
+              {queue.map((item, i) => (
+                <div
+                  key={item.id + i}
+                  className={[
+                    'gp-q-item',
+                    i === index      ? 'gp-q-item-active'  : '',
+                    i === dragIdx    ? 'gp-q-item-dragging' : '',
+                    i === dragOverIdx && i !== dragIdx ? 'gp-q-item-over' : '',
+                  ].join(' ')}
+                  draggable
+                  onDragStart={e => handleDragStart(e, i)}
+                  onDragOver={e => handleDragOver(e, i)}
+                  onDrop={e => handleDrop(e, i)}
+                  onDragEnd={handleDragEnd}
+                  onClick={() => { if (dragIdx === null) goToIndex(i) }}
+                >
+                  <span className="gp-q-grip" onTouchStart={e => handleGripTouchStart(e, i)}><GripIcon /></span>
+                  <div className="gp-q-mini-cover" style={!item.cover_url ? { background: miniColor(item) } : undefined}>
+                    {item.cover_url && <img src={item.cover_url} alt="" className="gp-q-mini-cover-img" />}
+                    {i === index && playing
+                      ? <span className="gp-q-playing-dot"><PlayIcon size={10} /></span>
+                      : (!item.cover_url && <span style={{ fontSize: 11, fontWeight: 700 }}>{(item.nome || '').charAt(0).toUpperCase()}</span>)
+                    }
+                  </div>
+                  <div className="gp-q-info">
+                    <div className="gp-q-nome">{item.nome}</div>
+                    <div className="gp-q-autor">{item.nome_artistico || item.titular_nome}</div>
+                  </div>
+                  {i === index && <span className="gp-q-now-badge">agora</span>}
+                  {queue.length > 1 && (
+                    <button
+                      className="gp-q-remove"
+                      onClick={e => { e.stopPropagation(); removeFromQueue(i) }}
+                      title="Remover da fila"
+                    >×</button>
+                  )}
                 </div>
-                <div className="gp-q-info">
-                  <div className="gp-q-nome">{item.nome}</div>
-                  <div className="gp-q-autor">{item.nome_artistico || item.titular_nome}</div>
-                </div>
-                {i === index && <span className="gp-q-now-badge">agora</span>}
-                {queue.length > 1 && (
-                  <button
-                    className="gp-q-remove"
-                    onClick={e => { e.stopPropagation(); removeFromQueue(i) }}
-                    title="Remover da fila"
-                  >×</button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ── Barra de progresso ── */}
-        <div className="gp-exp-progress-wrap">
-          <div
-            className="gp-exp-progress-bar"
-            ref={barRef}
-            onMouseDown={handleBarMouseDown}
-            onTouchStart={e => { e.stopPropagation(); seekFromEvent(e) }}
-            onTouchMove={e => { e.stopPropagation(); seekFromEvent(e) }}
-          >
-            <div className="gp-exp-progress-fill" style={{ width: `${pct}%` }}>
-              <div className="gp-exp-progress-thumb" />
+              ))}
             </div>
           </div>
-          <div className="gp-exp-times">
-            <span>{fmt(currentTime)}</span>
-            <span>-{fmt(Math.max(0, duration - currentTime))}</span>
-          </div>
-        </div>
-
-        {/* ── Controles principais ── */}
-        <div className="gp-exp-controls">
-          <button
-            className={`gp-exp-ctrl-btn gp-exp-ctrl-side ${shuffle ? 'gp-exp-ctrl-on' : ''}`}
-            onClick={toggleShuffle}
-            aria-label={shuffle ? 'Desativar aleatório' : 'Aleatório'}
-            title={shuffle ? 'Aleatório ligado' : 'Aleatório desligado'}
-          >
-            <ShuffleIcon />
-          </button>
-          <button className="gp-exp-ctrl-btn" onClick={prevTrack} aria-label="Anterior"><PrevIcon size={30} /></button>
-          <button className="gp-exp-play-btn" onClick={togglePlay} aria-label={playing ? 'Pausar' : 'Tocar'}>
-            {loading ? <Spinner size={32} /> : playing ? <PauseIcon size={34} /> : <PlayIcon size={34} />}
-          </button>
-          <button className="gp-exp-ctrl-btn" onClick={nextTrack} aria-label="Próxima"><NextIcon size={30} /></button>
-          <button
-            className={`gp-exp-ctrl-btn gp-exp-ctrl-side ${repeat !== 'off' ? 'gp-exp-ctrl-on' : ''}`}
-            onClick={cycleRepeat}
-            aria-label={`Repetir: ${repeat}`}
-            title={repeat === 'off' ? 'Repetir desligado' : repeat === 'all' ? 'Repetir fila' : 'Repetir esta obra'}
-          >
-            <RepeatIcon />
-            {repeat === 'one' && <span className="gp-exp-ctrl-badge">1</span>}
-          </button>
-        </div>
-
-        {/* ── Barra de ações inferior ── */}
-        <div className="gp-exp-actions">
-          <button className="gp-exp-action-btn" onClick={abrirLetra} aria-label="Ler letra" title="Ler letra">
-            <BookIcon />
-          </button>
-          <div style={{ flex: 1 }} />
-          <button
-            className="gp-exp-action-btn"
-            onClick={() => setShowQueue(q => !q)}
-            aria-label="Fila"
-            title="Fila"
-          >
-            <QueueIcon />
-            {queue.length > 1 && <span className="gp-exp-action-badge">{queue.length}</span>}
-          </button>
-          <button
-            className="gp-exp-action-btn"
-            onClick={shareTrack}
-            aria-label="Compartilhar"
-            title="Compartilhar música"
-          >
-            <ShareIcon />
-          </button>
-        </div>
-        {shareToast && (
-          <div className="gp-share-toast">Link copiado!</div>
         )}
 
-        {/* Ficha técnica */}
+        {shareToast && <div className="gp-share-toast">Link copiado!</div>}
+
         {fichaOpen && (
           <FichaTecnica
             obra={obra}
@@ -383,29 +369,6 @@ export default function GlobalPlayer() {
             isPlaying={playing}
             isActive
           />
-        )}
-
-        {/* Janela de letra */}
-        {letraOpen && (
-          <div
-            className="gp-letra-sheet"
-            onTouchStart={handleLetraTouchStart}
-            onTouchEnd={handleLetraTouchEnd}
-          >
-            <div className="gp-letra-handle-bar" onClick={() => setLetraOpen(false)} />
-            <div className="gp-letra-header">
-              <span className="gp-letra-titulo">{obra.nome}</span>
-              <button className="gp-letra-close" onClick={() => setLetraOpen(false)}>×</button>
-            </div>
-            <div className="gp-letra-body">
-              {letraLoading
-                ? <div className="gp-letra-empty">Carregando letra…</div>
-                : (letra && letra.trim())
-                  ? <pre className="gp-letra-text">{letra}</pre>
-                  : <div className="gp-letra-empty">Letra não disponível para esta obra.</div>
-              }
-            </div>
-          </div>
         )}
       </div>
     )
@@ -495,7 +458,7 @@ function NextIcon({ size = 16 }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><polygon points="5,4 15,12 5,20"/><rect x="16" y="4" width="3" height="16" rx="1"/></svg>
 }
 function CloseIcon() {
-  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 }
 function MinimizeIcon() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -509,14 +472,6 @@ function VolumeIcon() {
 function DotsIcon() {
   return <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
 }
-function CheckIcon() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="11" fill="#22C55E"/>
-      <path d="M7 12.5l3.2 3.2L17 9" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  )
-}
 function ShuffleIcon() {
   return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
 }
@@ -524,10 +479,10 @@ function RepeatIcon() {
   return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
 }
 function BookIcon() {
-  return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
 }
 function QueueIcon() {
-  return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
 }
 function ShareIcon() {
   return (
