@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState, useRef } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { usePlayer } from '../contexts/PlayerContext'
 import { api } from '../lib/api'
@@ -14,6 +14,7 @@ function fmt(cents) {
 export default function Catalogo() {
  const { perfil } = useAuth()
  const navigate = useNavigate()
+ const [searchParams] = useSearchParams()
  const { playObra, obra: obraAtual, playing, togglePlay } = usePlayer()
 
  const [obras, setObras] = useState([])
@@ -23,10 +24,35 @@ export default function Catalogo() {
  const [page, setPage] = useState(1)
  const [hasMore, setHasMore] = useState(true)
  const [selected, setSelected] = useState(null)
+ const autoplayedRef = useRef(false)
 
  const perPage = 12
 
  useEffect(() => { fetchObras(1, true) }, [busca, genero])
+
+ // Autoplay quando vindo de um link compartilhado (?obra=<id>)
+ const autoplayId = searchParams.get('obra')
+ useEffect(() => {
+  if (!autoplayId || autoplayedRef.current) return
+  // Tenta encontrar na lista já carregada
+  const found = obras.find(o => o.id === autoplayId && o.audio_path)
+  if (found) {
+   autoplayedRef.current = true
+   playObra(found)
+   navigate('/catalogo', { replace: true })
+   return
+  }
+  // Se a lista ainda não tem (loading) espera; se terminou e não achou, busca direto
+  if (!loading && obras.length > 0) {
+   autoplayedRef.current = true
+   api.get(`/catalogo/${autoplayId}`).then(data => {
+    if (data && data.audio_path) {
+     playObra(data)
+     navigate('/catalogo', { replace: true })
+    }
+   }).catch(() => {})
+  }
+ }, [autoplayId, obras, loading])
 
  async function fetchObras(p = 1, reset = false) {
  setLoading(true)

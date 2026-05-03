@@ -6,6 +6,7 @@
   "devCommand": "npm run dev",
   "rewrites": [
     { "source": "/.env", "destination": "/__not_found.html" },
+    { "source": "/obra/:id", "destination": "https://pitch-me-4kut.onrender.com/api/share/obra/:id" },
     { "source": "/.env.(.*)", "destination": "/__not_found.html" },
     { "source": "/.git/(.*)", "destination": "/__not_found.html" },
     { "source": "/.gitignore", "destination": "/__not_found.html" },

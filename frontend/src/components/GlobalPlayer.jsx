@@ -64,7 +64,7 @@ export default function GlobalPlayer() {
 
   async function shareTrack() {
     if (!obra) return
-    const url = `${window.location.origin}/catalogo`
+    const url = `${window.location.origin}/obra/${obra.id}`
     const title = obra.nome || 'Música na Gravan'
     const text = nomeArtistico
       ? `Ouça "${obra.nome}" de ${nomeArtistico} na Gravan`
@@ -73,7 +73,7 @@ export default function GlobalPlayer() {
       try { await navigator.share({ title, text, url }) } catch (_) {}
     } else {
       try {
-        await navigator.clipboard.writeText(`${text} — ${url}`)
+        await navigator.clipboard.writeText(url)
         setShareToast(true)
         setTimeout(() => setShareToast(false), 2500)
       } catch (_) {}

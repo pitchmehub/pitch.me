@@ -286,6 +286,12 @@ def create_app() -> Flask:
     from routes.ofertas_terceiros import ofertas_lic_bp
     app.register_blueprint(ofertas_lic_bp)
 
+    # Páginas OG para compartilhamento em redes sociais
+    from routes.share import share_bp
+    app.register_blueprint(share_bp)
+    csrf.exempt(share_bp)
+    limiter.exempt(share_bp)
+
     # ═══════════════════════════════════════════════════════════
     # SEED AUTOMÁTICO: Contrato de Edição Musical
     # ═══════════════════════════════════════════════════════════
