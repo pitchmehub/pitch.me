@@ -203,7 +203,7 @@ export default function GlobalPlayer() {
             <button className="gp-hero-btn" onClick={colapsarParaMini} aria-label="Fechar player">
               <ChevronDownIcon />
             </button>
-            <span className="gp-hero-label">Tocando agora</span>
+            <span />
             <button className="gp-hero-btn" onClick={() => setFichaOpen(true)} aria-label="Ficha técnica">
               <DotsIcon />
             </button>
