@@ -425,21 +425,26 @@ def webhook():
                 ).single().execute().data or {}
                 titular_id = obra_info.get("titular_id")
                 if titular_id and titular_id != trans.get("comprador_id"):
-                    valor_reais = f"R$ {trans['valor_cents'] / 100:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+                    # Mostra o valor LÍQUIDO do compositor (75% do bruto, após comissão Gravan)
+                    liquido_cents = int(trans.get("liquido_cents") or 0)
+                    bruto_cents   = int(trans.get("valor_cents") or 0)
+                    _fmt = lambda c: f"R$ {c / 100:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
                     _notify(
                         perfil_id=titular_id,
                         tipo="compra",
                         titulo=f"Sua obra foi licenciada: \"{obra_info.get('nome','—')}\"",
                         mensagem=(
                             f"{comprador_info.get('nome') or 'Um intérprete'} licenciou "
-                            f"\"{obra_info.get('nome','—')}\" por {valor_reais}. "
-                            f"O valor será liberado na sua carteira após todas as partes assinarem o contrato."
+                            f"\"{obra_info.get('nome','—')}\" por {_fmt(bruto_cents)} (valor bruto). "
+                            f"Sua parte líquida (após comissão Gravan de 25%): {_fmt(liquido_cents)}. "
+                            f"O valor será creditado na sua carteira após todas as partes assinarem o contrato."
                         ),
                         link="/contratos",
                         payload={
-                            "transacao_id": trans["id"],
-                            "obra_id":      trans["obra_id"],
-                            "valor_cents":  trans["valor_cents"],
+                            "transacao_id":  trans["id"],
+                            "obra_id":       trans["obra_id"],
+                            "valor_cents":   bruto_cents,
+                            "liquido_cents": liquido_cents,
                         },
                     )
             except Exception as _e:
