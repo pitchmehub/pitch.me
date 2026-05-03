@@ -242,7 +242,6 @@ export default function Comprar() {
  {eExclusiva
  ? ' de exclusividade (renovação somente por novo acordo escrito)'
  : ' com renovação automática (rescisão por e-mail com 30 dias de antecedência ao fim do período)'},
- fee de 5% à GRAVAN sobre a exploração comercial da obra,
  território mundial, foro Rio de Janeiro/RJ).
  Ao clicar em "Pagar", minha assinatura eletrônica será registrada
  (MP 2.200-2/2001 e Lei 14.063/2020).

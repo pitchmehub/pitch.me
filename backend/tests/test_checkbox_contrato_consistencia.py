@@ -89,17 +89,9 @@ class TestCheckboxBateComContrato:
             "Contrato mudou a regra de renovação da exclusiva — atualize o checkbox."
         )
 
-    def test_fee_5_pct_exploracao(self, checkbox_text, contrato_text):
-        assert "5%" in checkbox_text and "exploração comercial" in checkbox_text, (
-            "Checkbox não cita o fee de 5% sobre exploração comercial."
-        )
-        # O fee de 5% sobre exploração comercial aparece na 6.3 (bilateral) e
-        # na 5 (trilateral). Garantimos que pelo menos um continua no template.
-        assert "5% (cinco por cento) do valor bruto" in contrato_text, (
-            "Cláusula do fee de 5% sobre exploração comercial sumiu do contrato — "
-            "remova / atualize o checkbox."
-        )
-        assert "exploração comercial" in contrato_text
+    # test_fee_5_pct_exploracao removido: o fee de 5% sobre exploração comercial
+    # é pago pela editora diretamente à Gravan, fora da plataforma, por isso não
+    # é exibido nem no checkbox de compra nem no recibo fiscal.
 
     def test_territorio_mundial(self, checkbox_text, contrato_text):
         assert "território mundial" in checkbox_text, (

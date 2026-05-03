@@ -240,7 +240,6 @@ def gerar_dados_recibo(perfil_id: str, ano: int, mes: int) -> dict:
     linhas = []
     bruto = 0
     plataforma_inf = 0
-    exploracao_inf = 0
     for p in pagamentos:
         t = tx_map.get(p.get("transacao_id")) or {}
         oid = t.get("obra_id")
@@ -251,13 +250,8 @@ def gerar_dados_recibo(perfil_id: str, ano: int, mes: int) -> dict:
         valor_cred = int(p.get("valor_cents") or 0)
         share = p.get("share_pct")
 
-        # Fees informativos calculados sobre o valor bruto da transação:
-        # 25% plataforma, 5% exploração comercial (cláusula 5/6.3 GRAVAN)
         plat_inf = int(Decimal(valor_total) * PLATFORM_RATE)
-        expl_inf = int(Decimal(valor_total) * Decimal("0.05"))
-
         plataforma_inf += plat_inf
-        exploracao_inf += expl_inf
         bruto += valor_cred
 
         # Papel do beneficiário nessa linha
@@ -313,7 +307,6 @@ def gerar_dados_recibo(perfil_id: str, ano: int, mes: int) -> dict:
             "bruto_creditado_cents": bruto,
             "qtd_transacoes": len({l["transacao_id"] for l in linhas if l.get("transacao_id")}),
             "platform_fee_cents_informativo": plataforma_inf,
-            "exploracao_fee_cents_informativo": exploracao_inf,
             "ytd_cents": ytd_cents,
             "platform_rate_pct": float(PLATFORM_RATE * 100),
             "editora_rate_pct": float(EDITORA_RATE * 100),
@@ -325,9 +318,9 @@ def gerar_dados_recibo(perfil_id: str, ano: int, mes: int) -> dict:
             "recolhimento de tributos (IRRF, ISS, INSS, etc.) e a "
             "emissão de nota fiscal de serviço (NFS-e), quando "
             "aplicáveis, são de responsabilidade exclusiva do "
-            "beneficiário, observada a sua natureza jurídica. Os fees "
-            "destacados (25% plataforma e 5% exploração comercial) são "
-            "informativos e já estão deduzidos do valor creditado."
+            "beneficiário, observada a sua natureza jurídica. O fee de "
+            "plataforma destacado (25%) é informativo e já está "
+            "deduzido do valor creditado."
         ),
         "emitido_em": datetime.utcnow().isoformat() + "Z",
     }
@@ -463,10 +456,6 @@ def gerar_pdf_recibo(dados: dict) -> bytes:
         [
             f"Fee plataforma GRAVAN (informativo, {tot['platform_rate_pct']:.0f}%)",
             _brl(tot["platform_fee_cents_informativo"]),
-        ],
-        [
-            "Fee exploração comercial (informativo, 5%)",
-            _brl(tot["exploracao_fee_cents_informativo"]),
         ],
         [
             f"Acumulado no ano ({per['ano']}, até {per['label']})",
