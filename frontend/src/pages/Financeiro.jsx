@@ -203,8 +203,6 @@ export default function Financeiro() {
                 <Card label="Transações" value={recibo.totais.qtd_transacoes} />
                 <Card label={`Fee plataforma (${recibo.totais.platform_rate_pct.toFixed(0)}%)`}
                       value={fmt(recibo.totais.platform_fee_cents_informativo)} sub="informativo" />
-                <Card label="Fee exploração comercial (5%)"
-                      value={fmt(recibo.totais.exploracao_fee_cents_informativo)} sub="informativo" />
                 <Card label={`Acumulado em ${recibo.periodo.ano}`}
                       value={fmt(recibo.totais.ytd_cents)} />
               </div>
