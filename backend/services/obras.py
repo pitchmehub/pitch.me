@@ -121,7 +121,7 @@ class ObraService:
         )
         self.sb.table("obras").update({"audio_path": audio_path}).eq("id", obra_id).execute()
 
-        # 6. Inserir coautorias
+        # 6. Inserir coautorias (só se houver)
         rows = [
             {
                 "obra_id":    obra_id,
@@ -131,7 +131,8 @@ class ObraService:
             }
             for c in coautorias
         ]
-        self.sb.table("coautorias").insert(rows).execute()
+        if rows:
+            self.sb.table("coautorias").insert(rows).execute()
 
         # 7. Audit log
         AuditLogger.log_obra_criada(obra_id, campos["nome"])

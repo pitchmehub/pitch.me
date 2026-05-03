@@ -339,14 +339,20 @@ def criar_obra():
         },
     }
     try:
-        contrato = sb.table("contratos_edicao").insert({**contrato_row, "versao": contrato_versao}).execute()
-    except Exception:
-        contrato = sb.table("contratos_edicao").insert(contrato_row).execute()
+        try:
+            contrato = sb.table("contratos_edicao").insert({**contrato_row, "versao": contrato_versao}).execute()
+        except Exception:
+            contrato = sb.table("contratos_edicao").insert(contrato_row).execute()
 
-    if contrato.data:
-        sb.table("obras").update({
-            "contrato_edicao_id": contrato.data[0]["id"],
-        }).eq("id", obra["id"]).execute()
+        if contrato.data:
+            try:
+                sb.table("obras").update({
+                    "contrato_edicao_id": contrato.data[0]["id"],
+                }).eq("id", obra["id"]).execute()
+            except Exception as _ue:
+                print(f"[obras] falha ao atualizar contrato_edicao_id: {_ue}")
+    except Exception as _ce:
+        print(f"[obras] falha ao gerar contratos_edicao (não fatal): {_ce}")
 
     # ── Gravan Editora Operacional ────────────────────────────────
     # Vincula a obra à Gravan como Editora Detentora dos Direitos e
