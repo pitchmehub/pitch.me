@@ -52,6 +52,7 @@ export default function GlobalPlayer() {
   const queueListRef  = useRef(null)
   const barRef        = useRef(null)
   const touchStart    = useRef(null)
+  const touchStartEl  = useRef(null)
 
   // Reset letra/ficha on obra change
   useEffect(() => {
@@ -122,17 +123,21 @@ export default function GlobalPlayer() {
     window.addEventListener('mouseup', onUp)
   }
 
-  // ── Swipe down no hero para colapsar ─────────────────────
+  // ── Swipe: colapsar (hero) + skip (toda a tela) ──────────
   function handleExpandedTouchStart(e) {
-    if (e.target.closest('.gp-exp-scroll') || e.target.closest('.gp-queue-sheet') || e.target.closest('.gp-q-grip')) return
-    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    if (e.target.closest('.gp-queue-sheet') || e.target.closest('.gp-q-grip')) return
+    touchStart.current  = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    touchStartEl.current = e.target
   }
   function handleExpandedTouchEnd(e) {
     if (!touchStart.current) return
     const dx = e.changedTouches[0].clientX - touchStart.current.x
     const dy = e.changedTouches[0].clientY - touchStart.current.y
     touchStart.current = null
-    if (dy > 80 && Math.abs(dy) > Math.abs(dx) * 1.5) { colapsarParaMini(); return }
+    // Swipe para baixo → colapsar: só quando iniciado no hero
+    const fromHero = touchStartEl.current?.closest('.gp-hero')
+    if (fromHero && dy > 80 && Math.abs(dy) > Math.abs(dx) * 1.5) { colapsarParaMini(); return }
+    // Swipe horizontal → avançar/voltar: em qualquer lugar da tela
     if (!showQueue) {
       if (dx < -60 && Math.abs(dx) > Math.abs(dy) * 1.5) { nextTrack(); return }
       if (dx > 60  && Math.abs(dx) > Math.abs(dy) * 1.5) { prevTrack() }
@@ -286,11 +291,7 @@ export default function GlobalPlayer() {
         </div>
 
         {/* ─── LETRA (rola como parte da página) ─── */}
-        <div
-          className="gp-exp-scroll"
-          onTouchStart={e => e.stopPropagation()}
-          onTouchMove={e => e.stopPropagation()}
-        >
+        <div className="gp-exp-scroll">
           <div className="gp-exp-lyrics-label">Letra</div>
           {letraLoading
             ? <div className="gp-letra-empty">Carregando letra…</div>
@@ -303,6 +304,9 @@ export default function GlobalPlayer() {
         </div>
 
         {/* ─── FILA (bottom sheet) ─── */}
+        {showQueue && (
+          <div className="gp-queue-backdrop" onClick={() => setShowQueue(false)} />
+        )}
         {showQueue && (
           <div className="gp-queue-sheet" onTouchStart={e => e.stopPropagation()}>
             <div className="gp-queue-sheet-header">
