@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { api } from '../lib/api'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 function fmt(cents) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -15,6 +16,7 @@ function fmtData(iso) {
 }
 
 export default function Financeiro() {
+  const isMobile = useIsMobile()
   const [meses, setMeses] = useState([])
   const [carregandoMeses, setCarregandoMeses] = useState(true)
   const [erro, setErro] = useState('')
@@ -72,7 +74,7 @@ export default function Financeiro() {
   }
 
   return (
-    <div style={{ padding: 24, maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ padding: isMobile ? '0 0 16px' : 24, maxWidth: 1100, margin: '0 auto' }}>
       <header style={{ marginBottom: 16 }}>
         <h1 style={{ margin: 0, fontSize: 22 }}>Recibos fiscais mensais</h1>
         <p style={{ marginTop: 6, color: 'var(--muted, #6b7280)', fontSize: 14 }}>
@@ -90,11 +92,12 @@ export default function Financeiro() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 20 }}>
-        {/* Lista de meses */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '260px 1fr', gap: 16 }}>
+        {/* Lista de meses — no mobile, esconde quando há recibo selecionado */}
         <aside style={{
           background: '#fff', border: '1px solid #e5e7eb',
-          borderRadius: 10, padding: 12, minHeight: 320,
+          borderRadius: 10, padding: 12, minHeight: isMobile ? 'auto' : 320,
+          display: isMobile && selecionado ? 'none' : 'block',
         }}>
           <h3 style={{ margin: '4px 6px 10px', fontSize: 13, color: '#6b7280', textTransform: 'uppercase' }}>
             Últimos meses
@@ -136,20 +139,39 @@ export default function Financeiro() {
           )}
         </aside>
 
-        {/* Recibo */}
+        {/* Recibo — no mobile, só aparece quando há mês selecionado */}
+        {(!isMobile || selecionado) && (
         <section style={{
           background: '#fff', border: '1px solid #e5e7eb',
-          borderRadius: 10, padding: 18, minHeight: 320,
+          borderRadius: 10, padding: isMobile ? 14 : 18, minHeight: 320,
         }}>
+          {isMobile && selecionado && (
+            <button
+              onClick={() => setSelecionado(null)}
+              style={{
+                background: 'none', border: 'none', padding: '0 0 12px',
+                color: 'var(--brand, #4338ca)', fontSize: 14, fontWeight: 600,
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
+              }}
+            >
+              ← Voltar aos meses
+            </button>
+          )}
           {!selecionado ? (
-            <p style={{ color: '#6b7280' }}>Selecione um mês à esquerda para visualizar o recibo.</p>
+            <p style={{ color: '#6b7280' }}>Selecione um mês para visualizar o recibo.</p>
           ) : carregandoRecibo ? (
             <p style={{ color: '#6b7280' }}>Carregando recibo…</p>
           ) : !recibo ? (
             <p style={{ color: '#6b7280' }}>Sem dados para este período.</p>
           ) : (
             <>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                justifyContent: 'space-between',
+                alignItems: isMobile ? 'flex-start' : 'flex-start',
+                gap: 10, marginBottom: 14,
+              }}>
                 <div>
                   <h2 style={{ margin: 0, fontSize: 18 }}>Recibo de {recibo.periodo.label}</h2>
                   <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280' }}>
@@ -165,6 +187,7 @@ export default function Financeiro() {
                     border: 'none', padding: '10px 14px',
                     borderRadius: 8, cursor: baixando ? 'wait' : 'pointer',
                     fontSize: 14, fontWeight: 600,
+                    width: isMobile ? '100%' : 'auto',
                   }}
                 >
                   {baixando ? 'Gerando PDF…' : 'Baixar PDF'}
@@ -235,6 +258,7 @@ export default function Financeiro() {
             </>
           )}
         </section>
+        )}
       </div>
     </div>
   )
