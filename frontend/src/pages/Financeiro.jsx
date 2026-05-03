@@ -74,7 +74,7 @@ export default function Financeiro() {
   }
 
   return (
-    <div style={{ padding: isMobile ? '0 0 16px' : 24, maxWidth: 1100, margin: '0 auto' }}>
+    <div style={{ padding: isMobile ? '0 4px 16px' : 24, maxWidth: 1100, margin: '0 auto' }}>
       <header style={{ marginBottom: 16 }}>
         <h1 style={{ margin: 0, fontSize: 22 }}>Recibos fiscais mensais</h1>
         <p style={{ marginTop: 6, color: 'var(--muted, #6b7280)', fontSize: 14 }}>
