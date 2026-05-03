@@ -3,7 +3,7 @@
  */
 import { supabase } from './supabase'
 
-const BASE = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL
+const BASE = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '/api'
 
 async function getJwt() {
   const { data } = await supabase.auth.getSession()

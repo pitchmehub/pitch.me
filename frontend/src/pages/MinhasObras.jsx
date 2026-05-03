@@ -58,7 +58,7 @@ export default function MinhasObras() {
  await api.get(`/obras/${obra.id}`) // placeholder; vamos usar fetch DELETE
  } catch (_) {}
  try {
- await fetch(`${import.meta.env.VITE_API_BASE_URL}/obras/${obra.id}`, {
+ await fetch(`${import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '/api'}/obras/${obra.id}`, {
  method: 'DELETE',
  headers: {
  'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,

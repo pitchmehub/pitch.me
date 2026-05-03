@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
-const BASE = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL
+const BASE = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '/api'
 
 /**
  * Página pública de cancelamento de saque via link "Não fui eu" do e-mail.

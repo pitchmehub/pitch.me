@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import DEFAULT_CONTENT from '../config/landing.default.json'
 import GravanLogo from '../components/GravanLogo'
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '/api'
 
 export default function Landing() {
   const [showContato, setShowContato] = useState(false)
