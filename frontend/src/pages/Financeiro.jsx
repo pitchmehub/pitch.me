@@ -215,28 +215,30 @@ export default function Financeiro() {
                     <tr style={{ background: '#f9fafb', textAlign: 'left' }}>
                       <th style={th}>Data</th>
                       <th style={th}>Obra</th>
-                      <th style={th}>Pagador</th>
-                      <th style={th}>Papel</th>
+                      {!isMobile && <th style={th}>Pagador</th>}
+                      {!isMobile && <th style={th}>Papel</th>}
                       <th style={{ ...th, textAlign: 'right' }}>Bruto</th>
-                      <th style={{ ...th, textAlign: 'right' }}>Share</th>
+                      {!isMobile && <th style={{ ...th, textAlign: 'right' }}>Share</th>}
                       <th style={{ ...th, textAlign: 'right' }}>Creditado</th>
                     </tr>
                   </thead>
                   <tbody>
                     {recibo.linhas.length === 0 ? (
-                      <tr><td colSpan={7} style={{ ...td, color: '#6b7280', textAlign: 'center' }}>
+                      <tr><td colSpan={isMobile ? 4 : 7} style={{ ...td, color: '#6b7280', textAlign: 'center' }}>
                         Nenhum crédito no período.
                       </td></tr>
                     ) : recibo.linhas.map((l, i) => (
                       <tr key={i}>
                         <td style={td}>{fmtData(l.data)}</td>
                         <td style={td}>{l.obra_nome}</td>
-                        <td style={td}>{l.pagador_nome || '—'}</td>
-                        <td style={td}>{l.papel}</td>
+                        {!isMobile && <td style={td}>{l.pagador_nome || '—'}</td>}
+                        {!isMobile && <td style={td}>{l.papel}</td>}
                         <td style={{ ...td, textAlign: 'right' }}>{fmt(l.valor_total_cents)}</td>
-                        <td style={{ ...td, textAlign: 'right' }}>
-                          {l.share_pct != null ? `${l.share_pct.toFixed(2)}%` : '—'}
-                        </td>
+                        {!isMobile && (
+                          <td style={{ ...td, textAlign: 'right' }}>
+                            {l.share_pct != null ? `${l.share_pct.toFixed(2)}%` : '—'}
+                          </td>
+                        )}
                         <td style={{ ...td, textAlign: 'right', fontWeight: 600 }}>
                           {fmt(l.valor_creditado_cents)}
                         </td>
