@@ -154,6 +154,15 @@ def resumo():
     receita_liquida_mes_cents = int(round(receita_mes_cents * (1 - fee_rate)))
 
     # ── Ofertas: pendentes / aceitas / recusadas / expiradas / pagas ──
+    # Mapeamento singular (DB) → chave do resumo
+    STATUS_MAP = {
+        "pendente":       "pendentes",
+        "aceita":         "aceitas",
+        "recusada":       "recusadas",
+        "expirada":       "expiradas",
+        "contra_proposta":"contra_proposta",
+        "paga":           "pagas",
+    }
     ofertas_resumo = {
         "pendentes": 0, "aceitas": 0, "recusadas": 0,
         "expiradas": 0, "contra_proposta": 0, "pagas": 0,
@@ -163,6 +172,7 @@ def resumo():
         "obras_com_oferta": 0,
     }
     if obra_ids:
+        # --- Ofertas diretas do catálogo (tabela `ofertas`) ---
         try:
             ofs = (
                 sb.table("ofertas")
@@ -176,8 +186,9 @@ def resumo():
             for of in ofs:
                 st = of.get("status")
                 v = int(of.get("valor_cents") or 0)
-                if st in ofertas_resumo:
-                    ofertas_resumo[st] += 1
+                chave = STATUS_MAP.get(st)
+                if chave:
+                    ofertas_resumo[chave] += 1
                 if st == "pendente":
                     ofertas_resumo["valor_pendentes_cents"] += v
                 if st == "aceita":
@@ -185,16 +196,54 @@ def resumo():
                 if st == "paga":
                     ofertas_resumo["valor_pagas_cents"] += v
                 obras_com.add(of["obra_id"])
-            ofertas_resumo["obras_com_oferta"] = len(obras_com)
-            total_decididas = (ofertas_resumo["aceitas"] + ofertas_resumo["pagas"]
-                               + ofertas_resumo["recusadas"] + ofertas_resumo["expiradas"])
-            if total_decididas > 0:
-                aceitas_eff = ofertas_resumo["aceitas"] + ofertas_resumo["pagas"]
-                ofertas_resumo["taxa_conversao_pct"] = round(
-                    (aceitas_eff / total_decididas) * 100, 1
-                )
+        except Exception:
+            obras_com = set()
+
+        # --- Ofertas via editora terceira (tabela `ofertas_licenciamento`) ---
+        # Status dessa tabela: aguardando_pagamento, aguardando_editora,
+        # editora_cadastrada, concluida, expirada, reembolsada, cancelada
+        STATUS_LIC_MAP = {
+            "aguardando_pagamento": "pendentes",
+            "aguardando_editora":   "pendentes",
+            "editora_cadastrada":   "aceitas",
+            "concluida":            "pagas",
+            "expirada":             "expiradas",
+            "reembolsada":          "recusadas",
+            "cancelada":            "recusadas",
+        }
+        try:
+            ofs_lic = (
+                sb.table("ofertas_licenciamento")
+                .select("id, obra_id, status, valor_cents")
+                .in_("obra_id", obra_ids)
+                .execute()
+                .data
+                or []
+            )
+            for of in ofs_lic:
+                st = of.get("status")
+                v = int(of.get("valor_cents") or 0)
+                chave = STATUS_LIC_MAP.get(st)
+                if chave:
+                    ofertas_resumo[chave] += 1
+                if st in ("aguardando_pagamento", "aguardando_editora", "editora_cadastrada"):
+                    ofertas_resumo["valor_pendentes_cents"] += v
+                if st == "concluida":
+                    ofertas_resumo["valor_pagas_cents"] += v
+                obras_com.add(of["obra_id"])
         except Exception:
             pass
+
+        ofertas_resumo["obras_com_oferta"] = len(obras_com)
+
+        # Taxa de conversão unificada
+        total_decididas = (ofertas_resumo["aceitas"] + ofertas_resumo["pagas"]
+                           + ofertas_resumo["recusadas"] + ofertas_resumo["expiradas"])
+        if total_decididas > 0:
+            aceitas_eff = ofertas_resumo["aceitas"] + ofertas_resumo["pagas"]
+            ofertas_resumo["taxa_conversao_pct"] = round(
+                (aceitas_eff / total_decididas) * 100, 1
+            )
 
     # Obras sob exclusividade
     obras_exclusivas = sum(1 for o in obras_resp.data or [] if o.get("is_exclusive"))
