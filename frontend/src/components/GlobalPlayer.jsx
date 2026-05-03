@@ -39,11 +39,12 @@ export default function GlobalPlayer() {
     close, setMinimized, setExpanded, expandPlayer, setVolume,
   } = usePlayer()
 
-  const [showQueue,  setShowQueue]  = useState(false)
-  const [letraOpen,  setLetraOpen]  = useState(false)
-  const [letra,      setLetra]      = useState(null)
+  const [showQueue,    setShowQueue]    = useState(false)
+  const [letraOpen,    setLetraOpen]    = useState(false)
+  const [letra,        setLetra]        = useState(null)
   const [letraLoading, setLetraLoading] = useState(false)
-  const [fichaOpen,  setFichaOpen]  = useState(false)
+  const [fichaOpen,    setFichaOpen]    = useState(false)
+  const [shareToast,   setShareToast]   = useState(false)
 
   // Drag-to-reorder state
   const [dragIdx,     setDragIdx]     = useState(null)
@@ -60,6 +61,24 @@ export default function GlobalPlayer() {
     setLetraOpen(false)
     setFichaOpen(false)
   }, [obra?.id])
+
+  async function shareTrack() {
+    if (!obra) return
+    const url = `${window.location.origin}/catalogo`
+    const title = obra.nome || 'Música na Gravan'
+    const text = nomeArtistico
+      ? `Ouça "${obra.nome}" de ${nomeArtistico} na Gravan`
+      : `Ouça "${obra.nome}" na Gravan`
+    if (navigator.share) {
+      try { await navigator.share({ title, text, url }) } catch (_) {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${text} — ${url}`)
+        setShareToast(true)
+        setTimeout(() => setShareToast(false), 2500)
+      } catch (_) {}
+    }
+  }
 
   // Quando colapsa do expandido no mobile, manter o mini player visível
   // (acima do botão Descoberta) em vez de cair na barra de fundo.
@@ -344,13 +363,16 @@ export default function GlobalPlayer() {
           </button>
           <button
             className="gp-exp-action-btn"
-            onClick={close}
-            aria-label="Encerrar"
-            title="Encerrar player"
+            onClick={shareTrack}
+            aria-label="Compartilhar"
+            title="Compartilhar música"
           >
-            <CloseIcon />
+            <ShareIcon />
           </button>
         </div>
+        {shareToast && (
+          <div className="gp-share-toast">Link copiado!</div>
+        )}
 
         {/* Ficha técnica */}
         {fichaOpen && (
@@ -409,7 +431,7 @@ export default function GlobalPlayer() {
           {loading ? <Spinner /> : playing ? <PauseIcon /> : <PlayIcon />}
         </button>
         <button className="gp-icon-btn" onClick={e => { e.stopPropagation(); nextTrack() }}><NextIcon /></button>
-        <button className="gp-icon-btn gp-close-btn" onClick={e => { e.stopPropagation(); close() }}><CloseIcon /></button>
+        <button className="gp-icon-btn" onClick={e => { e.stopPropagation(); shareTrack() }} title="Compartilhar"><ShareIcon /></button>
         <div className="gp-mini-bar"><div className="gp-mini-bar-fill" style={{ width: `${pct}%` }} /></div>
       </div>
     )
@@ -451,7 +473,8 @@ export default function GlobalPlayer() {
           </div>
           {queue.length > 1 && <span className="gp-queue-info">{index + 1}/{queue.length}</span>}
           <button className="gp-icon-btn" onClick={() => setMinimized(true)}><MinimizeIcon /></button>
-          <button className="gp-icon-btn gp-close-btn" onClick={close}><CloseIcon /></button>
+          <button className="gp-icon-btn" onClick={shareTrack} title="Compartilhar"><ShareIcon /></button>
+          {shareToast && <span className="gp-bar-share-toast">Link copiado!</span>}
         </div>
       </div>
     </div>
@@ -505,6 +528,15 @@ function BookIcon() {
 }
 function QueueIcon() {
   return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+}
+function ShareIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+    </svg>
+  )
 }
 function GripIcon() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>

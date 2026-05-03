@@ -109,6 +109,28 @@
 .gp-icon-btn:disabled { opacity: .25; cursor: default; }
 .gp-close-btn:hover   { color: var(--error); }
 
+/* Toast "Link copiado!" — barra desktop */
+.gp-bar-share-toast {
+  font-size: 11px; color: var(--brand); white-space: nowrap;
+  font-weight: 600; pointer-events: none;
+  animation: gp-toast-fade 2.5s ease forwards;
+}
+/* Toast — player expandido */
+.gp-share-toast {
+  position: absolute; bottom: 88px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,255,255,.15); backdrop-filter: blur(8px);
+  color: #fff; font-size: 13px; font-weight: 600;
+  padding: 8px 18px; border-radius: 20px; pointer-events: none;
+  animation: gp-toast-fade 2.5s ease forwards; white-space: nowrap;
+  z-index: 10;
+}
+@keyframes gp-toast-fade {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 .gp-right {
   display: flex; align-items: center; gap: 12px;
   width: 260px; justify-content: flex-end; flex-shrink: 0;
