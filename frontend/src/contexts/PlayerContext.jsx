@@ -50,6 +50,12 @@ export function PlayerProvider({ children }) {
   const globalCacheRef = useRef(null)
   const globalLoadingRef = useRef(null)
 
+  // Refs para que os action handlers da Media Session sempre apontem
+  // para as versões mais recentes das funções, sem precisar re-registrar.
+  const nextTrackRef  = useRef(null)
+  const prevTrackRef  = useRef(null)
+  const seekRef       = useRef(null)
+
   async function loadGlobalCatalog() {
     if (globalCacheRef.current) return globalCacheRef.current
     if (globalLoadingRef.current) return globalLoadingRef.current
@@ -255,6 +261,95 @@ export function PlayerProvider({ children }) {
     if (el.currentTime > 3) { seek(0); return }
     setIndex(i => (i - 1 + queue.length) % queue.length)
   }, [queue.length, seek])
+
+  // Mantém os refs sempre apontando para as versões mais recentes
+  useEffect(() => { nextTrackRef.current = nextTrack }, [nextTrack])
+  useEffect(() => { prevTrackRef.current = prevTrack }, [prevTrack])
+  useEffect(() => { seekRef.current = seek },           [seek])
+
+  // ─── Media Session API ────────────────────────────────────────────
+  // Atualiza a central de controle / tela de bloqueio do iOS e Android
+  // com a capa, nome e artista da faixa atual, e registra os controles
+  // de play/pause/anterior/próxima/seek para funcionarem de fora do app.
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return
+
+    if (!obra) {
+      navigator.mediaSession.metadata = null
+      return
+    }
+
+    const artwork = obra.cover_url
+      ? [
+          { src: obra.cover_url, sizes: '96x96',   type: 'image/jpeg' },
+          { src: obra.cover_url, sizes: '128x128',  type: 'image/jpeg' },
+          { src: obra.cover_url, sizes: '256x256',  type: 'image/jpeg' },
+          { src: obra.cover_url, sizes: '512x512',  type: 'image/jpeg' },
+        ]
+      : []
+
+    const artist =
+      obra.nome_artistico ||
+      obra.titular?.nome_artistico ||
+      obra.titular?.nome ||
+      'Gravan'
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title:   obra.nome || 'Composição',
+      artist,
+      album:   'Gravan',
+      artwork,
+    })
+
+    // Registra os handlers apenas uma vez por faixa (refs garantem
+    // que sempre usamos a versão mais atual das funções).
+    navigator.mediaSession.setActionHandler('play',  () => {
+      audioRef.current?.play().catch(() => {})
+    })
+    navigator.mediaSession.setActionHandler('pause', () => {
+      audioRef.current?.pause()
+    })
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      prevTrackRef.current?.()
+    })
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      nextTrackRef.current?.()
+    })
+    navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+      const el = audioRef.current
+      if (!el) return
+      el.currentTime = Math.max(0, el.currentTime - (details?.seekOffset ?? 10))
+    })
+    navigator.mediaSession.setActionHandler('seekforward', (details) => {
+      const el = audioRef.current
+      if (!el) return
+      el.currentTime = Math.min(el.duration || 0, el.currentTime + (details?.seekOffset ?? 10))
+    })
+    navigator.mediaSession.setActionHandler('seekto', (details) => {
+      if (details?.seekTime != null && audioRef.current) {
+        audioRef.current.currentTime = details.seekTime
+      }
+    })
+  }, [obra?.id, obra?.cover_url])
+
+  // Mantém o playbackState sincronizado (para o iOS mostrar ▶ ou ⏸ correto)
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return
+    navigator.mediaSession.playbackState = playing ? 'playing' : 'paused'
+  }, [playing])
+
+  // Atualiza a barra de progresso da tela de bloqueio
+  useEffect(() => {
+    if (!('mediaSession' in navigator) || !('setPositionState' in navigator.mediaSession)) return
+    if (!duration || duration === Infinity) return
+    try {
+      navigator.mediaSession.setPositionState({
+        duration,
+        playbackRate: audioRef.current?.playbackRate ?? 1,
+        position: Math.min(currentTime, duration),
+      })
+    } catch (_) {}
+  }, [currentTime, duration])
 
   // Move item in queue, adjusts current index accordingly
   const reorderQueue = useCallback((from, to) => {
