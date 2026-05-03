@@ -5,7 +5,8 @@ Marketplace premium para compositores venderem obras musicais. **Design 1** (min
 **Stack:**
 - **Frontend:** React 18 + Vite
 - **Backend:** Python 3.11 + Flask + Gunicorn
-- **Banco de dados:** Supabase (PostgreSQL + RLS + Auth)   aa
+- **Banco de dados:** Supabase (PostgreSQL + RLS + Auth)
+  
 - **Pagamentos:** Stripe + PayPal
 - **PWA:** Service Worker com network-first cache  
 
