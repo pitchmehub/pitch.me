@@ -171,10 +171,12 @@ def _ensure_key():
         stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "")
 
 
-def _net_cents_do_charge(payment_intent_id: str) -> Optional[int]:
+def _net_e_charge_do_pi(payment_intent_id: str) -> tuple[Optional[int], Optional[str]]:
     """
-    Retorna o valor LÍQUIDO (em centavos) que entrou no balance da plataforma
-    para esse PaymentIntent. Já é descontado das taxas Stripe.
+    Retorna (net_cents, charge_id) para o PaymentIntent.
+    - net_cents: valor líquido após taxas Stripe (None se não disponível).
+    - charge_id: ID da Charge Stripe (ch_xxx) vinculada (None se não disponível).
+    Ambos são necessários para creditar wallets e criar Transfers com source_transaction.
     """
     _ensure_key()
     try:
@@ -184,15 +186,25 @@ def _net_cents_do_charge(payment_intent_id: str) -> Optional[int]:
         )
         charge = pi.get("latest_charge")
         if not charge:
-            return None
-        bt = charge.get("balance_transaction")
-        if not bt:
-            return None
-        # bt.net é o líquido após taxas Stripe, na moeda da conta (BRL)
-        return int(bt["net"])
+            return None, None
+        # charge_id
+        charge_id = charge.get("id") if isinstance(charge, dict) else charge
+        # net via balance_transaction
+        bt = charge.get("balance_transaction") if isinstance(charge, dict) else None
+        net = int(bt["net"]) if bt else None
+        return net, charge_id
     except Exception as e:
-        logger.error("Falha ao buscar net do PaymentIntent %s: %s", payment_intent_id, e)
-        return None
+        logger.error("Falha ao buscar PI %s: %s", payment_intent_id, e)
+        return None, None
+
+
+def _net_cents_do_charge(payment_intent_id: str) -> Optional[int]:
+    """
+    Retorna o valor LÍQUIDO (em centavos) que entrou no balance da plataforma
+    para esse PaymentIntent. Já é descontado das taxas Stripe.
+    """
+    net, _ = _net_e_charge_do_pi(payment_intent_id)
+    return net
 
 
 def _calcular_split_sobre_net(
@@ -324,8 +336,11 @@ def creditar_wallets_por_transacao(
     if not titular_id:
         return {"status": "obra_sem_titular"}
 
-    # Net Stripe (taxas Stripe rateadas proporcionalmente — item 9)
-    net = _net_cents_do_charge(pi_id) if pi_id else None
+    # Net Stripe + charge_id (necessário para source_transaction nos saques)
+    if pi_id:
+        net, stripe_charge_id = _net_e_charge_do_pi(pi_id)
+    else:
+        net, stripe_charge_id = None, None
     if net is None:
         net = t["valor_cents"]
 
@@ -474,11 +489,12 @@ def creditar_wallets_por_transacao(
                 # Editora não é coautora — coautoria_id fica nulo. A coluna
                 # precisa permitir NULL no schema (vide migration aplicada).
                 sb.table("pagamentos_compositores").insert({
-                    "perfil_id":    edp["perfil_id"],
-                    "transacao_id": transacao_id,
-                    "valor_cents":  edp["valor_cents"],
-                    "share_pct":    edp["share_pct"],
-                    "coautoria_id": None,
+                    "perfil_id":       edp["perfil_id"],
+                    "transacao_id":    transacao_id,
+                    "valor_cents":     edp["valor_cents"],
+                    "share_pct":       edp["share_pct"],
+                    "coautoria_id":    None,
+                    "stripe_charge_id": stripe_charge_id,
                 }).execute()
                 creditados_editora = 1
                 logger.info(
@@ -510,13 +526,14 @@ def creditar_wallets_por_transacao(
         if not wallet_ok:
             continue  # já logado e registrado em contract_events
 
-        # Registra histórico de pagamento
+        # Registra histórico de pagamento (com stripe_charge_id para saques futuros)
         try:
             sb.table("pagamentos_compositores").insert({
-                "perfil_id":    p["perfil_id"],
-                "transacao_id": transacao_id,
-                "valor_cents":  p["valor_cents"],
-                "share_pct":    p["share_pct"],
+                "perfil_id":        p["perfil_id"],
+                "transacao_id":     transacao_id,
+                "valor_cents":      p["valor_cents"],
+                "share_pct":        p["share_pct"],
+                "stripe_charge_id": stripe_charge_id,
             }).execute()
         except Exception as e:
             logger.error(

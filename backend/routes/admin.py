@@ -1376,3 +1376,78 @@ def test_email():
         "configuracao": configuracao,
         "erro":        erro,
     }), (200 if ok else 500)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Backfill: popula stripe_charge_id em pagamentos_compositores que estão sem ele
+# ──────────────────────────────────────────────────────────────────────────────
+@admin_bp.route("/backfill-charge-ids", methods=["POST"])
+def backfill_charge_ids():
+    """
+    Percorre todos os pagamentos_compositores com stripe_charge_id NULL,
+    busca o charge_id via PaymentIntent do Stripe e salva.
+    Pagamentos de modo teste ou com PI inválido ficam sem charge_id
+    (não é erro — apenas não podem ser usados como source_transaction).
+    """
+    import os, logging
+    import stripe as _stripe
+    _stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "")
+
+    log = logging.getLogger("gravan.admin.backfill")
+    sb = get_supabase()
+
+    limite = min(int(request.args.get("limit", "500")), 2000)
+
+    # Busca pagamentos sem charge_id
+    q = (sb.table("pagamentos_compositores")
+         .select("id, transacao_id")
+         .is_("stripe_charge_id", "null")
+         .limit(limite)
+         .execute())
+    registros = q.data or []
+
+    atualizados, sem_pi, falhas, teste = 0, 0, 0, 0
+
+    for r in registros:
+        transacao_id = r.get("transacao_id")
+        if not transacao_id:
+            sem_pi += 1
+            continue
+        try:
+            t = sb.table("transacoes").select("stripe_payment_intent").eq(
+                "id", transacao_id
+            ).limit(1).execute()
+            pi_id = ((t.data or [{}])[0]).get("stripe_payment_intent")
+            if not pi_id:
+                sem_pi += 1
+                continue
+            pi = _stripe.PaymentIntent.retrieve(pi_id, expand=["latest_charge"])
+            ch = pi.get("latest_charge")
+            if not ch:
+                sem_pi += 1
+                continue
+            # Detecta modo teste — não salva (não pode ser usado como source_transaction em live)
+            if isinstance(ch, dict) and ch.get("livemode") is False:
+                teste += 1
+                log.info("Backfill skip (teste): pagamento=%s pi=%s", r["id"][:8], pi_id)
+                continue
+            charge_id = ch.get("id") if isinstance(ch, dict) else ch
+            if not charge_id:
+                sem_pi += 1
+                continue
+            sb.table("pagamentos_compositores").update({
+                "stripe_charge_id": charge_id,
+            }).eq("id", r["id"]).execute()
+            atualizados += 1
+            log.info("Backfill OK: pagamento=%s charge=%s", r["id"][:8], charge_id[:12])
+        except Exception as e:
+            falhas += 1
+            log.warning("Backfill falhou para pagamento %s: %s", r["id"][:8], e)
+
+    return jsonify({
+        "total_sem_charge":   len(registros),
+        "atualizados":        atualizados,
+        "sem_pi_ou_charge":   sem_pi,
+        "modo_teste_pulados": teste,
+        "falhas":             falhas,
+    }), 200

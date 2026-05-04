@@ -582,7 +582,11 @@ def _processar_um_saque(sb, saque: dict) -> None:
             f"vinculada — só é possível sacar valores até esse limite."
         )
 
-    # ── 0c) Garante charge_id em cada pagamento ──
+    # ── 0c) Backfill: tenta buscar charge_id no Stripe para pagamentos sem ele ──
+    # Pagamentos criados antes da migration_saques_source_transaction podem não
+    # ter stripe_charge_id. Tentamos preencher aqui de forma lazy/best-effort.
+    # Pagamentos de modo teste ou de PIs inválidos continuarão sem charge_id
+    # e serão pulados na etapa 2 (não bloqueiam o saque).
     for p in pendentes:
         if not p.get("stripe_charge_id"):
             ch_id = _buscar_charge_id_da_transacao(sb, p["transacao_id"])
@@ -591,6 +595,25 @@ def _processar_um_saque(sb, saque: dict) -> None:
                     "stripe_charge_id": ch_id,
                 }).eq("id", p["id"]).execute()
                 p["stripe_charge_id"] = ch_id
+                log.info(
+                    "Backfill charge_id: pagamento=%s transacao=%s charge=%s",
+                    p["id"][:8], str(p["transacao_id"])[:8], ch_id[:12],
+                )
+
+    # ── 0d) Verifica se há saldo rastreável suficiente (apenas pagamentos com charge) ──
+    # Pagamentos sem charge vinculada (modo teste, estornados, legado) são pulados
+    # no Transfer e não contam para o limite disponível real.
+    soma_rastreavel = sum(
+        int(p["valor_cents"] or 0) for p in pendentes if p.get("stripe_charge_id")
+    )
+    if soma_rastreavel < valor_cents:
+        raise RuntimeError(
+            f"Saldo com origem Stripe rastreável insuficiente: "
+            f"{_fmt_brl(soma_rastreavel)} disponíveis (com charge válida), "
+            f"{_fmt_brl(valor_cents)} solicitados. "
+            f"Pagamentos de modo teste ou sem charge ({_fmt_brl(soma_disp - soma_rastreavel)}) "
+            f"não podem ser utilizados para saque."
+        )
 
     # ══════════════════════════════════════════════════════════════
     # PASSO 1 — DÉBITO ATÔMICO ANTES DE QUALQUER CHAMADA STRIPE
@@ -603,6 +626,8 @@ def _processar_um_saque(sb, saque: dict) -> None:
     # ══════════════════════════════════════════════════════════════
     # PASSO 2 — Cria Stripe Transfers (após débito confirmado)
     # Em caso de falha: reverte Transfers + RECONSTITUI wallet.
+    # Pagamentos sem stripe_charge_id são PULADOS (legado/teste) —
+    # nunca travam o saque. O check 0d já garantiu que há saldo suficiente.
     # ══════════════════════════════════════════════════════════════
     restante = valor_cents
     transfers_criados: list = []
@@ -613,12 +638,14 @@ def _processar_um_saque(sb, saque: dict) -> None:
         if restante <= 0:
             break
         if not p.get("stripe_charge_id"):
-            stripe_falhou = True
-            stripe_erro_msg = (
-                f"Pagamento {p['id']} (transação {p['transacao_id']}) sem "
-                f"charge Stripe vinculada."
+            # Pagamento sem charge vinculada (modo teste, legado, estorno):
+            # pula sem travar o saque — o check 0d já garantiu saldo suficiente.
+            log.warning(
+                "Pulando pagamento %s (transação %s) sem stripe_charge_id — "
+                "provavelmente modo teste ou pagamento estornado.",
+                p["id"][:8], str(p["transacao_id"])[:8],
             )
-            break
+            continue
         original = int(p["valor_cents"])
         consumir = min(original, restante)
         try:
@@ -644,6 +671,15 @@ def _processar_um_saque(sb, saque: dict) -> None:
             break
         transfers_criados.append((tr.id, p["id"], consumir, original, p))
         restante -= consumir
+
+    # Segurança: se o loop terminou com saldo ainda por transferir,
+    # isso não deveria acontecer pois o check 0d já validou. Trata como erro.
+    if not stripe_falhou and restante > 0:
+        stripe_falhou = True
+        stripe_erro_msg = (
+            f"Saldo rastreável esgotado no meio do saque: "
+            f"{_fmt_brl(valor_cents - restante)} transferidos de {_fmt_brl(valor_cents)}."
+        )
 
     if stripe_falhou:
         # Reverte os Transfers parcialmente criados
